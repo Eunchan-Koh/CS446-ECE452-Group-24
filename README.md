@@ -1,2 +1,7 @@
 # CS446/CS646/ECE452-Group-24
-team members(temp): Samir Ali, Eunchan Koh, Jason Wang, Zhu Vivian, Layne Lim Ah Tock
+**Team members: 
+Eunchan Koh
+Jason Wang
+Layne Lim Ah Tock
+Samir Ali
+Vivian Zhu
