@@ -2,4 +2,4 @@
 | --- | --- | --- | --- | --- | --- | --- |
 | May 15, 2024 | | | | | | created git repo |
 | May 20, 2024 | 1h | 1h | 1h | 1h | 1h | group discussion for choosing application |
-| May 15, 2024 | 0.67h | 0.67h | 0.67h | 0.67h | 0.67h | group discussion for D1 & Project Proposal Presentation |
+| May 23, 2024 | 0.67h | 0.67h | 0.67h | 0.67h | 0.67h | group discussion for D1 & Project Proposal Presentation |
