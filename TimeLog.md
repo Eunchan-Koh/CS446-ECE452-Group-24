@@ -7,7 +7,7 @@
 | May 25, 2024 | 2h | | | | | Finished making first version of sequence diagram, and updated the document with contents. |
 
 
-**How to update time log**
+**How to update time log**<br />
 copy the line below. paste it below the table above, and modify the sections you need.<br />
 | May 25, 2024 | (Eunchan) | (Jason) | (Layne) | (Samir) | (Vivian)| (task you've done) |
 
