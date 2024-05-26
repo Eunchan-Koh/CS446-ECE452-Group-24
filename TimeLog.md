@@ -8,5 +8,5 @@
 
 
 **How to update time log**
-copy the line below. paste it below the table above, and modify the sections you need.<\ br>
+copy the line below. paste it below the table above, and modify the sections you need.</ br>
 | May 25, 2024 | (Eunchan) | (Jason) | (Layne) | (Samir) | (Vivian)| (task you've done) |
