@@ -5,6 +5,7 @@
 | May 23, 2024 | 0.67h | 0.67h | 0.67h | 0.67h | 0.67h | group discussion for D1 & Project Proposal Presentation |
 | May 24, 2024 | 2.5h | | | | | worked on my(Eunchan's) portion of the proposal document & presentation. discussed about details with Samir. need to work on it further. |
 | May 25, 2024 | 2h | | | | | Finished making first version of sequence diagram, and updated the document with contents. |
+| May 25, 2024 | | | 0.25h | | | Worked on Page 1 of the D1 Proposal document and started working on page 2 |
 
 
 **How to update time log**<br />
