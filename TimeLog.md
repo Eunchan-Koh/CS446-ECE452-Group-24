@@ -7,6 +7,7 @@
 | May 25, 2024 | 2h      |       |       |       |        | Finished making first version of sequence diagram, and updated the document with contents.                                               |
 | May 25, 2024 |         |       | 0.25h |       |        | Worked on Page 1 of the D1 Proposal document and started working on page 2                                                               |
 | May 27, 2024 |         | 0.5h  |       |       |        | Worked on page 5 of the D1 Proposal document
+| May 27, 2024 |         |  |   1h     |       |        | Worked on page 1 & 2 of the D1 Proposal document
 | May 27, 2024 |         |  |       |    2.5h   |        | Completed Functional Properties and User Scenarios 
 
 
