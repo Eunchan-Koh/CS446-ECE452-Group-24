@@ -13,7 +13,7 @@ import com.auth0.android.jwt.JWT
 import com.auth0.android.provider.WebAuthProvider
 import com.auth0.android.result.Credentials
 import com.example.mealmates.R
-import com.gradle.models.User
+import com.example.mealmates.models.User
 
 class LoginViewModel : ViewModel() {
 

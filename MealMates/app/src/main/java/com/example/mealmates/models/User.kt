@@ -1,4 +1,4 @@
-package com.gradle.models
+package com.example.mealmates.models
 
 import com.auth0.android.jwt.JWT
 
