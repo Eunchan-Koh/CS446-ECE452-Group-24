@@ -17,7 +17,7 @@ class DatabaseService {
   @PostConstruct
   private fun main() {
     try {
-      val jdbcUrl = "jdbc:postgresql://neondb_owner:h2BQKdmkGNW9@ep-shrill-heart-a5jj2nsr.us-east-2.aws.neon.tech/neondb?sslmode=require"
+      val jdbcUrl = "jdbc:postgresql://ep-shrill-heart-a5jj2nsr.us-east-2.aws.neon.tech/neondb?user=admin&password=bHMaV7rUIXk3&sslmode=require"
       val connection = DriverManager.getConnection(jdbcUrl, "postgres", "postgres")
       if (!connection.isValid(0)) {
         throw Error("Failed to connect to database with jdbc")

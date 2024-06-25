@@ -1,6 +1,6 @@
 package com.backend.mealmatesapi.controllers
 
-import com.backend.mealmatesapi.models.RestaurantModels
+import com.backend.mealmatesapi.models.Restaurant
 import com.backend.mealmatesapi.services.DatabaseService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.ComponentScan
