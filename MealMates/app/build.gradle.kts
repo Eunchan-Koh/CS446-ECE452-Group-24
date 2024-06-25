@@ -60,10 +60,7 @@ dependencies {
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material3:material3")
     implementation("io.coil-kt:coil-compose:2.6.0")
-<<<<<<< HEAD
-=======
     implementation("androidx.wear.compose:compose-material:1.3.1")
->>>>>>> 30848b8a1125b6083b7820e0a0a8308d87229c39
     testImplementation("junit:junit:4.13.2")
     androidTestImplementation("androidx.test.ext:junit:1.1.5")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
