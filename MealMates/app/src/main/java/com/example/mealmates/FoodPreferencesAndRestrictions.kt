@@ -42,8 +42,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.mealmates.ui.theme.Purple40
-import com.example.mealmates.ui.theme.Purple80
+import com.example.mealmates.ui.theme.md_theme_light_primary
 
 
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -77,7 +76,7 @@ fun PreferenceAndRestrictions() {
                 text = "Food Preferences",
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
-                color = Purple40,
+                color = md_theme_light_primary,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -121,7 +120,7 @@ fun PreferenceAndRestrictions() {
                 text = "Food Restrictions",
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
-                color = Purple40,
+                color = md_theme_light_primary,
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -199,11 +198,11 @@ fun SearchFieldWithSearchIcon() {
 
 @Composable
 fun SaveChangesButton() {
-    val buttonColor = remember { mutableStateOf(Purple80) }
+    val buttonColor = remember { mutableStateOf(md_theme_light_primary) }
     Button(
         onClick = { /* Handle save changes */ },
         colors = ButtonDefaults.buttonColors(
-            Purple40
+            md_theme_light_primary
         ),
         modifier = Modifier
             .height(50.dp),
@@ -218,7 +217,7 @@ fun CancelButton() {
     Button(
         onClick = { /* Handle cancel */ },
         colors = ButtonDefaults.buttonColors(
-            Purple40
+            md_theme_light_primary
         ),
         modifier = Modifier
             .height(50.dp)
