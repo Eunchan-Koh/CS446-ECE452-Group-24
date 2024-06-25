@@ -11,6 +11,11 @@
 | May 27, 2024 |         |       | 1.25h |       |        | Worked on page 1 & 2 of the D1 Proposal document                                                                                         | 
 | May 27, 2024 | 0.5h    |       |       |       |        | Worked more on page 3 of D1 Proposal document                                                                                            |
 | June 1, 2024 | 1.5h    | 1.5h  | 1.5h  | 1.5h  | 1.5h   | group discussion & making plans, tickets, first milestone, etc.                                                                          |
+| June 10, 2024 | 0.5h   | 0.5h  | 0.5h  | 0.5h  | 0.5h   | group discussion						                                                                                                             |
+| June 10, 2024 | 0.5h   |       |       |       |        | worked on buddy team evaluation						                                                                                               |
+| June 18, 2024 | 0.5h   | 0.5h  | 0.5h  | 0.5h  | 0.5h   | group discussion						                                                                                                             |
+| June 22, 2024 | 3h     |       |       |       |        | studied how to use kotlin						                                                                                                     |
+| June 23, 2024 | 9h     |       |       |       |        | studied how to use jetpack & built main page and list of matched restaurants pages.                                                      |
 
 
 **How to update time log**<br />
