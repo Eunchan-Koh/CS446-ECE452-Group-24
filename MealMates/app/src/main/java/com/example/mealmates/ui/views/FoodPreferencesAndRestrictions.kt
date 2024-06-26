@@ -1,11 +1,9 @@
-package com.example.mealmates
+package com.example.mealmates.ui.views
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
@@ -35,7 +33,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
@@ -43,15 +40,15 @@ import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mealmates.ui.theme.md_theme_light_primary
+import com.example.mealmates.ui.viewModels.LoginViewModel
 
 
+@RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun PreferenceAndRestrictions() {
+fun PreferenceAndRestrictions(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit = {}) {
     val preferences = listOf(
-        "Chinese", "Indian", "Italian", "Korean", "Taiwanese", "Thai", "Mediterranean",
-        "Arab", "Greek", "Caribbean", "African", "Turkish", "Mexican", "Japanese", "French",
-        "British", "Middle Eastern", "Lao", "Cajun", "Portuguese", "American", "Malaysian",
+        "Chinese", "Indian", "Italian", "Korean",
         "+",
     )
 
@@ -69,7 +66,6 @@ fun PreferenceAndRestrictions() {
             Modifier
                 .verticalScroll(state = rememberScrollState())
                 .fillMaxSize()
-                .background(Color.White)
                 .padding(30.dp)
         ) {
             Text(
@@ -157,7 +153,7 @@ fun PreferenceAndRestrictions() {
                 }
             }
         }
-        SaveCancelButton()
+        SaveChangesButton(loginModel, onNavigateToMainPage);
     }
 }
 
@@ -170,7 +166,6 @@ fun SaveCancelButton() {
         horizontalArrangement = Arrangement.Center,
     ) {
         CancelButton();
-        SaveChangesButton();
     }
 }
 
@@ -196,19 +191,28 @@ fun SearchFieldWithSearchIcon() {
     )
 }
 
+@RequiresApi(Build.VERSION_CODES.S)
 @Composable
-fun SaveChangesButton() {
+fun SaveChangesButton(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit = {}) {
     val buttonColor = remember { mutableStateOf(md_theme_light_primary) }
-    Button(
-        onClick = { /* Handle save changes */ },
-        colors = ButtonDefaults.buttonColors(
-            md_theme_light_primary
-        ),
+
+    Row(
         modifier = Modifier
-            .height(50.dp),
-        shape = CircleShape
+            .fillMaxWidth()
+            .padding(30.dp),
+        horizontalArrangement = Arrangement.Center,
     ) {
-        Text(text = "Save Changes", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Button(
+            onClick = { onNavigateToMainPage() },
+            colors = ButtonDefaults.buttonColors(
+                md_theme_light_primary
+            ),
+            modifier = Modifier
+                .height(50.dp),
+            shape = CircleShape
+        ) {
+            Text(text = "Save Changes", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        }
     }
 }
 
