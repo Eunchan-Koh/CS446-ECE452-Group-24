@@ -68,7 +68,9 @@ fun MainView(
     viewModel: LoginViewModel
 ) {
 
-    viewModel.userIsComplete = true
+    // uncomment to override login process
+
+//    viewModel.userIsComplete = true
 
     Column(
         modifier = Modifier.padding(20.dp, 50.dp, 20.dp, 20.dp),
