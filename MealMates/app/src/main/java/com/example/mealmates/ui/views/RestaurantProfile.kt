@@ -1,4 +1,4 @@
-package com.example.mealmates.ui
+package com.example.mealmates.ui.views
 
 import android.content.Intent
 import android.net.Uri
@@ -40,6 +40,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.mealmates.R
+import com.example.mealmates.ui.viewModels.LoginViewModel
 
 data class RestaurantInfo(
     val name: String,
@@ -82,7 +83,7 @@ val RESTAURANT_DATA =
 const val swipeThreshold = 400f
 
 @Composable
-fun SwipePage() {
+fun RestaurantPrompt(loginModel: LoginViewModel, onNavigateToMatchedRestaurants: () -> Unit) {
     var offset by remember { mutableStateOf(0f) }
     var index by remember { mutableStateOf(0) }
 
@@ -111,6 +112,7 @@ fun SwipePage() {
                 Text(
                     text = "You've swiped all restaurants. Matches coming soon!",
                     textAlign = TextAlign.Center)
+                onNavigateToMatchedRestaurants()
             } else {
                 RestaurantProfile(info = RESTAURANT_DATA[index], tags = listOf("tag1", "tag2"))
             }

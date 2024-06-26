@@ -51,7 +51,7 @@ import com.example.mealmates.ui.viewModels.LoginViewModel
 fun Login(mainViewModel: LoginViewModel = viewModel()) {
     MealMatesTheme {
         if (mainViewModel.userIsComplete) {
-            //need to navigate to the next screen: homepage
+            MealMatesApp(mainViewModel)
         } else {
             Surface(
                 modifier = Modifier.fillMaxSize(),
@@ -146,7 +146,8 @@ fun MainView(
         if (viewModel.userIsAuthenticated && !viewModel.userIsComplete) {
             buttonText = "Proceed"
             onClickAction = {
-                viewModel.isLoading = true
+                //Remove and replace with add user logic.
+                viewModel.userIsComplete = true
             }
         } else {
 //            Image(
