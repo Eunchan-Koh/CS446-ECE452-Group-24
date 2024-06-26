@@ -134,6 +134,7 @@ fun MealMatesApp(loginModel: LoginViewModel) {
 
                     composable(Routes.GROUP_MEMBERS) {
                         GroupMembersPage(loginModel)
+
                     }
                 }
             }
