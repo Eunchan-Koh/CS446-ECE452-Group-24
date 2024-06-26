@@ -20,6 +20,7 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -35,52 +36,22 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import com.example.mealmates.R
+import com.example.mealmates.constants.RESTAURANT_DATA
 import com.example.mealmates.ui.viewModels.LoginViewModel
 
 data class RestaurantInfo(
     val name: String,
     val address: String,
     val website: String,
-    val photos: List<String>
+    val photos: List<String>,
+    val tags: List<String>
 )
 
-val RESTAURANT_DATA =
-    listOf(
-        RestaurantInfo(
-            name = "Gol's Lanzou Noodle",
-            address = "150 University Ave W Unit 6B, Waterloo, ON N2L 3E4",
-            website = "http://www.lanzhou.ca/",
-            photos =
-                listOf(
-                    "https://lh5.googleusercontent.com/p/AF1QipMi2Wy7AWGgVy_CtZJiSBFr7V2iLm28BEjNcjMJ=w101-h126-n-k-no-nu",
-                    "https://lh5.googleusercontent.com/p/AF1QipO-8GaKX8BhafiWtS9zf2cvXO-L91sB_4_2UYEI=w101-h168-n-k-no-nu",
-                    "https://lh5.googleusercontent.com/p/AF1QipMuJQaNzk8Pby5URLp-ctUh1-0R7Q1cGeePCBlW=w141-h235-n-k-no-nu")),
-        RestaurantInfo(
-            name = "Lazeez Shawarma",
-            address = "170 University Ave W, Waterloo, ON N2L 3E9",
-            website = "https://www.lazeezshawarma.com/",
-            photos =
-                listOf(
-                    "https://lh5.googleusercontent.com/p/AF1QipO9BYoECm621og8GC0wxggq87gG2JOSm20FI5P5=w141-h118-n-k-no-nu",
-                    "https://lh5.googleusercontent.com/p/AF1QipNm392wqqVvODh2iNPCEXvdPVSzq0MejvX5LBCt=w141-h235-n-k-no-nu",
-                )),
-        RestaurantInfo(
-            name = "Campus Pizza",
-            address = "160 University Ave W #2, Waterloo, ON N2L 3E9",
-            website = "http://www.campuspizza.ca/",
-            photos =
-                listOf(
-                    "https://lh5.googleusercontent.com/p/AF1QipP7fDcPKBo7OfwtcEx4Qmr4uWurq7e_1D2Xvh-a=w141-h118-n-k-no-nu",
-                    "https://lh5.googleusercontent.com/p/AF1QipOAGYi-SDADzNkfOCDKNa-5JXCUYvVzlAPV-y1O=w141-h176-n-k-no-nu",
-                )),
-    )
-
-const val swipeThreshold = 400f
+const val swipeThreshold = 300f
 
 @Composable
 fun RestaurantPrompt(loginModel: LoginViewModel, onNavigateToMatchedRestaurants: () -> Unit) {
@@ -109,12 +80,9 @@ fun RestaurantPrompt(loginModel: LoginViewModel, onNavigateToMatchedRestaurants:
                     }
             }) {
             if (index >= RESTAURANT_DATA.size) {
-                Text(
-                    text = "You've swiped all restaurants. Matches coming soon!",
-                    textAlign = TextAlign.Center)
                 onNavigateToMatchedRestaurants()
             } else {
-                RestaurantProfile(info = RESTAURANT_DATA[index], tags = listOf("tag1", "tag2"))
+                RestaurantProfile(info = RESTAURANT_DATA[index], tags = RESTAURANT_DATA[index].tags)
             }
         }
 }
@@ -157,7 +125,10 @@ fun RestaurantProfile(info: RestaurantInfo, tags: List<String>) {
             Text(text = info.address, fontSize = 15.sp)
             Row(verticalAlignment = Alignment.CenterVertically) {
                 for (tag in tags) {
-                    Text(text = tag)
+                    SuggestionChip(
+                        onClick = {},
+                        label = { Text(tag) },
+                        modifier = Modifier.padding(end = 8.dp))
                 }
             }
         }
