@@ -55,6 +55,15 @@ fun MealMatesApp(loginModel: LoginViewModel) {
         navController.navigate(Routes.MATCHED_RESTAURANTS)
     }
 
+    fun onNavigateToGroup() {
+        println("MealMatesApp.kt: onNavigateToGroup() called")
+        navController.navigate(Routes.GROUP)
+    }
+
+    fun onNavigateToGroupMembers() {
+        navController.navigate(Routes.GROUP_MEMBERS)
+    }
+
     MealMatesTheme {
         Scaffold(
 //            bottomBar = {
@@ -103,7 +112,8 @@ fun MealMatesApp(loginModel: LoginViewModel) {
                     startDestination = Routes.SURVEY
                 ) {
                     composable(Routes.HOME) {
-                        MainPage(loginModel) { onNavigateToRestaurantPrompts() }
+                        MainPage(loginModel, { onNavigateToRestaurantPrompts() },
+                            { onNavigateToGroup() })
                     }
 
                     composable(Routes.SURVEY) {
@@ -115,7 +125,15 @@ fun MealMatesApp(loginModel: LoginViewModel) {
                     }
 
                     composable(Routes.MATCHED_RESTAURANTS) {
-                        ListOfMatchedRestaurantsPage(loginModel)
+                        ListOfMatchedRestaurantsPage(loginModel) { onNavigateToMainPage() }
+                    }
+
+                    composable(Routes.GROUP) {
+                        GroupPage(loginModel, { onNavigateToGroupMembers() }, { onNavigateToRestaurantPrompts() })
+                    }
+
+                    composable(Routes.GROUP_MEMBERS) {
+                        GroupMembersPage(loginModel)
                     }
                 }
             }

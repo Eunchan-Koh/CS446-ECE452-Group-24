@@ -27,7 +27,7 @@ import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.viewModels.LoginViewModel
 
 @Composable
-fun ListOfMatchedRestaurantsPage(loginModel: LoginViewModel) {
+fun ListOfMatchedRestaurantsPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit) {
 
     MealMatesTheme{
         Column(
@@ -50,7 +50,7 @@ fun ListOfMatchedRestaurantsPage(loginModel: LoginViewModel) {
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Bottom
         ) {
-            BottomMenu()
+            BottomMenu({}, onNavigateToMainPage)
         }
 
     }
