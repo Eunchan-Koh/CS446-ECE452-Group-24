@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -35,10 +36,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mealmates.ui.theme.MealMatesTheme
+import com.example.mealmates.ui.theme.md_theme_light_primary
 import com.example.mealmates.ui.viewModels.LoginViewModel
 
 @Composable
-fun MainPage(loginModel: LoginViewModel, onNavigateToRestaurantPrompts: () -> Unit = {}) {
+fun MainPage(loginModel: LoginViewModel, onNavigateToRestaurantPrompts: () -> Unit = {}, OnNavigateToGroup: () -> Unit = {}){
 
     val (TotalGroupNum, setGroupNum) = remember {
         mutableStateOf(2)
@@ -52,7 +54,7 @@ fun MainPage(loginModel: LoginViewModel, onNavigateToRestaurantPrompts: () -> Un
             Divider(color = Color.Black, thickness = 1.dp)
             SearchBarSectionMainPage()
             Divider(color = Color.Black, thickness = 1.dp)
-            ListGroupsMainPage(TotalGroupNum)
+            ListGroupsMainPage(TotalGroupNum, OnNavigateToGroup)
 
         }
         Column(
@@ -117,50 +119,59 @@ fun SearchBarSectionMainPage(){
 }
 
 @Composable
-fun ListGroupsMainPage(GroupNum: Int){
+fun ListGroupsMainPage(GroupNum: Int, OnNavigateToGroup: () -> Unit = {}){
     for(i in 1..GroupNum){
         Column(
             modifier = Modifier
                 .height(82.dp)
                 .padding(horizontal = 10.dp, vertical = 0.dp)
                 .fillMaxWidth()
-                .clickable { /*to the corresponding group page*/},
+                .clickable { /*to the corresponding group page*/ },
 
             ) {
 
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-            ){
+            ) {
 //                Image(painter = , contentDescription = )
-                Icon(Icons.Default.AddCircle,
+                Icon(
+                    Icons.Default.AddCircle,
                     "add",
                     tint = Color.LightGray,
                     modifier = Modifier
                         .padding(10.dp)
                         .width(82.dp)
-                        .height(82.dp)
+                        .height(82.dp),
                 )
-                Column (
+                Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(10.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.Start
-                ){
-                    Text("Group$i", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                    Text("Tags: pizza, hamburger, ...")
+                ) {
+                    Button(
+                        onClick = { OnNavigateToGroup() },
+                        colors = ButtonDefaults.buttonColors(md_theme_light_primary),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(0.dp),
+                        shape = RoundedCornerShape(0.dp)
+                    ) {
+                        Text("Group$i", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                        Spacer(modifier = Modifier.width(40.dp))
+                        Text("Tags: pizza, hamburger, ...")
+                    }
                 }
             }
-
-
         }
         Divider(color = Color.White, thickness = 1.dp)
     }
 }
 
 @Composable
-fun BottomMenu(onNavigateToRestaurantPrompts: () -> Unit = {}){
+fun BottomMenu(onNavigateToRestaurantPrompts: () -> Unit = {}, onNavigateToMainPage: () -> Unit = {}){
     Column(
         modifier = Modifier
             .height(50.dp),
@@ -169,7 +180,7 @@ fun BottomMenu(onNavigateToRestaurantPrompts: () -> Unit = {}){
             modifier = Modifier.fillMaxSize()
         ){
             Button(
-                onClick = { /*TODO*/ },
+                onClick = { onNavigateToMainPage() },
                 modifier = Modifier
                     .fillMaxWidth(0.5f)
                     .fillMaxHeight(),

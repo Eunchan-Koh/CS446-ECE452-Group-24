@@ -1,15 +1,9 @@
-package com.example.mealmates
+package com.example.mealmates.ui.views
 
-import android.os.Bundle
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import com.example.mealmates.ui.theme.MealMatesTheme
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
@@ -25,7 +19,6 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -36,10 +29,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mealmates.constants.GROUP_STATE
+import com.example.mealmates.ui.viewModels.LoginViewModel
 import kotlin.math.abs
 
 @Composable
-fun MainGroupPage(){
+fun GroupPage(loginModel: LoginViewModel, onNavigateToGroupMembers: () -> Unit, onMatch: () -> Unit = {}) {
+
+    println("GroupPage.kt: GroupPage() called")
     var currentPage by remember { mutableIntStateOf(1) }
     fun changeCurrentPage(): () -> Unit = {
         currentPage = abs(currentPage - 1)
@@ -47,20 +43,20 @@ fun MainGroupPage(){
     Column(
         modifier = Modifier.fillMaxSize()
     ) {
-        MainAction(GROUP_STATE.MATCH)   // should be dynamic later
+        MainAction(GROUP_STATE.MATCH, onMatch)   // should be dynamic later
         GroupHeader("Group 1")
         LinkshareAndMembers(changeCurrentPage(), currentPage)
         Divider(color = Color.Black, thickness = 1.dp)
         if (currentPage == 1) {
             Preferences()
         } else {
-            GroupMembersPage()
+            onNavigateToGroupMembers()
         }
     }
 }
 
 @Composable
-fun MainAction(groupState: GROUP_STATE){
+fun MainAction(groupState: GROUP_STATE, onMatch: () -> Unit = {}) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -79,7 +75,7 @@ fun MainAction(groupState: GROUP_STATE){
             GROUP_STATE.FINAL -> "View Final Restaurant"
         }
         Button(
-            onClick = { /* todo */ },
+            onClick = { onMatch() },
             colors = ButtonDefaults.buttonColors(Color.LightGray, Color.LightGray, Color.Black, Color.White),
             modifier = Modifier
                 .height(100.dp)

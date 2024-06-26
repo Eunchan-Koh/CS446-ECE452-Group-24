@@ -5,6 +5,8 @@ object Routes {
     val SURVEY = "survey"
     val RESTAURANT_PROMPTS = "restaurant_prompts"
     val MATCHED_RESTAURANTS = "matched_restaurants"
+    val GROUP = "group"
+    val GROUP_MEMBERS = "group_members"
 }
 
 

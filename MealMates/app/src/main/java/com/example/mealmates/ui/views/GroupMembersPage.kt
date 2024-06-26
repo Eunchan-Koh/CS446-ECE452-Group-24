@@ -1,4 +1,4 @@
-package com.example.mealmates
+package com.example.mealmates.ui.views
 
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -22,14 +23,16 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mealmates.ui.theme.md_theme_light_primary
+import com.example.mealmates.ui.viewModels.LoginViewModel
 
 @Composable
-fun GroupMembersPage(){
+fun GroupMembersPage(loginModel: LoginViewModel) {
     val numMembers = 5
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .height((LocalConfiguration.current.screenHeightDp * 0.50).dp)
+            .fillMaxHeight()
             .background(Color.White)
             .verticalScroll(rememberScrollState()),
         verticalArrangement = Arrangement.spacedBy(0.dp, Alignment.CenterVertically),
@@ -40,7 +43,6 @@ fun GroupMembersPage(){
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(100.dp)
                     .background(color = Color.White)
                     .padding(20.dp),
                 horizontalArrangement = Arrangement.spacedBy(40.dp, Alignment.CenterHorizontally),
@@ -52,13 +54,13 @@ fun GroupMembersPage(){
                 )*/
                 Button(
                     onClick = { /* todo */ },
-                    colors = ButtonDefaults.buttonColors(Color.LightGray, Color.LightGray, Color.Black, Color.White),
+                    colors = ButtonDefaults.buttonColors(md_theme_light_primary, Color.White, Color.Black, Color.White),
                     modifier = Modifier
                         .height(80.dp)
                         .width((LocalConfiguration.current.screenWidthDp * 0.80).dp),
                     shape = RectangleShape
                 ) {
-                    Text("Group Member $i", color = Color.Black, fontSize = 24.sp)
+                    Text("Group Member $i", color = Color.White, fontSize = 24.sp)
                 }
             }
         }

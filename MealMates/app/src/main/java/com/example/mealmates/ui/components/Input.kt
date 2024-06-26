@@ -26,6 +26,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.mealmates.ui.theme.MealMatesTheme
+import com.example.mealmates.ui.theme.md_theme_light_onPrimary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -47,7 +48,7 @@ fun TextInput(
             Spacer(modifier = Modifier.height(8.dp))
             TextField(
                 colors = TextFieldDefaults.textFieldColors(
-                    containerColor = MaterialTheme.colorScheme.tertiary,
+                    containerColor = MaterialTheme.colorScheme.surface,
                 ),
                 value = value,
                 onValueChange = onValueChange,

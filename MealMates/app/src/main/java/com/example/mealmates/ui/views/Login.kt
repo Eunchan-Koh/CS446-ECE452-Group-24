@@ -68,6 +68,8 @@ fun MainView(
     viewModel: LoginViewModel
 ) {
 
+    viewModel.userIsComplete = true
+
     Column(
         modifier = Modifier.padding(20.dp, 50.dp, 20.dp, 20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -100,7 +102,7 @@ fun MainView(
                     .padding(20.dp),
             ) {
                 HeadlineLarge(
-                    text = "Please enter your name and select your type"
+                    text = "Please enter your name to continue",
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 TextInput(
