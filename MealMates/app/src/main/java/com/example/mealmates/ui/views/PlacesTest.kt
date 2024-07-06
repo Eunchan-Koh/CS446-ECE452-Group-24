@@ -116,7 +116,6 @@ fun PlacesResultDisplay(places: List<MealMatesPlace>) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val numPlaces = places.size
-        println(".....$places")
         for (i in 1..numPlaces) {
             Row(
                 modifier = Modifier

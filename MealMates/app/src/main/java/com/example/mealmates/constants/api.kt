@@ -2,7 +2,7 @@ package com.example.mealmates.constants
 
 object FieldMasks {
     // depending on our needs we may have to add more to this
-    val DEFAULT = "places.displayName,places.formattedAddress,places.location,places.photos,places.types,places.rating"
+    val DEFAULT = "places.id,places.displayName,places.formattedAddress,places.location,places.photos,places.types,places.rating"
 }
 object RestaurantTypes {
     val AMERICAN = "american_restaurant"

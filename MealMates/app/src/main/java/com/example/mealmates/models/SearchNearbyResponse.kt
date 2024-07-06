@@ -17,6 +17,7 @@ data class MealMatesPhoto(
     val photoReference: String      // not tested !!! might need modification during setting
 )
 data class MealMatesPlace (
+    val id: String,
     val types: List<String>,
     val formattedAddress: String,
     val location: LatLng,
@@ -38,6 +39,7 @@ class SearchNearbyResponse(
             val responseList = mutableListOf<MealMatesPlace>()
             for (place in placesJSON.asJsonArray) {
                 val placeJSONObject = place.asJsonObject
+                val id = placeJSONObject["id"].asString
                 val types = placeJSONObject["types"].asJsonArray
                 val typesListOfStrings = mutableListOf<String>()
                 for (type in types) {
@@ -64,9 +66,8 @@ class SearchNearbyResponse(
                     }
                 }
 
-                responseList.add(MealMatesPlace(typesListOfStrings, formattedAddress, location, rating, displayName, photosList))
+                responseList.add(MealMatesPlace(id, typesListOfStrings, formattedAddress, location, rating, displayName, photosList))
             }
-            //println("list places as MealMatePlaces:\n${responseList}")
             return responseList
         } catch (e: Exception) {
             throw e
