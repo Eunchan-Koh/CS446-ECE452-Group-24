@@ -32,6 +32,7 @@ import coil.compose.AsyncImage
 import com.example.mealmates.constants.RESTAURANT_DATA
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.viewModels.LoginViewModel
+import com.example.mealmates.constants.RESTAURANT_DATA
 
 @Composable
 fun ListOfMatchedRestaurantsPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit) {
