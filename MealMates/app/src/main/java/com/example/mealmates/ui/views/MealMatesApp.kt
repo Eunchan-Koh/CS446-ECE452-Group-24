@@ -64,6 +64,11 @@ fun MealMatesApp(loginModel: LoginViewModel) {
         navController.navigate(Routes.GROUP_MEMBERS)
     }
 
+    // test places api
+    fun searchNearbyPlaces() {
+        navController.navigate(Routes.PLACES_API_TEST)
+    }
+
     MealMatesTheme {
         Scaffold(
 //            bottomBar = {
@@ -129,12 +134,17 @@ fun MealMatesApp(loginModel: LoginViewModel) {
                     }
 
                     composable(Routes.GROUP) {
-                        GroupPage(loginModel, { onNavigateToGroupMembers() }, { onNavigateToRestaurantPrompts() })
+                        GroupPage(loginModel, { onNavigateToGroupMembers() }, { searchNearbyPlaces() })
                     }
 
                     composable(Routes.GROUP_MEMBERS) {
                         GroupMembersPage(loginModel)
 
+                    }
+
+                    // test
+                    composable(Routes.PLACES_API_TEST) {
+                        PlacesTest(loginModel)
                     }
                 }
             }
