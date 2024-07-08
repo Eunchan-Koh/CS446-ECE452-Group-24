@@ -1,6 +1,5 @@
 package com.example.mealmates.ui.views
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -12,12 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material3.Divider
-import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -117,6 +112,7 @@ fun OtherTopPicksSectionListOfMatched(){
 fun ListRestaurantsListOfMatched(GroupNum: Int){
     for(i in 0..GroupNum-1){
         Column(
+
             modifier = Modifier
                 .height(82.dp)
                 .padding(vertical = 0.dp)
