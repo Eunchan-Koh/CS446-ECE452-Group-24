@@ -36,7 +36,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mealmates.ui.theme.MealMatesTheme
+import com.example.mealmates.ui.theme.button_colour
 import com.example.mealmates.ui.theme.md_theme_light_primary
+import com.example.mealmates.ui.theme.selectableList_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
 
 @Composable
@@ -124,9 +126,10 @@ fun ListGroupsMainPage(GroupNum: Int, OnNavigateToGroup: () -> Unit = {}){
         Column(
             modifier = Modifier
                 .height(82.dp)
-                .padding(horizontal = 10.dp, vertical = 0.dp)
+                .padding(horizontal = 0.dp, vertical = 0.dp)
                 .fillMaxWidth()
-                .clickable { /*to the corresponding group page*/ },
+                .clickable { OnNavigateToGroup() }
+                .background(color = selectableList_colour),
 
             ) {
 
@@ -151,18 +154,9 @@ fun ListGroupsMainPage(GroupNum: Int, OnNavigateToGroup: () -> Unit = {}){
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.Start
                 ) {
-                    Button(
-                        onClick = { OnNavigateToGroup() },
-                        colors = ButtonDefaults.buttonColors(md_theme_light_primary),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(0.dp),
-                        shape = RoundedCornerShape(0.dp)
-                    ) {
-                        Text("Group$i", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                        Spacer(modifier = Modifier.width(40.dp))
-                        Text("Tags: pizza, hamburger, ...")
-                    }
+                    Text("Group$i", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                    Spacer(modifier = Modifier.width(40.dp))
+                    Text("Tags: pizza, hamburger, ...")
                 }
             }
         }
@@ -212,7 +206,9 @@ fun floatingActionButMainPage(){
         modifier = Modifier
             .padding(30.dp)
             .size(50.dp),
+        containerColor = button_colour,
         shape = CircleShape
+
 
     ) {
         Icon(Icons.Default.Add, "add", tint = Color.White)

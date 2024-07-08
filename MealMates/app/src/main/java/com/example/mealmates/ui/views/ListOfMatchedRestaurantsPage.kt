@@ -32,6 +32,7 @@ import coil.compose.AsyncImage
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.example.mealmates.constants.RESTAURANT_DATA
+import com.example.mealmates.ui.theme.selectableList_colour
 
 @Composable
 fun ListOfMatchedRestaurantsPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit) {
@@ -88,13 +89,13 @@ fun ImageSectionListOfMatched(){
 fun TopRestaurantInfoSectionListOfMatched(){
     Column(
         modifier = Modifier
-            .height(99.dp)
+            .height(75.dp)
             .fillMaxWidth()
             .background(color = Color.LightGray)
             .padding(vertical = 10.dp, horizontal = 15.dp)
     ){
         Text(RESTAURANT_DATA[2].name)//hardcoded for now
-        Spacer(modifier = Modifier.padding(10.dp))
+        Spacer(modifier = Modifier.padding(5.dp))
         Text(RESTAURANT_DATA[2].address)
     }
 }
@@ -104,11 +105,11 @@ fun OtherTopPicksSectionListOfMatched(){
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(10.dp),
+            .padding(horizontal = 15.dp, vertical = 10.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.Start
     ){
-        Text("Other top picks", fontWeight = FontWeight.Bold, fontSize = 20.sp)
+        Text("Other top picks", fontWeight = FontWeight.Bold, fontSize = 25.sp)
     }
 }
 
@@ -118,25 +119,28 @@ fun ListRestaurantsListOfMatched(GroupNum: Int){
         Column(
             modifier = Modifier
                 .height(82.dp)
-                .padding(horizontal = 10.dp, vertical = 0.dp)
+                .padding(vertical = 0.dp)
                 .fillMaxWidth()
+                .background(color = selectableList_colour)
                 .clickable { /*to the corresponding group page*/ },
 
             ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(horizontal = 20.dp),
+                verticalAlignment = Alignment.CenterVertically
             ){
                 AsyncImage(model = RESTAURANT_DATA[i].photos[0],
                     contentDescription = "restaurant image",
                     contentScale = ContentScale.Crop,
-                    modifier = Modifier.size(75.dp)
+                    modifier = Modifier.size(60.dp)
                         .clip(CircleShape)
                 )
                 Column (
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(vertical = 0.dp, horizontal = 10.dp),
+                        .padding(vertical = 0.dp, horizontal = 20.dp),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.Start
                 ){
