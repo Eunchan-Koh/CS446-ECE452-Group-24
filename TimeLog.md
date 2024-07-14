@@ -16,7 +16,10 @@
 | June 18, 2024 | 0.5h   | 0.5h  | 0.5h  | 0.5h  | 0.5h   | group discussion						                                                                                                             |
 | June 22, 2024 | 3h     |       |       |       |        | studied how to use kotlin						                                                                                                     |
 | June 23, 2024 | 9h     |       |       |       |        | studied how to use jetpack & built main page and list of matched restaurants pages.                                                      |
-
+| June 26, 2024 | 0.25h  | 0.25h | 0.25h | 0.25h | 0.25h  | Group meeting                                                                                                                            |
+| June 27, 2024 | 2.5h   |       |       |       |        | Worked on Report                                                                                                                         |
+| July 2, 2024  | 0.5h   | 0.5h  | 0.5h  | 0.5h  | 0.5h   | group discussion						                                                                                                             |
+| July 8, 2024  | 1.5h   |       |       |       |        | Worked on UI - created and refined pages                                                                                                 |
 
 **How to update time log**<br />
 copy the line below. paste it below the table above, and modify the sections you need.<br />
