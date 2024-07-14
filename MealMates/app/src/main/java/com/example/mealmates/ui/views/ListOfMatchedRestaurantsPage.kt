@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
+import com.example.mealmates.constants.RESTAURANT_DATA
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.example.mealmates.constants.RESTAURANT_DATA
