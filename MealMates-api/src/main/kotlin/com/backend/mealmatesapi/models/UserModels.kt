@@ -11,14 +11,14 @@ import java.sql.Date
 
 @Serializable
 data class User(
-    val id: Int,
-    val username: String,
-    val password: String,
+    val id: String,
     val email: String,
-    val firstName: String,
-    val lastName: String,
+    val name: String,
+    val preferences: List<String>,
+    val restrictions: List<String>,
+//    val location:
 ) {
     override fun toString(): String {
-        return "User(id=$id, username='$username', password='$password', email='$email', firstName='$firstName', lastName='$lastName'"
+        return "User(id=$id, email='$email', name='$name', preferences='$preferences', restrictions='$restrictions')"
     }
 }
