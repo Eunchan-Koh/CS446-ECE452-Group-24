@@ -12,13 +12,25 @@ data class User(
     val id: String,
     val email: String,
     val name: String,
-    val preferences: List<String>,
-    val restrictions: List<String>,
-    val image: ByteArray,
-    @Contextual
-    val location: Point,
-//    val location:
+    val preferences: List<String> = emptyList(),
+    val restrictions: List<String> = emptyList(),
+    val image: ByteArray = ByteArray(0),
+    @Serializable(with = PointSerializer::class)
+    val location: Point = Point(0, 0),
 ) {
+    @Serializer(forClass = Point::class)
+    class PointSerializer {
+
+        override fun serialize(encoder: Encoder, value: Point) {
+            encoder.encodeString("${value.x},${value.y}")
+        }
+
+        override fun deserialize(decoder: Decoder): Point {
+            val (x, y) = decoder.decodeString().split(",").map { it.toInt() }
+            return Point(x, y)
+        }
+    }
+
     override fun toString(): String {
         return "User(id=$id, email='$email', name='$name', preferences='$preferences', restrictions='$restrictions')"
     }
