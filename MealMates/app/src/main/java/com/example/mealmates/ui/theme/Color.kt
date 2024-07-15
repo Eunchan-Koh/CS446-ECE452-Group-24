@@ -68,4 +68,6 @@ val text_colour = Color(0xff0E3057)
 val container_colour = Color(0xffF1F5FF)
 val button_colour = Color(0xff3E69FE)
 
+val selectableList_colour = Color(0xffF9F9F9)
+
 val seed = Color(0xFF3561F6)

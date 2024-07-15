@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("org.jetbrains.kotlin.plugin.serialization")
+    id("com.google.android.libraries.mapsplatform.secrets-gradle-plugin")
 }
 
 android {
@@ -43,6 +44,7 @@ android {
     buildFeatures {
         compose = true
         viewBinding = true
+        buildConfig = true
     }
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.1"
@@ -52,6 +54,10 @@ android {
             excludes += "/META-INF/{AL2.0,LGPL2.1}"
         }
     }
+}
+
+secrets {
+    propertiesFileName = "secrets.properties"
 }
 
 dependencies {
@@ -109,4 +115,8 @@ dependencies {
     implementation("io.coil-kt:coil-compose:+")
     implementation("com.auth0.android:auth0:+")
     implementation("com.auth0.android:jwtdecode:+")
+
+    // Google Places SDK
+    implementation(platform("org.jetbrains.kotlin:kotlin-bom:1.9.20"))
+    implementation("com.google.android.libraries.places:places:3.5.0")
 }
