@@ -12,6 +12,7 @@ import com.google.gson.JsonObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
+import java.awt.Point
 
 @RestController
 @ComponentScan("com.backend.mealmatesapi.services")
@@ -27,12 +28,14 @@ class UserController {
     fun getUser(@RequestParam("id") id: String): User {
         val result: List<List<Any>>? = databaseService.query("SELECT * FROM Users u where u.uid = '$id';")
         if(result.isNullOrEmpty()) {
-            return User("1", "User not found", "User not found", listOf(), listOf())
-        } else if(result[0][0] is String && result[0][1] is String && result[0][2] is String) {
+            return User("1", "User not found", "User not found", listOf(), listOf(), ByteArray(0), Point(0, 0))
+        } else if(result[0][0] is String && result[0][1] is String && result[0][2] is String && result[0][3] is List<*> &&
+            result[0][4] is List<*> && result[0][5] is ByteArray && result[0][6] is Point) {
+
             return User(result[0][0] as String, result[0][1] as String, result[0][2] as String,
-                        result[0][3] as List<String>, result[0][4] as List<String>)
+                        result[0][3] as List<String>, result[0][4] as List<String>, result[0][5] as ByteArray, result[0][6] as Point)
         } else {
-            return User("1", "User not found", "User not found", listOf(), listOf())
+            return User("1", "User not found", "User not found", listOf(), listOf(), ByteArray(0), Point(0, 0))
         }
     }
 

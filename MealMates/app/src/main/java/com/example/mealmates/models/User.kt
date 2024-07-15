@@ -1,9 +1,17 @@
 package com.example.mealmates.models
 
+import android.graphics.Point
 import com.auth0.android.jwt.JWT
+import kotlinx.serialization.Contextual
 
 
-class User(val idToken: String? = null, var type: String = "", var name: String = "") {
+class User(val idToken: String? = null,
+           var name: String = "",
+           var preferences: List<String> = emptyList(),
+           var restrictions: List<String> = emptyList(),
+           var image: ByteArray = byteArrayOf(),
+           @Contextual
+           var location: Point = Point(0, 0)) {
 
     private val TAG = "User"
 

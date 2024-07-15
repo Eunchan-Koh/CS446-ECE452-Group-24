@@ -42,10 +42,12 @@ class DatabaseService {
           row.add(data.getObject(i) as PGobject)
         } else if (rsmd.getColumnTypeName(i) == "serial" || rsmd.getColumnTypeName(i) == "int4") {
           row.add(data.getInt(i))
-        } else if (rsmd.getColumnTypeName(i) == "_time") {
-          row.add(data.getArray(i).array as Array<Time>)
+        } else if (rsmd.getColumnTypeName(i) == "_text") {
+          row.add(data.getArray(i).array as Array<String>)
         } else if (rsmd.getColumnTypeName(i) == "bool") {
             row.add(data.getBoolean(i))
+        } else if (rsmd.getColumnTypeName(i) == "point") {
+          row.add(data.getObject(i) as PGobject)
         } else {
             row.add(data.getString(i))
         }
