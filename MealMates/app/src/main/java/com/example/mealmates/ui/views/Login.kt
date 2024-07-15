@@ -2,6 +2,7 @@ package com.example.mealmates.ui.views
 
 import TextInput
 import android.annotation.SuppressLint
+import android.graphics.Point
 import android.os.Build
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
@@ -38,6 +39,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mealmates.R
+import com.example.mealmates.apiCalls.UserApi
+import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.ui.components.HeadlineLarge
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
@@ -89,7 +92,6 @@ fun MainView(
 
         if (viewModel.userIsAuthenticated && !viewModel.userIsComplete) {
             var name by rememberSaveable { mutableStateOf(viewModel.user.name) }
-            var type by rememberSaveable { mutableStateOf(viewModel.user.type) }
 
             if (!validateName(name)) {
                 Text(
@@ -113,36 +115,9 @@ fun MainView(
                     value = name,
                     onValueChange = { name = it }
                 )
-//                Spacer(modifier = Modifier.height(20.dp))
-//                Row(
-//                    modifier = Modifier.fillMaxWidth(),
-//                    horizontalArrangement = Arrangement.SpaceEvenly
-//                ) {
-//                    Column {
-//                        Text("Patient")
-//                        RadioButton(
-//                            selected = type == "patient",
-//                            onClick = { type = "patient" },
-//                            colors = RadioButtonDefaults.colors(
-//                                selectedColor = button_colour
-//                            )
-//                        )
-//                    }
-//                    Column {
-//                        Text("Doctor")
-//                        RadioButton(
-//                            selected = type == "doctor",
-//                            onClick = { type = "doctor" },
-//                            colors = RadioButtonDefaults.colors(
-//                                selectedColor = button_colour
-//                            )
-//                        )
-//                    }
-//                }
             }
 
             viewModel.user.name = name
-            viewModel.user.type = type
         }
 
         var buttonText: String = "Begin"
@@ -150,7 +125,12 @@ fun MainView(
         if (viewModel.userIsAuthenticated && !viewModel.userIsComplete) {
             buttonText = "Proceed"
             onClickAction = {
-                //Remove and replace with add user logic.
+                println("Adding user")
+                GlobalObjects.user.name = viewModel.user.name
+                // TODO: Temporarily saving user here, should be done after location and survey ideally
+                GlobalObjects.user.image = byteArrayOf(0)
+                GlobalObjects.user.location = Point(0, 0)
+                UserApi().addUser(GlobalObjects.user)
                 viewModel.userIsComplete = true
             }
         } else {

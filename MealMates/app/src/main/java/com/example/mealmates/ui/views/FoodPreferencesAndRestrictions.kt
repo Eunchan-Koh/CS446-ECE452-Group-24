@@ -153,6 +153,9 @@ fun PreferenceAndRestrictions(loginModel: LoginViewModel, onNavigateToMainPage: 
                 }
             }
         }
+        // TODO: When user clicks on Save Changes, save the preferences and restrictions
+        // HOW TO: GlobalObjects.user.preferences = preferences
+        // HOW TO: GlobalObjects.user.restrictions = restrictions
         SaveChangesButton(loginModel, onNavigateToMainPage);
     }
 }

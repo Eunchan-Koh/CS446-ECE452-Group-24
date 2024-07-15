@@ -57,7 +57,8 @@ class UserApi {
             var success = false
             runBlocking {
                 launch {
-                    success = client.post("$host/patient") {
+                    println("Adding user: $user")
+                    success = client.post("$host/user") {
                         contentType(ContentType.Application.Json)
                         setBody(user)
                     }.status.isSuccess()
@@ -74,7 +75,7 @@ class UserApi {
             var success = false
             runBlocking {
                 launch {
-                    success = client.put("$host/patient") {
+                    success = client.put("$host/user") {
                         contentType(ContentType.Application.Json)
                         setBody(user)
                     }.status.isSuccess()
