@@ -1,6 +1,7 @@
 package com.example.mealmates.ui.viewModels
 
 import android.content.Context
+import android.provider.Settings.Global
 import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,6 +14,8 @@ import com.auth0.android.jwt.JWT
 import com.auth0.android.provider.WebAuthProvider
 import com.auth0.android.result.Credentials
 import com.example.mealmates.R
+import com.example.mealmates.apiCalls.UserApi
+import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.models.User
 
 class LoginViewModel : ViewModel() {
@@ -48,10 +51,19 @@ class LoginViewModel : ViewModel() {
                         jwt = jwt.slice(6 until jwt.length)
                     }
 
+                    val user: User = UserApi().getUser(jwt)
+                    println(user)
+
+                    if(user.id != "") {
+                        GlobalObjects.user = user
+                        userIsComplete = true
+                    } else {
+                        GlobalObjects.user = User(result.idToken)
+                    }
+
                     userIsAuthenticated = true
                     appJustLaunched = false
                     isLoading = true
-                    user = User(accessToken)
                 }
 
             })

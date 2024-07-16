@@ -8,6 +8,7 @@ import org.springframework.context.annotation.Import
 import org.springframework.stereotype.Component
 import org.springframework.stereotype.Service
 import org.postgresql.util.PGobject
+import java.awt.Point
 import java.sql.*
 
 @Service
@@ -36,16 +37,21 @@ class DatabaseService {
     while (data.next()) {
       val row = ArrayList<Any>()
       for (i in 1..rsmd.columnCount) {
-        if (rsmd.getColumnTypeName(i) == "date") {
+        println(rsmd.getColumnTypeName(i))
+        if (rsmd.getColumnTypeName(i) == "date"  && data.getArray(i) != null) {
           row.add(data.getDate(i))
-        } else if (rsmd.getColumnTypeName(i) == "jsonb") {
+        } else if (rsmd.getColumnTypeName(i) == "jsonb"  && data.getArray(i) != null) {
           row.add(data.getObject(i) as PGobject)
-        } else if (rsmd.getColumnTypeName(i) == "serial" || rsmd.getColumnTypeName(i) == "int4") {
+        } else if (rsmd.getColumnTypeName(i) == "serial" || rsmd.getColumnTypeName(i) == "int4"  && data.getArray(i) != null) {
           row.add(data.getInt(i))
-        } else if (rsmd.getColumnTypeName(i) == "_time") {
-          row.add(data.getArray(i).array as Array<Time>)
-        } else if (rsmd.getColumnTypeName(i) == "bool") {
+        } else if (rsmd.getColumnTypeName(i) == "_text" && data.getArray(i) != null) {
+          row.add(data.getArray(i).array as Array<String>)
+        } else if (rsmd.getColumnTypeName(i) == "bool"  && data.getArray(i) != null) {
             row.add(data.getBoolean(i))
+        } else if (rsmd.getColumnTypeName(i) == "point" && data.getObject(i) != null) {
+          row.add(data.getObject(i) as Point)
+        } else if (rsmd.getColumnTypeName(i) == "bytea" && data.getBytes(i) != null) {
+          row.add(data.getBytes(i) as ByteArray)
         } else {
             row.add(data.getString(i))
         }

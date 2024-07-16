@@ -1,49 +1,33 @@
-package com.backend.mealmatesapi.models
+package com.example.mealmates.models
 
-import kotlinx.serialization.*
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-import java.awt.Point
-import java.sql.Time
-import java.sql.Date
+import android.graphics.Point
+import kotlinx.serialization.Serializable
+
 
 @Serializable
-data class User(
-    val id: String,
-    val email: String,
+data class Group(
+    val gid: String,
     val name: String,
+    val uids: List<String>,
     val preferences: List<String> = emptyList(),
     val restrictions: List<String> = emptyList(),
     val image: ByteArray = ByteArray(0),
     @Serializable(with = PointSerializer::class)
     val location: Point = Point(0, 0),
 ) {
-    @Serializer(forClass = Point::class)
-    class PointSerializer {
-
-        override fun serialize(encoder: Encoder, value: Point) {
-            encoder.encodeString("${value.x},${value.y}")
-        }
-
-        override fun deserialize(decoder: Decoder): Point {
-            val (x, y) = decoder.decodeString().split(",").map { it.toInt() }
-            return Point(x, y)
-        }
-    }
-
     override fun toString(): String {
-        return "User(id=$id, email='$email', name='$name', preferences='$preferences', restrictions='$restrictions')"
+        return "Group(id=$gid, uids='$uids', name='$name', preferences='$preferences', restrictions='$restrictions')"
     }
 
     override fun equals(other: Any?): Boolean {
         if (this === other) return true
         if (javaClass != other?.javaClass) return false
 
-        other as User
+        other as Group
 
-        if (id != other.id) return false
-        if (email != other.email) return false
+        if (gid != other.gid) return false
         if (name != other.name) return false
+        if(uids != other.uids) return false
         if (preferences != other.preferences) return false
         if (restrictions != other.restrictions) return false
         if (!image.contentEquals(other.image)) return false
@@ -53,8 +37,8 @@ data class User(
     }
 
     override fun hashCode(): Int {
-        var result = id.hashCode()
-        result = 31 * result + email.hashCode()
+        var result = gid.hashCode()
+        result = 31 * result + uids.hashCode()
         result = 31 * result + name.hashCode()
         result = 31 * result + preferences.hashCode()
         result = 31 * result + restrictions.hashCode()

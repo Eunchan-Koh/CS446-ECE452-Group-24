@@ -35,6 +35,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mealmates.apiCalls.UserApi
+import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
 import com.example.mealmates.ui.theme.selectableList_colour
@@ -69,7 +71,6 @@ fun MainPage(loginModel: LoginViewModel, onNavigateToRestaurantPrompts: () -> Un
             ){
                 floatingActionButMainPage()
             }
-            BottomMenu(onNavigateToRestaurantPrompts = onNavigateToRestaurantPrompts)
         }
 
     }
@@ -120,8 +121,10 @@ fun SearchBarSectionMainPage(){
 }
 
 @Composable
-fun ListGroupsMainPage(GroupNum: Int, OnNavigateToGroup: () -> Unit = {}){
-    for(i in 1..GroupNum){
+fun ListGroupsMainPage(GroupNum: Int, OnNavigateToGroup: () -> Unit = {}) {
+    //TODO: Use this information of all the user's groups. Left to Eunchan.
+    val groups = UserApi().getUserGroups(GlobalObjects.user.id!!)
+    for (i in 1..GroupNum) {
         Column(
             modifier = Modifier
                 .height(82.dp)
@@ -161,41 +164,6 @@ fun ListGroupsMainPage(GroupNum: Int, OnNavigateToGroup: () -> Unit = {}){
         }
         Divider(color = Color.White, thickness = 1.dp)
     }
-}
-
-@Composable
-fun BottomMenu(onNavigateToRestaurantPrompts: () -> Unit = {}, onNavigateToMainPage: () -> Unit = {}){
-    Column(
-        modifier = Modifier
-            .height(50.dp),
-    ) {
-        Row(
-            modifier = Modifier.fillMaxSize()
-        ){
-            Button(
-                onClick = { onNavigateToMainPage() },
-                modifier = Modifier
-                    .fillMaxWidth(0.5f)
-                    .fillMaxHeight(),
-
-                colors = ButtonDefaults.buttonColors(Color.White),
-                shape = RoundedCornerShape(0.dp)
-            ) {
-                Text("Home",color = Color.Black)
-            }
-            Button(
-                onClick = { onNavigateToRestaurantPrompts() },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .fillMaxHeight(),
-                colors = ButtonDefaults.buttonColors(Color.LightGray),
-                shape = RoundedCornerShape(0.dp)
-            ) {
-                Text("Match",color = Color.Black)
-            }
-        }
-    }
-
 }
 
 
