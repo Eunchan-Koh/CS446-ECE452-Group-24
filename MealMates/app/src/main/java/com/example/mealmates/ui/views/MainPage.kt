@@ -131,7 +131,7 @@ fun ListGroupsMainPage(OnNavigateToGroup: () -> Unit = {}) {
     //TODO: Use this information of all the user's groups. Left to Eunchan.
     val groups = UserApi().getUserGroups(GlobalObjects.user.id!!)
     val groupSize = groups.size
-//    Text("$temp1s for check")
+//    Text("$temp1s")
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
