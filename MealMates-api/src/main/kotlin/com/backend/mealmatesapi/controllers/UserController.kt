@@ -7,6 +7,7 @@ import com.google.gson.JsonObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 import java.awt.Point
+import com.backend.mealmatesapi.models.Group
 
 @RestController
 @ComponentScan("com.backend.mealmatesapi.services")
@@ -20,15 +21,23 @@ class UserController {
     @GetMapping("")
     @ResponseBody
     fun getUser(@RequestParam("id") id: String): User {
-        println(id)
         val result: List<List<Any>>? = databaseService.query("SELECT * FROM Users u where u.uid = '$id';")
         if(result.isNullOrEmpty()) {
             return User("", "User not found", "User not found", listOf(), listOf(), ByteArray(0), Point(0, 0))
-        } else if(result[0][0] is String && result[0][1] is String && result[0][2] is String && result[0][3] is List<*> &&
-            result[0][4] is List<*> && result[0][5] is ByteArray && result[0][6] is Point) {
+        } else if(result[0][0] is String && result[0][1] is String && result[0][2] is String && result[0][3] is Array<*> &&
+            result[0][4] is Array<*>) {
+
+            var image = ByteArray(0)
+            var location = Point(0, 0)
+            if(result[0][5] is ByteArray) {
+                image = result[0][5] as ByteArray
+            }
+            if(result[0][6] is Point) {
+                location = result[0][6] as Point
+            }
 
             return User(result[0][0] as String, result[0][1] as String, result[0][2] as String,
-                        result[0][3] as List<String>, result[0][4] as List<String>, result[0][5] as ByteArray, result[0][6] as Point)
+                (result[0][3] as Array<String>).toList(), (result[0][4] as Array<String>).toList(), image, location)
         } else {
             return User("", "User not found", "User not found", listOf(), listOf(), ByteArray(0), Point(0, 0))
         }
@@ -63,6 +72,22 @@ class UserController {
         queryStr += " WHERE uid = '$user.id';"
         databaseService.query(queryStr)
         return "Updated user with id $user.id, email $user.email, name $user.name, preferences $user.preferences, restrictions $user.restrictions RETURNING uid"
+    }
+
+    @GetMapping("/groups")
+    @ResponseBody
+    fun getUserGroups(@RequestParam id: String): List<Group> {
+        println("this is id $id")
+        val result: List<List<Any>>? = databaseService.query("SELECT g.* FROM Groups g WHERE g.uids @> ARRAY['$id']::text[];")
+        if(result.isNullOrEmpty()) {
+            return listOf()
+        } else {
+            val groups = mutableListOf<Group>()
+            for(group in result) {
+                groups.add(Group(group[0] as Int, group[1] as String, (group[2] as Array<String>).toList(), (group[3] as Array<String>).toList(), (group[4] as Array<String>).toList()))
+            }
+            return groups
+        }
     }
 
 }
