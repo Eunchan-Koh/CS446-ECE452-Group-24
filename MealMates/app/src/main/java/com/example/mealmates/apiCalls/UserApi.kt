@@ -3,6 +3,7 @@ package com.example.mealmates.apiCalls
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.example.mealmates.models.Group
 import com.example.mealmates.models.User
 import io.ktor.client.*
 import io.ktor.client.call.body
@@ -82,6 +83,25 @@ class UserApi {
                 }
             }
             success
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    fun getUserGroups(id: String): List<Group> {
+        return try {
+            var groups: List<Group>? = null
+            runBlocking {
+                launch {
+                    groups = client.get("$host/user/groups?id=$id").body()
+                }
+            }
+            println("these are the groups $groups")
+            if (groups != null) {
+                groups as List<Group>
+            } else {
+                emptyList()
+            }
         } catch (e: Exception) {
             throw e
         }

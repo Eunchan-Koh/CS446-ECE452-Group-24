@@ -29,9 +29,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
+import com.example.mealmates.ui.viewModels.LoginViewModel
 
 @Composable
-fun UserProfileManagementPage(){
+fun UserProfileManagementPage(loginModel: LoginViewModel) {
 
     val (TotalGroupNum, setGroupNum) = remember {
         mutableStateOf(2)
@@ -66,7 +67,6 @@ fun UserProfileManagementPage(){
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Bottom
         ){
-            BottomMenu()
         }
 
     }

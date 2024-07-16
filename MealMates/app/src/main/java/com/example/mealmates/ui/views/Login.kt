@@ -72,7 +72,7 @@ fun MainView(
 ) {
 
     // uncomment to override login process
-
+//    GlobalObjects.user = UserApi().getUser("65f9aa62cd606f2e1413f38e")
 //    viewModel.userIsComplete = true
 
     Column(

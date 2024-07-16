@@ -52,12 +52,13 @@ class LoginViewModel : ViewModel() {
                     }
 
                     val user: User = UserApi().getUser(jwt)
+                    println(user)
 
                     if(user.id != "") {
                         GlobalObjects.user = user
                         userIsComplete = true
                     } else {
-                        GlobalObjects.user = User(accessToken)
+                        GlobalObjects.user = User(result.idToken)
                     }
 
                     userIsAuthenticated = true

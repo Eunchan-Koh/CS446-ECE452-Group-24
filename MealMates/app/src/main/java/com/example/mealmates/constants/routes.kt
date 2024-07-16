@@ -8,6 +8,7 @@ object Routes {
     val GROUP = "group"
     val GROUP_MEMBERS = "group_members"
     val PLACES_API_TEST = "places_test"
+    val PROFILE = "profile"
 }
 
 

@@ -29,6 +29,7 @@ object PointSerializer : KSerializer<Point> {
 @Serializable
 class User(var id: String? = null,
            var name: String = "",
+           var email: String = "",
            var preferences: List<String> = emptyList(),
            var restrictions: List<String> = emptyList(),
            var image: ByteArray = byteArrayOf(0),
@@ -37,8 +38,6 @@ class User(var id: String? = null,
 
 
     private val TAG = "User"
-
-    var email = ""
 
     init {
         if (id != null) {

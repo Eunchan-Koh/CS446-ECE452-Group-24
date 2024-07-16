@@ -54,7 +54,6 @@ fun ListOfMatchedRestaurantsPage(loginModel: LoginViewModel, onNavigateToMainPag
                 .fillMaxSize(),
             verticalArrangement = Arrangement.Bottom
         ) {
-            BottomMenu({}, onNavigateToMainPage)
         }
 
     }
