@@ -1,6 +1,7 @@
 package com.backend.mealmatesapi.services
 
 import jakarta.annotation.PostConstruct
+import kotlinx.serialization.json.JsonObject
 import org.apache.juli.logging.Log
 import org.apache.logging.log4j.Logger
 import org.slf4j.LoggerFactory
@@ -41,7 +42,7 @@ class DatabaseService {
         if (rsmd.getColumnTypeName(i) == "date"  && data.getArray(i) != null) {
           row.add(data.getDate(i))
         } else if (rsmd.getColumnTypeName(i) == "jsonb"  && data.getArray(i) != null) {
-          row.add(data.getObject(i) as PGobject)
+          row.add(data.getObject(i) as JsonObject)
         } else if (rsmd.getColumnTypeName(i) == "serial" || rsmd.getColumnTypeName(i) == "int4"  && data.getArray(i) != null) {
           row.add(data.getInt(i))
         } else if (rsmd.getColumnTypeName(i) == "_text" && data.getArray(i) != null) {

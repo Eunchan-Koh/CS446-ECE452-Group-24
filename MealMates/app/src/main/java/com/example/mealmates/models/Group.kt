@@ -6,7 +6,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class Group(
-    val gid: String,
+    val gid: Int,
     val name: String,
     val uids: List<String>,
     val preferences: List<String> = emptyList(),
