@@ -1,5 +1,7 @@
 package com.example.mealmates.ui.views
 
+import android.graphics.Point
+import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -24,22 +26,31 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.example.mealmates.apiCalls.UserApi
+import com.example.mealmates.constants.GlobalObjects
+import com.example.mealmates.models.User
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
 
 @Composable
-fun UserProfileManagementPage(loginModel: LoginViewModel) {
+fun UserProfileManagementPage(loginModel: LoginViewModel, onNavigateToSurvey: () -> Unit = {}) {
+    val userCur = UserApi().getUser(GlobalObjects.user.id!!)
+    var tempUserName: String
+    var tempUserEmail: String
+    var tempUserLocation: String
+    val userName = userCur.name
+    val userEmail = userCur.email
+    val userLocation = userCur.location
 
-    val (TotalGroupNum, setGroupNum) = remember {
-        mutableStateOf(2)
-    }
     MealMatesTheme{
         Column(
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier
+                .fillMaxWidth()
                 .fillMaxHeight(0.92f)
 //                .background(color = Color.Gray)
             ,
@@ -51,15 +62,17 @@ fun UserProfileManagementPage(loginModel: LoginViewModel) {
                 .fillMaxWidth()
 //                .background(color = Color.Green),
                 )
-            choosePicProfile()
-            NameSetupProfile()
-            LocationSetupProfile()
+            ChoosePicProfile()
+            tempUserName = nameSetupProfile(userName)
+            //Location is being shown using point only; need to be fixed to address later
+            //Email section can be added - will work on it after some discussion
+            LocationSetupProfile(userLocation)
             Spacer(modifier = Modifier
-                .height(180.dp)
+                .height(150.dp)
 //                .background(color = Color.Gray)
                 .fillMaxWidth())
-            EditPrefProfile()
-            SaveButtonProfile()
+            EditPrefProfile(onNavigateToSurvey)
+            SaveButtonProfile(tempUserName)
 
         }
         Column(
@@ -74,7 +87,7 @@ fun UserProfileManagementPage(loginModel: LoginViewModel) {
 
 
 @Composable
-fun choosePicProfile(){
+fun ChoosePicProfile(){
     Icon(
         Icons.Default.AddCircle,
         "add",
@@ -88,9 +101,9 @@ fun choosePicProfile(){
 }
 
 @Composable
-fun NameSetupProfile(){
+fun nameSetupProfile(userName: String) : String{
     val (value, setValue) = remember {
-        mutableStateOf("")
+        mutableStateOf(userName)
     }
     Column(//Search Section
         modifier = Modifier
@@ -113,11 +126,12 @@ fun NameSetupProfile(){
             }
         )
     }
+    return value
 }
 @Composable
-fun LocationSetupProfile() {
+fun LocationSetupProfile(userLocation: Point){
     val (value, setValue) = remember {
-        mutableStateOf("")
+        mutableStateOf(userLocation.toString())
     }
     Column(//Search Section
         modifier = Modifier
@@ -140,10 +154,11 @@ fun LocationSetupProfile() {
             }
         )
     }
+//    return value
 }
 
 @Composable
-fun EditPrefProfile(){
+fun EditPrefProfile(onNavigateToSurvey: () -> Unit = {}){
     Column(
         modifier = Modifier.height(20.dp),
         verticalArrangement = Arrangement.Center,
@@ -151,19 +166,23 @@ fun EditPrefProfile(){
     ) {
         ClickableText(
             AnnotatedString("Edit preferences & restrictions"),
-            onClick = {/*link to preference & restrictions page here*/}
+            onClick = {onNavigateToSurvey()}
         )
     }
 }
 
 @Composable
-fun SaveButtonProfile(){
+fun SaveButtonProfile(tempUserName: String){
+    val context = LocalContext.current
     Column(
         modifier = Modifier.fillMaxHeight(),
         verticalArrangement = Arrangement.Bottom
     ){
         Button(
-            onClick = {},
+            onClick = {
+            /*update user name and user location - save the values using update*/
+                Toast.makeText(context, "Saved Profile Changes", Toast.LENGTH_SHORT).show()
+            },
             colors = ButtonDefaults.buttonColors(containerColor = button_colour)
             ){
             Text("Save")
