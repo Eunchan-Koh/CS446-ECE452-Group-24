@@ -49,11 +49,14 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mealmates.R
+import com.example.mealmates.apiCalls.GroupApi
 import com.example.mealmates.constants.RestaurantTypeToLabel
-import com.example.mealmates.examples.PLACES_API_NEARBY_SEARCH_BODY_EXAMPLES
+import com.example.mealmates.models.Group
 import com.example.mealmates.models.MealMatesPlace
+import com.example.mealmates.models.SearchNearbyRequest
 import com.example.mealmates.models.SearchNearbyResponse
 import com.example.mealmates.ui.viewModels.LoginViewModel
+import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -72,6 +75,29 @@ data class RestaurantInfo(
     val tags: List<String>
 )
 
+const val MAX_RESULT_COUNT = 15
+
+fun fetchNearbyRestaurants(groupId: String): List<MealMatesPlace> {
+    val groupInfo: Group = GroupApi().getGroup(groupId)
+    if (groupInfo.preferences.isEmpty()) {
+        return emptyList()
+    }
+
+    val request =
+        SearchNearbyRequest(
+                includedTypes = groupInfo.preferences,
+                excludedTypes = emptyList(),
+                maxResultCount = MAX_RESULT_COUNT,
+                center = LatLng(groupInfo.location.x.toDouble(), groupInfo.location.y.toDouble()),
+                radius = 1000.0)
+            .request
+
+    val nearbySearchBodyString = Gson().toJson(request)
+    val nearbySearchResponseString = searchNearbyMatches(requestBodyString = nearbySearchBodyString)
+    val response = SearchNearbyResponse(nearbySearchResponseString)
+    return response.listPlaces()
+}
+
 const val swipeThreshold = 300f
 
 @Composable
@@ -85,11 +111,7 @@ fun RestaurantPrompt(
     var index by remember { mutableIntStateOf(0) }
 
     LaunchedEffect(Unit) {
-        val nearbySearchBodyString = Gson().toJson(PLACES_API_NEARBY_SEARCH_BODY_EXAMPLES[1])
-        val nearbySearchResponseString =
-            searchNearbyMatches(requestBodyString = nearbySearchBodyString)
-        val response = SearchNearbyResponse(nearbySearchResponseString)
-        places = response.listPlaces()
+        places = fetchNearbyRestaurants("1") // TODO: dynamic group ID
         isLoading = false
     }
 

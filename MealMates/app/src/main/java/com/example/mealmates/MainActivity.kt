@@ -20,10 +20,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         val mainViewModel: LoginViewModel by viewModels()
         mainViewModel.setContext(this)
-        setContent {
-            // RestaurantPrompt(mainViewModel) { println("yes") }
-            Login(mainViewModel)
-        }
+        setContent { Login(mainViewModel) }
     }
 }
 
