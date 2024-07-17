@@ -21,6 +21,7 @@ class MainActivity : ComponentActivity() {
         val mainViewModel: LoginViewModel by viewModels()
         mainViewModel.setContext(this)
         setContent {
+            // RestaurantPrompt(mainViewModel) { println("yes") }
             Login(mainViewModel)
         }
     }
@@ -28,16 +29,11 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
+    Text(text = "Hello $name!", modifier = modifier)
 }
 
 @Preview(showBackground = true)
 @Composable
 fun GreetingPreview() {
-    MealMatesTheme {
-        Greeting("Android")
-    }
+    MealMatesTheme { Greeting("Android") }
 }
