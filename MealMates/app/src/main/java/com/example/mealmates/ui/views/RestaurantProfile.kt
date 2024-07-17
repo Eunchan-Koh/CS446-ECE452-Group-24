@@ -93,10 +93,9 @@ fun RestaurantPrompt(
         isLoading = false
     }
 
-    println("restaurnt prompt loop for no reason")
-
     if (isLoading) {
         // TODO: Show loading spinner
+        println("Restaurant prompt page is loading...")
         return
     }
 
@@ -137,7 +136,6 @@ fun RestaurantPrompt(
             if (index >= 1) {
                 println("Done")
             } else {
-                println("Callign page")
                 RestaurantProfile(places[index])
             }
         }
@@ -175,26 +173,16 @@ fun fetchPlacePhoto(photoReference: String): ByteArray {
 @Composable
 fun PagerIndicator(pagerState: PagerState) {
     Row(
-        modifier = Modifier
-            .wrapContentHeight()
-            .fillMaxWidth()
-            .offset(y = -(32).dp),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        repeat(pagerState.pageCount) { iteration ->
-            val color =
-                if (pagerState.currentPage == iteration) Color.Blue else Color.LightGray
-            Box(
-                modifier = Modifier
-                    .padding(2.dp)
-                    .clip(CircleShape)
-                    .background(color)
-                    .size(10.dp)
-            )
+        modifier = Modifier.wrapContentHeight().fillMaxWidth().offset(y = -(32).dp),
+        horizontalArrangement = Arrangement.Center) {
+            repeat(pagerState.pageCount) { iteration ->
+                val color = if (pagerState.currentPage == iteration) Color.Blue else Color.LightGray
+                Box(
+                    modifier =
+                        Modifier.padding(2.dp).clip(CircleShape).background(color).size(10.dp))
+            }
         }
-    }
 }
-
 
 const val MAX_IMAGES = 8
 
@@ -202,10 +190,9 @@ const val MAX_IMAGES = 8
 @Composable
 fun RestaurantProfile(place: MealMatesPlace) {
     val photoCache = remember { mutableMapOf<String, ByteArray>() }
-    println(photoCache)
+
     Column(modifier = Modifier.fillMaxSize()) {
         val pagerState = rememberPagerState(pageCount = { min(place.photos.size, MAX_IMAGES) })
-        println("infinite loop check")
         HorizontalPager(
             state = pagerState,
             key = { place.photos[it].photoReference },
@@ -214,7 +201,6 @@ fun RestaurantProfile(place: MealMatesPlace) {
                     val photoReference = place.photos[index].photoReference
                     var photoByteArray = photoCache[photoReference]
                     if (photoByteArray == null) {
-                        println("calling fetchplacephoto: " + photoReference)
                         photoCache[photoReference] = fetchPlacePhoto(photoReference)
                         photoByteArray = photoCache[photoReference]
                     }
