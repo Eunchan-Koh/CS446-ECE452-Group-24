@@ -20,6 +20,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
@@ -136,6 +137,7 @@ fun RestaurantPrompt(
             if (index >= 1) {
                 println("Done")
             } else {
+                println("Callign page")
                 RestaurantProfile(places[index])
             }
         }
@@ -169,6 +171,31 @@ fun fetchPlacePhoto(photoReference: String): ByteArray {
     }
 }
 
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun PagerIndicator(pagerState: PagerState) {
+    Row(
+        modifier = Modifier
+            .wrapContentHeight()
+            .fillMaxWidth()
+            .offset(y = -(32).dp),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        repeat(pagerState.pageCount) { iteration ->
+            val color =
+                if (pagerState.currentPage == iteration) Color.Blue else Color.LightGray
+            Box(
+                modifier = Modifier
+                    .padding(2.dp)
+                    .clip(CircleShape)
+                    .background(color)
+                    .size(10.dp)
+            )
+        }
+    }
+}
+
+
 const val MAX_IMAGES = 8
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -199,17 +226,7 @@ fun RestaurantProfile(place: MealMatesPlace) {
                 }
             }
 
-        Row(
-            Modifier.wrapContentHeight().fillMaxWidth().offset(y = -(32).dp),
-            horizontalArrangement = Arrangement.Center) {
-                repeat(pagerState.pageCount) { iteration ->
-                    val color =
-                        if (pagerState.currentPage == iteration) Color.Blue else Color.LightGray
-                    Box(
-                        modifier =
-                            Modifier.padding(2.dp).clip(CircleShape).background(color).size(10.dp))
-                }
-            }
+        PagerIndicator(pagerState)
 
         Column(modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 8.dp)) {
             Row(verticalAlignment = Alignment.CenterVertically) {

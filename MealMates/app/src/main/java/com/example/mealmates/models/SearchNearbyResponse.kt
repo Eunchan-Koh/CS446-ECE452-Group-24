@@ -47,7 +47,7 @@ class SearchNearbyResponse(responseString: String) {
                         locationJSONObject["latitude"].asDouble,
                         locationJSONObject["longitude"].asDouble)
 
-                val rating = placeJSONObject["rating"].asDouble
+                val rating = if(placeJSONObject["rating"] != null) placeJSONObject["rating"].asDouble else 0.0
 
                 val displayName = placeJSONObject["displayName"].asJsonObject["text"].asString
 
