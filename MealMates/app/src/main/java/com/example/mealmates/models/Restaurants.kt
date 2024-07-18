@@ -1,11 +1,7 @@
-package com.backend.mealmatesapi.models
+package com.example.mealmates.models
 
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.*
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
 import kotlinx.serialization.json.JsonObject
-import java.awt.Point
 
 @Serializable
 data class Restaurants(
