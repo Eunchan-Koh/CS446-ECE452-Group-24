@@ -39,7 +39,7 @@ class RestaurantController {
     @ResponseBody
     fun createRestaurants(@RequestBody restaurant: Restaurants): String {
         val query =
-            "INSERT INTO Restaurants (rid, gid, matched, suggested) VALUES ('${restaurant.rid}', '${restaurant.gid}', '${restaurant.matched}', ARRAY[${
+            "INSERT INTO Restaurants (gid, matched, suggested) VALUES (''${restaurant.gid}', '${restaurant.matched}', ARRAY[${
                 restaurant.suggested.joinToString(",")
             }]::text[]) RETURNING rid;"
         databaseService.query(query)

@@ -50,9 +50,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mealmates.R
 import com.example.mealmates.apiCalls.GroupApi
+import com.example.mealmates.apiCalls.RestaurantsApi
 import com.example.mealmates.constants.RestaurantTypeToLabel
 import com.example.mealmates.models.Group
+import com.example.mealmates.models.Matched
 import com.example.mealmates.models.MealMatesPlace
+import com.example.mealmates.models.Restaurants
 import com.example.mealmates.models.SearchNearbyRequest
 import com.example.mealmates.models.SearchNearbyResponse
 import com.example.mealmates.ui.viewModels.LoginViewModel
@@ -66,6 +69,9 @@ import io.ktor.client.request.parameter
 import kotlin.math.min
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.json.encodeToJsonElement
 
 data class RestaurantInfo(
     val name: String,
@@ -75,7 +81,7 @@ data class RestaurantInfo(
     val tags: List<String>
 )
 
-const val MAX_RESULT_COUNT = 15
+const val MAX_RESULT_COUNT = 10
 
 fun fetchNearbyRestaurants(groupId: String): List<MealMatesPlace> {
     val groupInfo: Group = GroupApi().getGroup(groupId)
@@ -98,7 +104,56 @@ fun fetchNearbyRestaurants(groupId: String): List<MealMatesPlace> {
     return response.listPlaces()
 }
 
+fun updateDatabase(userId: String, groupId: String, likedRestaurants: List<String>) {
+    val res: Restaurants = RestaurantsApi().getRestaurants(groupId)
+    var rids = mutableListOf<String>()
+    var liked = mutableListOf<Int>()
+    var completed = mutableListOf<String>()
+
+    // Table row already exists, so initialize with existing data instead
+    if (res.rid != -1) {
+        val matchedInfo: Matched = Gson().fromJson(res.matched.toString(), Matched::class.java)
+        rids = matchedInfo.rids.toMutableList()
+        liked = matchedInfo.liked.toMutableList()
+        completed = matchedInfo.completed.toMutableList()
+    }
+
+    for (rid in likedRestaurants) {
+        val index = rids.indexOf(rid)
+        // Restaurant is not in the list yet
+        if (index == -1) {
+            rids.add(rid)
+            liked.add(1)
+        } else {
+            // Restaurant exists, update
+            liked[index] += 1
+        }
+    }
+    completed.add(userId)
+
+    val updatedMatched =
+        JsonObject(
+            mapOf(
+                "rids" to Json.encodeToJsonElement(rids),
+                "liked" to Json.encodeToJsonElement(liked),
+                "completed" to Json.encodeToJsonElement(completed)))
+
+    // Table row does not exist, so create
+    if (res.rid == -1) {
+        // TODO: RID is hardcoded. Replace api call once the parameter is fixed
+        val updatedInfo = Restaurants(0, groupId.toInt(), updatedMatched, emptyList())
+        RestaurantsApi().addRestaurants(updatedInfo)
+    } else {
+        // Table row exists, so update
+        val updatedInfo = Restaurants(res.rid, res.gid, updatedMatched, res.suggested)
+        RestaurantsApi().editRestaurants(updatedInfo)
+    }
+}
+
 const val swipeThreshold = 300f
+
+// TODO: Replace with dynamic grouping
+const val groupId = "2"
 
 @Composable
 fun RestaurantPrompt(
@@ -109,9 +164,10 @@ fun RestaurantPrompt(
     var places by remember { mutableStateOf(emptyList<MealMatesPlace>()) }
     var offset by remember { mutableFloatStateOf(0f) }
     var index by remember { mutableIntStateOf(0) }
+    var likedRestaurants by remember { mutableStateOf(emptyList<String>()) }
 
     LaunchedEffect(Unit) {
-        places = fetchNearbyRestaurants("1") // TODO: dynamic group ID
+        places = fetchNearbyRestaurants(groupId)
         isLoading = false
     }
 
@@ -141,12 +197,13 @@ fun RestaurantPrompt(
                 detectHorizontalDragGestures(
                     onDragEnd = {
                         when {
+                            // swipe right
                             offset > swipeThreshold -> {
-                                println("swipe right")
+                                likedRestaurants += places[index].id
                                 index++
                             }
+                            // swipe left
                             offset < -swipeThreshold -> {
-                                println("swipe left")
                                 index++
                             }
                         }
@@ -155,8 +212,10 @@ fun RestaurantPrompt(
                         offset += dragAmount
                     }
             }) {
-            if (index >= 1) {
-                println("Done")
+            // Swiping complete
+            if (index >= places.size) {
+                updateDatabase(loginModel.user.id!!, groupId, likedRestaurants)
+                onNavigateToMatchedRestaurants()
             } else {
                 RestaurantProfile(places[index])
             }
