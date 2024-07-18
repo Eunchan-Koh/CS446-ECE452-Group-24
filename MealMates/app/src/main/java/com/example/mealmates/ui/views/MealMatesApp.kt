@@ -172,7 +172,7 @@ fun MealMatesApp(loginModel: LoginViewModel) {
                     }
 
                     composable(Routes.PROFILE) {
-                        UserProfileManagementPage(loginModel)
+                        UserProfileManagementPage(loginModel) { onNavigateToSurvey() }
                     }
 
                     // test
