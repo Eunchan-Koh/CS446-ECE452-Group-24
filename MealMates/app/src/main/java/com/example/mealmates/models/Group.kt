@@ -1,11 +1,7 @@
 package com.example.mealmates.models
 
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.Serializable
-
-data class Point2D (
-    val x: Double,
-    val y: Double
-)
 
 @Serializable
 data class Group(
@@ -15,8 +11,7 @@ data class Group(
     val preferences: List<String> = emptyList(),
     val restrictions: List<String> = emptyList(),
     val image: ByteArray = ByteArray(0),
-    @Serializable(with = PointSerializer::class)
-    val location: Point2D = Point2D(0.0, 0.0),
+    @Serializable(with = LatLngSerializer::class) var location: LatLng = LatLng(0.0, 0.0)
 ) {
     override fun toString(): String {
         return "Group(id=$gid, uids='$uids', name='$name', preferences='$preferences', restrictions='$restrictions')"
