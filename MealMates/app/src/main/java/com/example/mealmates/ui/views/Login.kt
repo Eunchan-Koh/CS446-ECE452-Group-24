@@ -61,8 +61,8 @@ fun Login(mainViewModel: LoginViewModel = viewModel()) {
 fun MainView(viewModel: LoginViewModel) {
 
     // uncomment to override login process
-    GlobalObjects.user = UserApi().getUser("65f9aa62cd606f2e1413f38e")
-    viewModel.userIsComplete = true
+//    GlobalObjects.user = UserApi().getUser("65f9aa62cd606f2e1413f38e")
+//    viewModel.userIsComplete = true
 
     Column(
         modifier = Modifier.padding(20.dp, 50.dp, 20.dp, 20.dp),
@@ -88,7 +88,9 @@ fun MainView(viewModel: LoginViewModel) {
             }
 
             Column(
-                modifier = Modifier.fillMaxWidth().padding(20.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
             ) {
                 HeadlineLarge(
                     text = "Please enter your name to continue",
@@ -140,14 +142,19 @@ fun LogButton(
     onClick: () -> Unit,
 ) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(20.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(20.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Button(
             onClick = { onClick() },
             elevation = ButtonDefaults.elevation(defaultElevation = 0.dp, pressedElevation = 0.dp),
             modifier =
-                Modifier.fillMaxWidth().height(50.dp).border(0.dp, md_theme_light_onSecondary),
+            Modifier
+                .fillMaxWidth()
+                .height(50.dp)
+                .border(0.dp, md_theme_light_onSecondary),
             colors =
                 ButtonDefaults.buttonColors(
                     backgroundColor = button_colour, contentColor = md_theme_light_onSecondary),
