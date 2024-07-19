@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import com.example.mealmates.R
 import com.example.mealmates.apiCalls.GroupApi
 import com.example.mealmates.apiCalls.RestaurantsApi
+import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.constants.RestaurantTypeToLabel
 import com.example.mealmates.models.Group
 import com.example.mealmates.models.Matched
@@ -59,7 +60,6 @@ import com.example.mealmates.models.Restaurants
 import com.example.mealmates.models.SearchNearbyRequest
 import com.example.mealmates.models.SearchNearbyResponse
 import com.example.mealmates.ui.viewModels.LoginViewModel
-import com.google.android.gms.maps.model.LatLng
 import com.google.gson.Gson
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -73,6 +73,7 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 
+// TODO: Remove when able
 data class RestaurantInfo(
     val name: String,
     val address: String,
@@ -85,7 +86,6 @@ const val MAX_RESULT_COUNT = 10
 
 fun fetchNearbyRestaurants(groupId: String): List<MealMatesPlace> {
     val groupInfo: Group = GroupApi().getGroup(groupId)
-    println(groupInfo)
     if (groupInfo.preferences.isEmpty()) {
         return emptyList()
     }
@@ -95,7 +95,7 @@ fun fetchNearbyRestaurants(groupId: String): List<MealMatesPlace> {
                 includedTypes = groupInfo.preferences,
                 excludedTypes = emptyList(),
                 maxResultCount = MAX_RESULT_COUNT,
-                center = LatLng(groupInfo.location.x, groupInfo.location.y),
+                center = groupInfo.location,
                 radius = 1000.0)
             .request
 
@@ -105,29 +105,42 @@ fun fetchNearbyRestaurants(groupId: String): List<MealMatesPlace> {
     return response.listPlaces()
 }
 
-fun updateDatabase(userId: String, groupId: String, likedRestaurants: List<String>) {
+fun updateDatabaseOnSwipeCompletion(
+    userId: String,
+    groupId: String,
+    allRestaurants: List<MealMatesPlace>,
+    likedRestaurants: List<String>
+) {
     val res: Restaurants = RestaurantsApi().getRestaurants(groupId)
     var rids = mutableListOf<String>()
     var liked = mutableListOf<Int>()
     var completed = mutableListOf<String>()
 
-    // Table row already exists, so initialize with existing data instead
+    // Table row already exists
     if (res.rid != -1) {
         val matchedInfo: Matched = Gson().fromJson(res.matched.toString(), Matched::class.java)
+
+        // User has already completed the matching process, skip
+        if (matchedInfo.completed.contains(userId)) {
+            println("User $userId has already completed the matching process. Skipping...")
+            return
+        }
+
+        // Initialize with existing row data
         rids = matchedInfo.rids.toMutableList()
         liked = matchedInfo.liked.toMutableList()
         completed = matchedInfo.completed.toMutableList()
     }
 
-    for (rid in likedRestaurants) {
-        val index = rids.indexOf(rid)
+    for (place in allRestaurants) {
+        val index = rids.indexOf(place.id)
         // Restaurant is not in the list yet
         if (index == -1) {
-            rids.add(rid)
-            liked.add(1)
+            rids.add(place.id)
+            liked.add(if (likedRestaurants.contains(place.id)) 1 else 0)
         } else {
             // Restaurant exists, update
-            liked[index] += 1
+            liked[index] += if (likedRestaurants.contains(place.id)) 1 else 0
         }
     }
     completed.add(userId)
@@ -214,8 +227,9 @@ fun RestaurantPrompt(
                     }
             }) {
             // Swiping complete
-            if (index >= places.size) {
-                updateDatabase(loginModel.user.id!!, groupId, likedRestaurants)
+            if (index == places.size) {
+                updateDatabaseOnSwipeCompletion(
+                    GlobalObjects.user.id!!, groupId, places, likedRestaurants)
                 onNavigateToMatchedRestaurants()
             } else {
                 RestaurantProfile(places[index])
