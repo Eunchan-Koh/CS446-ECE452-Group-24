@@ -6,8 +6,6 @@ import kotlinx.serialization.json.JsonObject
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.ComponentScan
 import org.springframework.web.bind.annotation.*
-import java.sql.Date
-import java.sql.Time
 
 @RestController
 @ComponentScan("com.backend.mealmatesapi.services")
@@ -40,7 +38,7 @@ class RestaurantController {
     fun createRestaurants(@RequestBody restaurant: Restaurants): String {
         val query =
             "INSERT INTO Restaurants (gid, matched, suggested) VALUES (''${restaurant.gid}', '${restaurant.matched}', ARRAY[${
-                restaurant.suggested.joinToString(",")
+                restaurant.suggested.joinToString(",") { "'$it'" }
             }]::text[]) RETURNING rid;"
         databaseService.query(query)
         return "Inserted restaurant with rid ${restaurant.rid}, gid ${restaurant.gid}, matched ${restaurant.matched}, suggested ${restaurant.suggested}"
@@ -54,7 +52,7 @@ class RestaurantController {
             queryStr += "matched = '${restaurant.matched}', "
         }
         if (restaurant.suggested.isNotEmpty()) {
-            queryStr += "suggested = ARRAY[${restaurant.suggested.joinToString(",")}]::text[], "
+            queryStr += "suggested = ARRAY[${restaurant.suggested.joinToString(",") { "'$it'" }}]::text[], "
         }
         queryStr = queryStr.substring(0, queryStr.length - 2)
         queryStr += " WHERE rid = '${restaurant.rid}' AND gid = '${restaurant.gid}' RETURNING rid;"
