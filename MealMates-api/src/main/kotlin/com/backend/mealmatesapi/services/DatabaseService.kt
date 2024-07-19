@@ -1,8 +1,10 @@
 package com.backend.mealmatesapi.services
 
 import jakarta.annotation.PostConstruct
+import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import org.postgresql.geometric.PGpoint
+import org.postgresql.util.PGobject
 import org.springframework.stereotype.Service
 import java.awt.geom.Point2D
 import java.sql.*
@@ -40,7 +42,9 @@ class DatabaseService {
                 if (rsmd.getColumnTypeName(i) == "date" && data.getArray(i) != null) {
                     row.add(data.getDate(i))
                 } else if (rsmd.getColumnTypeName(i) == "jsonb" && data.getArray(i) != null) {
-                    row.add(data.getObject(i) as JsonObject)
+                    val pgObject = data.getObject(i) as PGobject
+                    val jsonObject = Json.decodeFromString<JsonObject>(pgObject.value!!)
+                    row.add(jsonObject)
                 } else if (rsmd.getColumnTypeName(i) == "serial" || rsmd.getColumnTypeName(i) == "int4" && data.getArray(
                         i
                     ) != null

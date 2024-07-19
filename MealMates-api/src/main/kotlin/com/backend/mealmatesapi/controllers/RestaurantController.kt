@@ -18,7 +18,7 @@ class RestaurantController {
     @GetMapping("")
     @ResponseBody
     fun getRestaurants(@RequestParam("gid") gid: String): Restaurants {
-        val result: List<List<Any>>? = databaseService.query("SELECT * FROM Restaurants r where g.gid = '$gid';")
+        val result: List<List<Any>>? = databaseService.query("SELECT * FROM Restaurants r where r.gid = '$gid';")
         if (result.isNullOrEmpty()) {
             return Restaurants(-1, -1)
         } else if (result[0][0] is Int && result[0][1] is Int && result[0][2] is JsonObject && result[0][3] is Array<*>) {
@@ -37,7 +37,7 @@ class RestaurantController {
     @ResponseBody
     fun createRestaurants(@RequestBody restaurant: Restaurants): String {
         val query =
-            "INSERT INTO Restaurants (gid, matched, suggested) VALUES (''${restaurant.gid}', '${restaurant.matched}', ARRAY[${
+            "INSERT INTO Restaurants (gid, matched, suggested) VALUES ('${restaurant.gid}', '${restaurant.matched}', ARRAY[${
                 restaurant.suggested.joinToString(",") { "'$it'" }
             }]::text[]) RETURNING rid;"
         databaseService.query(query)
