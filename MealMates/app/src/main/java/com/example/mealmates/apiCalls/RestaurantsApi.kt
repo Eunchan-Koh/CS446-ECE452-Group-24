@@ -1,7 +1,6 @@
 package com.example.mealmates.apiCalls
 
-import com.example.mealmates.models.Group
-import com.example.mealmates.models.User
+import com.example.mealmates.models.Restaurants
 import io.ktor.client.*
 import io.ktor.client.call.body
 import io.ktor.client.engine.android.*
@@ -16,10 +15,10 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
 @OptIn(DelicateCoroutinesApi::class)
-class UserApi {
+class RestaurantsApi {
 
     private val host: String = "http://10.0.2.2:8080"
-    private val nullUser = User()
+    private val nullRestaurants = Restaurants(-1, -1)
     private val client = HttpClient(Android) {
         install(ContentNegotiation) {
             json(Json {
@@ -31,34 +30,33 @@ class UserApi {
         }
     }
 
-    fun getUser(id: String): User {
+    fun getRestaurants(id: String): Restaurants {
         return try {
-            var user: User? = null
+            var restaurants: Restaurants? = null
             runBlocking {
                 launch {
-                    user = client.get("$host/user?id=$id").body()
+                    restaurants = client.get("$host/restaurants?id=$id").body()
                 }
             }
-            if (user != null) {
-                user as User
+            if (restaurants != null) {
+                restaurants as Restaurants
             } else {
-                nullUser
+                nullRestaurants
             }
         } catch (e: Exception) {
             throw e
         }
     }
 
-    @OptIn(InternalAPI::class)
-    fun addUser(user: User): Boolean {
+    fun addRestaurants(restaurants: Restaurants): Boolean {
         return try {
             var success = false
             runBlocking {
                 launch {
-                    println("Adding user: $user")
-                    success = client.post("$host/user") {
+                    println("Adding restaurants: $restaurants")
+                    success = client.post("$host/restaurants") {
                         contentType(ContentType.Application.Json)
-                        setBody(user)
+                        setBody(restaurants)
                     }.status.isSuccess()
                 }
             }
@@ -68,14 +66,15 @@ class UserApi {
         }
     }
 
-    fun updateUser(user: User): Boolean {
+    fun editRestaurants(restaurants: Restaurants): Boolean {
         return try {
             var success = false
             runBlocking {
                 launch {
-                    success = client.put("$host/user") {
+                    println("Editing restaurants: $restaurants")
+                    success = client.put("$host/restaurants") {
                         contentType(ContentType.Application.Json)
-                        setBody(user)
+                        setBody(restaurants)
                     }.status.isSuccess()
                 }
             }
@@ -85,20 +84,15 @@ class UserApi {
         }
     }
 
-    fun getUserGroups(id: String): List<Group> {
+    fun deleteRestaurants(gid: String): Boolean {
         return try {
-            var groups: List<Group>? = null
+            var success = false
             runBlocking {
                 launch {
-                    groups = client.get("$host/user/groups?id=$id").body()
+                    success = client.delete("$host/restaurants?gid=$gid").status.isSuccess()
                 }
             }
-            println("these are the groups $groups")
-            if (groups != null) {
-                groups as List<Group>
-            } else {
-                emptyList()
-            }
+            success
         } catch (e: Exception) {
             throw e
         }

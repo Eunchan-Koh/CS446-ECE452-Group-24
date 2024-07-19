@@ -1,5 +1,7 @@
 package com.example.mealmates.ui.views
 
+import android.graphics.Paint.Align
+import android.widget.Space
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,6 +15,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
@@ -27,7 +30,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -49,9 +54,9 @@ fun MainPage(loginModel: LoginViewModel, onNavigateToRestaurantPrompts: () -> Un
         ) {
             AdvertisementSectionMainPage()
             Divider(color = Color.Black, thickness = 1.dp)
-            SearchBarSectionMainPage()
-            Divider(color = Color.Black, thickness = 1.dp)
-            ListGroupsMainPage(TotalGroupNum, OnNavigateToGroup)
+//            SearchBarSectionMainPage()
+//            Divider(color = Color.Black, thickness = 1.dp)
+            ListGroupsMainPage(OnNavigateToGroup)
 
         }
         Column(
@@ -63,7 +68,7 @@ fun MainPage(loginModel: LoginViewModel, onNavigateToRestaurantPrompts: () -> Un
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomEnd
             ){
-                floatingActionButMainPage()
+                FloatingActionButMainPage()
             }
         }
 
@@ -115,54 +120,70 @@ fun SearchBarSectionMainPage(){
 }
 
 @Composable
-fun ListGroupsMainPage(GroupNum: Int, OnNavigateToGroup: () -> Unit = {}) {
+fun ListGroupsMainPage(OnNavigateToGroup: () -> Unit = {}) {
     //TODO: Use this information of all the user's groups. Left to Eunchan.
-//    val groups = UserApi().getUserGroups(GlobalObjects.user.id!!)
-    for (i in 1..GroupNum) {
-        Column(
-            modifier = Modifier
-                .height(82.dp)
-                .padding(horizontal = 0.dp, vertical = 0.dp)
-                .fillMaxWidth()
-                .clickable { OnNavigateToGroup() }
-                .background(color = selectableList_colour),
 
-            ) {
-
-            Row(
+    val groups = UserApi().getUserGroups(GlobalObjects.user.id!!)
+    val groupSize = groups.size
+//    Text("$temp1s")
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+    ) {
+        for (i in 1..groupSize) {
+            Column(
                 modifier = Modifier
+                    .height(92.dp)
+                    .padding(horizontal = 0.dp, vertical = 0.dp)
                     .fillMaxWidth()
-            ) {
-//                Image(painter = , contentDescription = )
-                Icon(
-                    Icons.Default.AddCircle,
-                    "add",
-                    tint = Color.LightGray,
-                    modifier = Modifier
-                        .padding(10.dp)
-                        .width(82.dp)
-                        .height(82.dp),
-                )
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(10.dp),
-                    verticalArrangement = Arrangement.Center,
-                    horizontalAlignment = Alignment.Start
+                    .clickable { OnNavigateToGroup() }
+                    .background(color = selectableList_colour),
+//                    horizontalAlignment = Alignment.CenterHorizontally
+
                 ) {
-                    Text("Group$i", fontWeight = FontWeight.Bold, fontSize = 20.sp)
-                    Spacer(modifier = Modifier.width(40.dp))
-                    Text("Tags: pizza, hamburger, ...")
+
+                Row(
+                    modifier = Modifier
+                        .fillMaxSize(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+//                Image(painter = , contentDescription = )
+                    Icon(
+                        Icons.Default.AddCircle,
+                        "add",
+                        tint = Color.LightGray,
+                        modifier = Modifier
+                            .padding(vertical = 4.dp)
+                            .width(82.dp)
+                            .height(82.dp),
+                    )
+                    Column(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .padding(vertical = 10.dp, horizontal = 20.dp),
+                        verticalArrangement = Arrangement.Center,
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        Text("Group$i", fontWeight = FontWeight.Bold, fontSize = 24.sp)
+                        Spacer(modifier = Modifier.width(40.dp))
+                        Text("Tags: pizza, hamburger, ...", fontSize = 18.sp)
+                    }
                 }
             }
+            Divider(color = Color.White, thickness = 1.dp)
+            Spacer(modifier = Modifier
+                .height(5.dp)
+                .fillMaxWidth()
+                .background(color = Color.White)
+            )
         }
-        Divider(color = Color.White, thickness = 1.dp)
     }
+
 }
 
 
 @Composable
-fun floatingActionButMainPage(){
+fun FloatingActionButMainPage(){
     FloatingActionButton(onClick = { /*open up create group page*/ },
         modifier = Modifier
             .padding(30.dp)

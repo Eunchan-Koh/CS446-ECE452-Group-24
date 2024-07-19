@@ -1,7 +1,6 @@
 package com.example.mealmates.apiCalls
 
 import com.example.mealmates.models.Group
-import com.example.mealmates.models.User
 import io.ktor.client.*
 import io.ktor.client.call.body
 import io.ktor.client.engine.android.*
@@ -16,10 +15,10 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 
 @OptIn(DelicateCoroutinesApi::class)
-class UserApi {
+class GroupApi {
 
     private val host: String = "http://10.0.2.2:8080"
-    private val nullUser = User()
+    private val nullGroup = Group(-1, "", emptyList())
     private val client = HttpClient(Android) {
         install(ContentNegotiation) {
             json(Json {
@@ -31,18 +30,18 @@ class UserApi {
         }
     }
 
-    fun getUser(id: String): User {
+    fun getGroup(id: String): Group {
         return try {
-            var user: User? = null
+            var group: Group? = null
             runBlocking {
                 launch {
-                    user = client.get("$host/user?id=$id").body()
+                    group = client.get("$host/group?id=$id").body()
                 }
             }
-            if (user != null) {
-                user as User
+            if (group != null) {
+                group as Group
             } else {
-                nullUser
+                nullGroup
             }
         } catch (e: Exception) {
             throw e
@@ -50,15 +49,15 @@ class UserApi {
     }
 
     @OptIn(InternalAPI::class)
-    fun addUser(user: User): Boolean {
+    fun createGroup(group: Group): Boolean {
         return try {
             var success = false
             runBlocking {
                 launch {
-                    println("Adding user: $user")
-                    success = client.post("$host/user") {
+                    println("Adding group: $group")
+                    success = client.post("$host/group") {
                         contentType(ContentType.Application.Json)
-                        setBody(user)
+                        setBody(group)
                     }.status.isSuccess()
                 }
             }
@@ -68,37 +67,20 @@ class UserApi {
         }
     }
 
-    fun updateUser(user: User): Boolean {
+    @OptIn(InternalAPI::class)
+    fun updateGroup(group: Group): Boolean {
         return try {
             var success = false
             runBlocking {
                 launch {
-                    success = client.put("$host/user") {
+                    println("Updating group: $group")
+                    success = client.put("$host/group") {
                         contentType(ContentType.Application.Json)
-                        setBody(user)
+                        setBody(group)
                     }.status.isSuccess()
                 }
             }
             success
-        } catch (e: Exception) {
-            throw e
-        }
-    }
-
-    fun getUserGroups(id: String): List<Group> {
-        return try {
-            var groups: List<Group>? = null
-            runBlocking {
-                launch {
-                    groups = client.get("$host/user/groups?id=$id").body()
-                }
-            }
-            println("these are the groups $groups")
-            if (groups != null) {
-                groups as List<Group>
-            } else {
-                emptyList()
-            }
         } catch (e: Exception) {
             throw e
         }
