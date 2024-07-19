@@ -1,8 +1,11 @@
 package com.example.mealmates.models
 
-import android.graphics.Point
 import kotlinx.serialization.Serializable
 
+data class Point2D (
+    val x: Double,
+    val y: Double
+)
 
 @Serializable
 data class Group(
@@ -13,7 +16,7 @@ data class Group(
     val restrictions: List<String> = emptyList(),
     val image: ByteArray = ByteArray(0),
     @Serializable(with = PointSerializer::class)
-    val location: Point = Point(0, 0),
+    val location: Point2D = Point2D(0.0, 0.0),
 ) {
     override fun toString(): String {
         return "Group(id=$gid, uids='$uids', name='$name', preferences='$preferences', restrictions='$restrictions')"
@@ -27,7 +30,7 @@ data class Group(
 
         if (gid != other.gid) return false
         if (name != other.name) return false
-        if(uids != other.uids) return false
+        if (uids != other.uids) return false
         if (preferences != other.preferences) return false
         if (restrictions != other.restrictions) return false
         if (!image.contentEquals(other.image)) return false

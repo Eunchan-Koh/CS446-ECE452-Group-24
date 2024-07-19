@@ -85,6 +85,7 @@ const val MAX_RESULT_COUNT = 10
 
 fun fetchNearbyRestaurants(groupId: String): List<MealMatesPlace> {
     val groupInfo: Group = GroupApi().getGroup(groupId)
+    println(groupInfo)
     if (groupInfo.preferences.isEmpty()) {
         return emptyList()
     }
@@ -94,7 +95,7 @@ fun fetchNearbyRestaurants(groupId: String): List<MealMatesPlace> {
                 includedTypes = groupInfo.preferences,
                 excludedTypes = emptyList(),
                 maxResultCount = MAX_RESULT_COUNT,
-                center = LatLng(groupInfo.location.x.toDouble(), groupInfo.location.y.toDouble()),
+                center = LatLng(groupInfo.location.x, groupInfo.location.y),
                 radius = 1000.0)
             .request
 
@@ -153,7 +154,7 @@ fun updateDatabase(userId: String, groupId: String, likedRestaurants: List<Strin
 const val swipeThreshold = 300f
 
 // TODO: Replace with dynamic grouping
-const val groupId = "2"
+const val groupId = "3"
 
 @Composable
 fun RestaurantPrompt(
