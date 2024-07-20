@@ -31,6 +31,7 @@ import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.md_theme_dark_onPrimary
 import com.example.mealmates.ui.theme.md_theme_light_secondary
 import com.example.mealmates.ui.viewModels.LoginViewModel
+import com.google.android.libraries.places.api.net.PlacesClient
 
 data class NavigationItem(
     val icon: ImageVector,
@@ -43,7 +44,7 @@ data class NavigationItem(
     "SuspiciousIndentation"
 )
 @Composable
-fun MealMatesApp(loginModel: LoginViewModel) {
+fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
     val navController = rememberNavController()
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     var showBottomBar by rememberSaveable { mutableStateOf(true) }
@@ -67,6 +68,10 @@ fun MealMatesApp(loginModel: LoginViewModel) {
 
     fun onNavigateToMainPage() {
         navController.navigate(Routes.HOME)
+    }
+
+    fun onNavigateToLocationPage() {
+        navController.navigate(Routes.LOCATION)
     }
 
     fun onNavigateToRestaurantPrompts() {
@@ -96,6 +101,7 @@ fun MealMatesApp(loginModel: LoginViewModel) {
 
     showBottomBar = when (navBackStackEntry?.destination?.route) {
         "survey" -> false
+        "location" -> false
         else -> true
     }
 
@@ -151,7 +157,12 @@ fun MealMatesApp(loginModel: LoginViewModel) {
                     }
 
                     composable(Routes.SURVEY) {
-                        PreferenceAndRestrictions(loginModel) { onNavigateToMainPage() }
+                        PreferenceAndRestrictions(loginModel) { onNavigateToLocationPage() }
+                    }
+
+                    composable(Routes.LOCATION) {
+                        val locationSettingPage = LocationSettingPage()
+                        locationSettingPage.LocationSettings(loginModel, placesClient) { onNavigateToMainPage() }
                     }
 
                     composable(Routes.RESTAURANT_PROMPTS) {

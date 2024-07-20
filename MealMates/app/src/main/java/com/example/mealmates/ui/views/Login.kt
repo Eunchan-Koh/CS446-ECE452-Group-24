@@ -38,15 +38,16 @@ import com.example.mealmates.ui.theme.button_colour
 import com.example.mealmates.ui.theme.md_theme_light_onSecondary
 import com.example.mealmates.ui.theme.md_theme_light_primary
 import com.example.mealmates.ui.viewModels.LoginViewModel
+import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.gms.maps.model.LatLng
 
 @RequiresApi(Build.VERSION_CODES.S)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
 @Composable
-fun Login(mainViewModel: LoginViewModel = viewModel()) {
+fun Login(mainViewModel: LoginViewModel = viewModel(), placesClient: PlacesClient) {
     MealMatesTheme {
         if (mainViewModel.userIsComplete) {
-            MealMatesApp(mainViewModel)
+            MealMatesApp(mainViewModel, placesClient)
         } else {
             Surface(
                 modifier = Modifier.fillMaxSize(),

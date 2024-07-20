@@ -1,7 +1,12 @@
 package com.backend.mealmatesapi.models
 
 import kotlinx.serialization.*
+import kotlinx.serialization.encoding.Decoder
+import kotlinx.serialization.encoding.Encoder
+import java.awt.Point
 import java.awt.geom.Point2D
+import java.sql.Time
+import java.sql.Date
 
 @Serializable
 data class User(

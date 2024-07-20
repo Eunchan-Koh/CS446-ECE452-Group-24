@@ -42,7 +42,6 @@ class User(
             try {
                 val jwt = JWT(id!!)
                 var idString = jwt.subject ?: "1"
-
                 if (idString.startsWith("auth0|")) {
                     idString = idString.slice(6 until idString.length)
                 }

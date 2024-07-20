@@ -5,8 +5,9 @@ import com.backend.mealmatesapi.models.User
 import com.backend.mealmatesapi.services.DatabaseService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
-import java.awt.geom.Point2D
+import java.awt.Point
 import com.backend.mealmatesapi.models.Group
+import java.awt.geom.Point2D
 
 @RestController
 @ComponentScan("com.backend.mealmatesapi.services")
@@ -63,12 +64,17 @@ class UserController {
     @PutMapping("")
     @ResponseBody
     fun updateUser(@RequestBody user: User): String {
-        //TODO: Support for image and location. See GroupController.kt for example
-        var queryStr = "UPDATE User SET "
-        if (user.email.isNotEmpty()) {
+        //TODO: Support for image and location
+        val locationForQuery = if (user.location != Point2D.Double()) {
+            "point(${user.location.x}, ${user.location.y})"
+        } else {
+            "NULL"
+        }
+        var queryStr = "UPDATE Users SET "
+        if(user.email.isNotEmpty()) {
             queryStr += "email = '${user.email}', "
         }
-        if (user.name.isNotEmpty()) {
+        if(user.name.isNotEmpty()) {
             queryStr += "name = '${user.name}', "
         }
         if (user.preferences.isNotEmpty()) {
@@ -77,10 +83,13 @@ class UserController {
         if (user.restrictions.isNotEmpty()) {
             queryStr += "restrictions = ARRAY[${user.restrictions.joinToString(",") { "'$it'" }}], "
         }
+        if(user.location != Point(0,0)) {
+            queryStr += "location = ${locationForQuery}, "
+        }
         queryStr = queryStr.dropLast(2)
         queryStr += " WHERE uid = '${user.id}';"
         databaseService.query(queryStr)
-        return "Updated user with id ${user.id}, email ${user.email}, name ${user.name}, preferences ${user.preferences}, restrictions ${user.restrictions} RETURNING uid"
+        return "Updated user with id ${user.id}, email ${user.email}, name ${user.name}, preferences ${user.preferences}, restrictions ${user.restrictions}, location ${user.location} RETURNING uid"
     }
 
     @GetMapping("/groups")

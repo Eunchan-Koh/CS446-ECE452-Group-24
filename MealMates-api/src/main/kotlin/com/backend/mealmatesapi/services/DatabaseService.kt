@@ -13,7 +13,6 @@ import java.sql.*
 
 class DatabaseService {
     var db: Connection? = null
-
     @PostConstruct
     private fun main() {
         try {
