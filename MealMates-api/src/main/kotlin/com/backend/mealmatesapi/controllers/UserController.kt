@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 import java.awt.Point
 import com.backend.mealmatesapi.models.Group
+import java.awt.geom.Point2D
 
 @RestController
 @ComponentScan("com.backend.mealmatesapi.services")
@@ -23,23 +24,23 @@ class UserController {
     fun getUser(@RequestParam("id") id: String): User {
         val result: List<List<Any>>? = databaseService.query("SELECT * FROM Users u where u.uid = '$id';")
         if(result.isNullOrEmpty()) {
-            return User("", "User not found", "User not found", listOf(), listOf(), ByteArray(0), Point(0, 0))
+            return User("", "User not found", "User not found", listOf(), listOf(), ByteArray(0), Point2D.Double())
         } else if(result[0][0] is String && result[0][1] is String && result[0][2] is String && result[0][3] is Array<*> &&
             result[0][4] is Array<*>) {
 
             var image = ByteArray(0)
-            var location = Point(0, 0)
+            var location = Point2D.Double()
             if(result[0][5] is ByteArray) {
                 image = result[0][5] as ByteArray
             }
-            if(result[0][6] is Point) {
-                location = result[0][6] as Point
+            if(result[0][6] is Point2D.Double) {
+                location = result[0][6] as Point2D.Double
             }
 
             return User(result[0][0] as String, result[0][1] as String, result[0][2] as String,
                 (result[0][3] as Array<String>).toList(), (result[0][4] as Array<String>).toList(), image, location)
         } else {
-            return User("", "User not found", "User not found", listOf(), listOf(), ByteArray(0), Point(0, 0))
+            return User("", "User not found", "User not found", listOf(), listOf(), ByteArray(0), Point2D.Double())
         }
     }
 
@@ -55,12 +56,17 @@ class UserController {
     @ResponseBody
     fun updateUser(@RequestBody user: User): String {
         //TODO: Support for image and location
-        var queryStr = "UPDATE User SET "
+        val locationForQuery = if (user.location != Point2D.Double()) {
+            "point(${user.location.x}, ${user.location.y})"
+        } else {
+            "NULL"
+        }
+        var queryStr = "UPDATE Users SET "
         if(user.email.isNotEmpty()) {
-            queryStr += "email = '$user.email', "
+            queryStr += "email = '${user.email}', "
         }
         if(user.name.isNotEmpty()) {
-            queryStr += "name = '$user.name', "
+            queryStr += "name = '${user.name}', "
         }
         if(user.preferences.isNotEmpty()) {
             queryStr += "preferences = ARRAY[${user.preferences.joinToString(",")}], "
@@ -68,10 +74,13 @@ class UserController {
         if(user.restrictions.isNotEmpty()) {
             queryStr += "restrictions = ARRAY[${user.restrictions.joinToString(",")}], "
         }
+        if(user.location != Point(0,0)) {
+            queryStr += "location = ${locationForQuery}, "
+        }
         queryStr = queryStr.dropLast(2)
-        queryStr += " WHERE uid = '$user.id';"
+        queryStr += " WHERE uid = '${user.id}';"
         databaseService.query(queryStr)
-        return "Updated user with id $user.id, email $user.email, name $user.name, preferences $user.preferences, restrictions $user.restrictions RETURNING uid"
+        return "Updated user with id ${user.id}, email ${user.email}, name ${user.name}, preferences ${user.preferences}, restrictions ${user.restrictions}, location ${user.location} RETURNING uid"
     }
 
     @GetMapping("/groups")

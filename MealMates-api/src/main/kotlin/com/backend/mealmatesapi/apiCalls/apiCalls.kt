@@ -22,9 +22,32 @@ fun searchNearbyMatches(requestBodyString: String): String {
                     headers {
                         append(HttpHeaders.ContentType, ContentType.Application.Json)
                         append("X-Goog-Api-Key", apiKey)
-                        append("X-Goog-FieldMask", FieldMasks.DEFAULT)
+                        append("X-Goog-FieldMask", FieldMasks.SEARCH_NEARBY_DEFAULT)
                     }
                     setBody(requestBodyString)
+                }.bodyAsText()
+                responseString = res
+            }
+        }
+        responseString
+    } catch (e: Exception) {
+        throw e
+    }
+}
+
+fun getPlaceDetails(placeID: String): String {
+    val client = HttpClient(Android)
+    val apiKey = "AIzaSyAjTN0RQCtZ3sWV6g_bw-D75cZkk6bmL3s"
+    return try {
+        var responseString = ""
+        runBlocking {
+            launch {
+                val res: String = client.get("https://places.googleapis.com/v1/${placeID}/") {
+                    headers {
+                        append(HttpHeaders.ContentType, ContentType.Application.Json)
+                        append("X-Goog-Api-Key", apiKey)
+                        append("X-Goog-FieldMask", FieldMasks.PLACE_DETAILS_DEFAULT)
+                    }
                 }.bodyAsText()
                 responseString = res
             }

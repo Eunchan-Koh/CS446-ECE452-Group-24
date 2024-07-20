@@ -4,6 +4,7 @@ import kotlinx.serialization.*
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import java.awt.Point
+import java.awt.geom.Point2D
 import java.sql.Time
 import java.sql.Date
 
@@ -15,19 +16,20 @@ data class User(
     val preferences: List<String> = emptyList(),
     val restrictions: List<String> = emptyList(),
     val image: ByteArray = ByteArray(0),
-    @Serializable(with = PointSerializer::class)
-    val location: Point = Point(0, 0),
+    @Serializable(with = Point2DSerializer::class)
+    val location: Point2D.Double = Point2D.Double()
 ) {
-    @Serializer(forClass = Point::class)
-    class PointSerializer {
+    @OptIn(ExperimentalSerializationApi::class)
+    @Serializer(forClass = Point2D.Double::class)
+    class Point2DSerializer {
 
-        override fun serialize(encoder: Encoder, value: Point) {
+        override fun serialize(encoder: Encoder, value: Point2D.Double) {
             encoder.encodeString("${value.x},${value.y}")
         }
 
-        override fun deserialize(decoder: Decoder): Point {
-            val (x, y) = decoder.decodeString().split(",").map { it.toInt() }
-            return Point(x, y)
+        override fun deserialize(decoder: Decoder): Point2D.Double {
+            val (x, y) = decoder.decodeString().split(",").map { it.toDouble() }
+            return Point2D.Double(x, y)
         }
     }
 

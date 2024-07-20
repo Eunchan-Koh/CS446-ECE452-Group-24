@@ -13,18 +13,23 @@ import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-object PointSerializer : KSerializer<Point> {
+object PointSerializer : KSerializer<Point2D> {
     override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Point", PrimitiveKind.STRING)
 
-    override fun serialize(encoder: Encoder, value: Point) {
+    override fun serialize(encoder: Encoder, value: Point2D) {
         encoder.encodeString("${value.x},${value.y}")
     }
 
-    override fun deserialize(decoder: Decoder): Point {
-        val (x, y) = decoder.decodeString().split(",").map { it.toInt() }
-        return Point(x, y)
+    override fun deserialize(decoder: Decoder): Point2D {
+        val (x, y) = decoder.decodeString().split(",").map { it.toDouble() }
+        return Point2D(x, y)
     }
 }
+
+data class Point2D (
+    val x: Double,
+    val y: Double
+)
 
 @Serializable
 class User(var id: String? = null,
@@ -34,7 +39,7 @@ class User(var id: String? = null,
            var restrictions: List<String> = emptyList(),
            var image: ByteArray = byteArrayOf(0),
            @Serializable(with = PointSerializer::class)
-           var location: Point = Point(0, 0)) {
+           var location: Point2D = Point2D(0.0, 0.0)) {
 
 
     private val TAG = "User"
@@ -45,12 +50,19 @@ class User(var id: String? = null,
                 val jwt = JWT(id!!)
                 var idString = jwt.subject ?: "1"
 
+                println("huhuhhhhh")
+
                 if (idString.startsWith("auth0|")) {
+                    println("AAAAAAAAAA")
                     idString = idString.slice(6 until idString.length)
+                    println("!!!!!!!!")
                 }
                 id = idString
                 name = jwt.getClaim("name").asString() ?: ""
                 email = jwt.getClaim("email").asString() ?: ""
+                var locationString = jwt.getClaim("location").asString() ?: ""
+                println("......")
+                println(locationString)
             } catch (error: com.auth0.android.jwt.DecodeException) {
                 println(TAG + "Error occurred trying to decode JWT: $error ")
             }
