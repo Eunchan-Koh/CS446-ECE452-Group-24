@@ -47,6 +47,47 @@ object RestaurantTypes {
     val VIETNAMESE = "vietnamese_restaurant"
 }
 
+val RESTAURANT_TYPE_LABEL_LIST = mapOf<String, String>(
+    "American" to RestaurantTypes.AMERICAN,
+    "Bakery" to RestaurantTypes.BAKERY,
+    "Barbecue" to RestaurantTypes.BARBECUE,
+    "Brazilian" to RestaurantTypes.BRAZILIAN,
+    "Breakfast" to RestaurantTypes.BREAKFAST,
+    "Brunch" to RestaurantTypes.BRUNCH,
+    "Cafe" to RestaurantTypes.CAFE,
+    "Chinese" to RestaurantTypes.CHINESE,
+    "Coffee" to RestaurantTypes.COFFEE,
+    "Fast Food" to RestaurantTypes.FAST_FOOD,
+    "French" to RestaurantTypes.FRENCH,
+    "Greek" to RestaurantTypes.GREEK,
+    "Hamburger" to RestaurantTypes.HAMBURGER,
+    "Ice Cream" to RestaurantTypes.ICE_CREAM,
+    "Indian" to RestaurantTypes.INDIAN,
+    "Indonesian" to RestaurantTypes.INDONESIAN,
+    "Italian" to RestaurantTypes.ITALIAN,
+    "Japanese" to RestaurantTypes.JAPANESE,
+    "Korean" to RestaurantTypes.KOREAN,
+    "Lebanese" to RestaurantTypes.LEBANESE,
+    "Meal Delivery" to RestaurantTypes.MEAL_DELIVERY,
+    "Meal Takeaway" to RestaurantTypes.MEAL_TAKEAWAY,
+    "Mediterranean" to RestaurantTypes.MEDITERRANEAN,
+    "Mexican" to RestaurantTypes.MEXICAN,
+    "Middle Eastern" to RestaurantTypes.MIDDLE_EASTERN,
+    "Pizza" to RestaurantTypes.PIZZA,
+    "Ramen" to RestaurantTypes.RAMEN,
+    "Restaurant" to RestaurantTypes.RESTAURANT,
+    "Sandwich" to RestaurantTypes.SANDWICH,
+    "Seafood" to RestaurantTypes.SEAFOOD,
+    "Spanish" to RestaurantTypes.SPANISH,
+    "Steak House" to RestaurantTypes.STEAK_HOUSE,
+    "Sushi" to RestaurantTypes.SUSHI,
+    "Thai" to RestaurantTypes.THAI,
+    "Turkish" to RestaurantTypes.TURKISH,
+    "Vegan" to RestaurantTypes.VEGAN,
+    "Vegetarian" to RestaurantTypes.VEGETARIAN,
+    "Vietnamese" to RestaurantTypes.VIETNAMESE,
+    )
+
 // This is a reverse mapping of RestaurantTypes above with undesired labels removed
 val RestaurantTypeToLabel =
     mapOf(
@@ -85,3 +126,5 @@ val RestaurantTypeToLabel =
         "vegan_restaurant" to "VEGAN",
         "vegetarian_restaurant" to "VEGETARIAN",
         "vietnamese_restaurant" to "VIETNAMESE")
+
+    

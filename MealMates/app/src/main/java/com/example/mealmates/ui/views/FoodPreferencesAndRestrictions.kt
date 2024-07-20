@@ -2,20 +2,18 @@ package com.example.mealmates.ui.views
 
 import android.os.Build
 import androidx.annotation.RequiresApi
-import androidx.compose.foundation.background
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
@@ -30,43 +28,37 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mealmates.constants.GlobalObjects
+import com.example.mealmates.constants.RESTAURANT_TYPE_LABEL_LIST
 import com.example.mealmates.ui.theme.md_theme_light_primary
 import com.example.mealmates.ui.viewModels.LoginViewModel
-
 
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
 fun PreferenceAndRestrictions(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit = {}) {
-    val preferences = listOf(
-        "Chinese", "Indian", "Italian", "Korean",
-        "+",
-    )
+    val selectedPreferences = remember { mutableStateListOf<String>() }
 
-    val restrictions = listOf(
-        "Vegan", "Halal", "Kosher", "Vegetarian", "Gluten-Free", "Pescatarian", "Paleo",
-        "Dairy-Free", "+"
-    )
-
-    Column(
-        Modifier.fillMaxHeight(),
-        verticalArrangement = Arrangement.SpaceBetween
-    )
-    {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .padding(30.dp)
+    ) {
         Column(
             Modifier
-                .verticalScroll(state = rememberScrollState())
                 .fillMaxSize()
-                .padding(30.dp)
+                .verticalScroll(ScrollState(0)),
+            verticalArrangement = Arrangement.SpaceBetween,
         ) {
             Text(
                 text = "Food Preferences",
@@ -75,24 +67,27 @@ fun PreferenceAndRestrictions(loginModel: LoginViewModel, onNavigateToMainPage: 
                 color = md_theme_light_primary,
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
-            SearchFieldWithSearchIcon();
-            Spacer(modifier = Modifier.height(8.dp))
-
             FlowRow(
                 Modifier
-                    .fillMaxWidth(1f)
+                    .fillMaxWidth()
                     .wrapContentHeight(),
-                horizontalArrangement = Arrangement.spacedBy(15.dp),
-                maxItemsInEachRow = 4,
+                    verticalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.SpaceAround
             ) {
-                for (p in preferences) {
+                for (r in RESTAURANT_TYPE_LABEL_LIST) {
                     var selected by remember { mutableStateOf(false) }
 
                     FilterChip(
-                        onClick = { selected = !selected },
+                        onClick = {
+                            selected = !selected;
+                            if (selected) {
+                                selectedPreferences.add(r.value)
+                            } else {
+                                selectedPreferences.remove(r.value)
+                            }
+                        },
                         label = {
-                            Text(p)
+                            Text(r.key)
                         },
                         selected = selected,
                         leadingIcon = if (selected) {
@@ -109,54 +104,38 @@ fun PreferenceAndRestrictions(loginModel: LoginViewModel, onNavigateToMainPage: 
                 }
             }
 
-            Spacer(modifier = Modifier.height(30.dp))
-
-
-            Text(
-                text = "Food Restrictions",
-                fontSize = 40.sp,
-                fontWeight = FontWeight.Bold,
-                color = md_theme_light_primary,
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
-            SearchFieldWithSearchIcon()
-            Spacer(modifier = Modifier.height(8.dp))
-
-
-            FlowRow(
-                Modifier
-                    .fillMaxWidth(1f)
-                    .wrapContentHeight(),
-                horizontalArrangement = Arrangement.spacedBy(10.dp),
-            ) {
-                for (r in restrictions) {
-                    var selected by remember { mutableStateOf(false) }
-
-                    FilterChip(
-                        onClick = { selected = !selected },
-                        label = {
-                            Text(r)
-                        },
-                        selected = selected,
-                        leadingIcon = if (selected) {
-                            {
-                                Icon(
-                                    imageVector = Icons.Filled.Done,
-                                    contentDescription = "Done icon",
-                                )
-                            }
-                        } else {
-                            null
-                        },
-                    )
-                }
-            }
+            SaveChangesButton(loginModel, onNavigateToMainPage, selectedPreferences);
         }
-        // TODO: When user clicks on Save Changes, save the preferences and restrictions
-        // HOW TO: GlobalObjects.user.preferences = preferences
-        // HOW TO: GlobalObjects.user.restrictions = restrictions
-        SaveChangesButton(loginModel, onNavigateToMainPage);
+    }
+}
+
+@RequiresApi(Build.VERSION_CODES.S)
+@Composable
+fun SaveChangesButton(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit = {}, selectedPreferences: List<String>) {
+    val buttonColor = remember { mutableStateOf(md_theme_light_primary) }
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(30.dp),
+        verticalAlignment = Alignment.Bottom,
+        horizontalArrangement = Arrangement.Center,
+    ) {
+        Button(
+            onClick = {
+                onNavigateToMainPage();
+                GlobalObjects.user.preferences = selectedPreferences;
+                GlobalObjects.user.restrictions = selectedPreferences;
+            },
+            colors = ButtonDefaults.buttonColors(
+                md_theme_light_primary
+            ),
+            modifier = Modifier
+                .height(50.dp),
+            shape = CircleShape
+        ) {
+            Text(text = "Save Changes", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        }
     }
 }
 
@@ -171,7 +150,6 @@ fun SaveCancelButton() {
         CancelButton();
     }
 }
-
 @Composable
 fun SearchFieldWithSearchIcon() {
     var text by remember { mutableStateOf(TextFieldValue("")) }
@@ -192,31 +170,6 @@ fun SearchFieldWithSearchIcon() {
             Text(text = "Search")
         },
     )
-}
-
-@RequiresApi(Build.VERSION_CODES.S)
-@Composable
-fun SaveChangesButton(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit = {}) {
-    val buttonColor = remember { mutableStateOf(md_theme_light_primary) }
-
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(30.dp),
-        horizontalArrangement = Arrangement.Center,
-    ) {
-        Button(
-            onClick = { onNavigateToMainPage() },
-            colors = ButtonDefaults.buttonColors(
-                md_theme_light_primary
-            ),
-            modifier = Modifier
-                .height(50.dp),
-            shape = CircleShape
-        ) {
-            Text(text = "Save Changes", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-        }
-    }
 }
 
 @Composable
