@@ -54,7 +54,6 @@ fun PlacesTest(loginModel: LoginViewModel) {
     PlacesResultDisplay(places = nearbySearchResults)
 }
 
-@Composable
 fun searchNearbyMatches(requestBodyString: String): String {
     val client = HttpClient(Android)
     val apiKey = "AIzaSyAjTN0RQCtZ3sWV6g_bw-D75cZkk6bmL3s"

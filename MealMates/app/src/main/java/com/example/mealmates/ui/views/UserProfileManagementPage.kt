@@ -1,6 +1,5 @@
 package com.example.mealmates.ui.views
 
-import android.graphics.Point
 import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -32,10 +31,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.mealmates.apiCalls.UserApi
 import com.example.mealmates.constants.GlobalObjects
-import com.example.mealmates.models.User
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
+import com.google.android.gms.maps.model.LatLng
 
 @Composable
 fun UserProfileManagementPage(loginModel: LoginViewModel, onNavigateToSurvey: () -> Unit = {}) {
@@ -129,7 +128,7 @@ fun nameSetupProfile(userName: String) : String{
     return value
 }
 @Composable
-fun LocationSetupProfile(userLocation: Point){
+fun LocationSetupProfile(userLocation: LatLng){
     val (value, setValue) = remember {
         mutableStateOf(userLocation.toString())
     }

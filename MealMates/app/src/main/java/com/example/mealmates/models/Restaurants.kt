@@ -3,6 +3,8 @@ package com.example.mealmates.models
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 
+data class Matched(val rids: List<String>, val liked: List<Int>, val completed: List<String>)
+
 @Serializable
 data class Restaurants(
     val rid: Int,
@@ -25,7 +27,6 @@ data class Restaurants(
         if (gid != other.gid) return false
         if (matched != other.matched) return false
         if (suggested != other.suggested) return false
-
 
         return true
     }
