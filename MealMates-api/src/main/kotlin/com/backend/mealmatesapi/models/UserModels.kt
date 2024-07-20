@@ -16,22 +16,9 @@ data class User(
     val preferences: List<String> = emptyList(),
     val restrictions: List<String> = emptyList(),
     val image: ByteArray = ByteArray(0),
-    @Serializable(with = Point2DSerializer::class)
-    val location: Point2D.Double = Point2D.Double()
+    @Serializable(with = Group.Point2DSerializer::class)
+    val location: Point2D.Double = Point2D.Double(),
 ) {
-    @OptIn(ExperimentalSerializationApi::class)
-    @Serializer(forClass = Point2D.Double::class)
-    class Point2DSerializer {
-
-        override fun serialize(encoder: Encoder, value: Point2D.Double) {
-            encoder.encodeString("${value.x},${value.y}")
-        }
-
-        override fun deserialize(decoder: Decoder): Point2D.Double {
-            val (x, y) = decoder.decodeString().split(",").map { it.toDouble() }
-            return Point2D.Double(x, y)
-        }
-    }
 
     override fun toString(): String {
         return "User(id=$id, email='$email', name='$name', preferences='$preferences', restrictions='$restrictions')"

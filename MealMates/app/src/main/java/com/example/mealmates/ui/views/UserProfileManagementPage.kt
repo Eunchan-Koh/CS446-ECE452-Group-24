@@ -36,6 +36,7 @@ import com.example.mealmates.models.User
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
+import com.google.android.gms.maps.model.LatLng
 
 @Composable
 fun UserProfileManagementPage(loginModel: LoginViewModel, onNavigateToSurvey: () -> Unit = {}) {
@@ -129,7 +130,7 @@ fun nameSetupProfile(userName: String) : String{
     return value
 }
 @Composable
-fun LocationSetupProfile(userLocation: Point2D){
+fun LocationSetupProfile(userLocation: LatLng){
     val (value, setValue) = remember {
         mutableStateOf(userLocation.toString())
     }

@@ -1,28 +1,26 @@
 package com.example.mealmates.models
 
-import android.graphics.Point
 import com.auth0.android.jwt.JWT
-import kotlinx.serialization.Contextual
-import kotlinx.serialization.ExperimentalSerializationApi
+import com.google.android.gms.maps.model.LatLng
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.Serializer
 import kotlinx.serialization.descriptors.PrimitiveKind
 import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 
-object PointSerializer : KSerializer<Point2D> {
-    override val descriptor: SerialDescriptor = PrimitiveSerialDescriptor("Point", PrimitiveKind.STRING)
+object LatLngSerializer : KSerializer<LatLng> {
+    override val descriptor: SerialDescriptor =
+        PrimitiveSerialDescriptor("Point", PrimitiveKind.STRING)
 
-    override fun serialize(encoder: Encoder, value: Point2D) {
-        encoder.encodeString("${value.x},${value.y}")
+    override fun serialize(encoder: Encoder, value: LatLng) {
+        encoder.encodeString("${value.latitude},${value.longitude}")
     }
 
-    override fun deserialize(decoder: Decoder): Point2D {
+    override fun deserialize(decoder: Decoder): LatLng {
         val (x, y) = decoder.decodeString().split(",").map { it.toDouble() }
-        return Point2D(x, y)
+        return LatLng(x, y)
     }
 }
 
@@ -32,15 +30,15 @@ data class Point2D (
 )
 
 @Serializable
-class User(var id: String? = null,
-           var name: String = "",
-           var email: String = "",
-           var preferences: List<String> = emptyList(),
-           var restrictions: List<String> = emptyList(),
-           var image: ByteArray = byteArrayOf(0),
-           @Serializable(with = PointSerializer::class)
-           var location: Point2D = Point2D(0.0, 0.0)) {
-
+class User(
+    var id: String? = null,
+    var name: String = "",
+    var email: String = "",
+    var preferences: List<String> = emptyList(),
+    var restrictions: List<String> = emptyList(),
+    var image: ByteArray = byteArrayOf(0),
+    @Serializable(with = LatLngSerializer::class) var location: LatLng = LatLng(0.0, 0.0)
+) {
 
     private val TAG = "User"
 

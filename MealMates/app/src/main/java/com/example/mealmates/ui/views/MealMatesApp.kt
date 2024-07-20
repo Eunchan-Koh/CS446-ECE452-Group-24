@@ -174,7 +174,7 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                     }
 
                     composable(Routes.GROUP) {
-                        GroupPage(loginModel, { onNavigateToGroupMembers() }, { searchNearbyPlaces() })
+                        GroupPage(loginModel, { onNavigateToGroupMembers() }, { onNavigateToRestaurantPrompts() })
                     }
 
                     composable(Routes.GROUP_MEMBERS) {

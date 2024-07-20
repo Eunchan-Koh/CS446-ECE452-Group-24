@@ -8,7 +8,6 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
-import io.ktor.util.InternalAPI
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -19,25 +18,23 @@ class RestaurantsApi {
 
     private val host: String = "http://10.0.2.2:8080"
     private val nullRestaurants = Restaurants(-1, -1)
-    private val client = HttpClient(Android) {
-        install(ContentNegotiation) {
-            json(Json {
-                prettyPrint = true
-                isLenient = true
-                ignoreUnknownKeys = true
-            })
-            ContentType.Application.Json
+    private val client =
+        HttpClient(Android) {
+            install(ContentNegotiation) {
+                json(
+                    Json {
+                        prettyPrint = true
+                        isLenient = true
+                        ignoreUnknownKeys = true
+                    })
+                ContentType.Application.Json
+            }
         }
-    }
 
-    fun getRestaurants(id: String): Restaurants {
+    fun getRestaurants(gid: String): Restaurants {
         return try {
             var restaurants: Restaurants? = null
-            runBlocking {
-                launch {
-                    restaurants = client.get("$host/restaurants?id=$id").body()
-                }
-            }
+            runBlocking { launch { restaurants = client.get("$host/restaurants?gid=$gid").body() } }
             if (restaurants != null) {
                 restaurants as Restaurants
             } else {
@@ -54,10 +51,14 @@ class RestaurantsApi {
             runBlocking {
                 launch {
                     println("Adding restaurants: $restaurants")
-                    success = client.post("$host/restaurants") {
-                        contentType(ContentType.Application.Json)
-                        setBody(restaurants)
-                    }.status.isSuccess()
+                    success =
+                        client
+                            .post("$host/restaurants") {
+                                contentType(ContentType.Application.Json)
+                                setBody(restaurants)
+                            }
+                            .status
+                            .isSuccess()
                 }
             }
             success
@@ -72,10 +73,14 @@ class RestaurantsApi {
             runBlocking {
                 launch {
                     println("Editing restaurants: $restaurants")
-                    success = client.put("$host/restaurants") {
-                        contentType(ContentType.Application.Json)
-                        setBody(restaurants)
-                    }.status.isSuccess()
+                    success =
+                        client
+                            .put("$host/restaurants") {
+                                contentType(ContentType.Application.Json)
+                                setBody(restaurants)
+                            }
+                            .status
+                            .isSuccess()
                 }
             }
             success
@@ -88,14 +93,11 @@ class RestaurantsApi {
         return try {
             var success = false
             runBlocking {
-                launch {
-                    success = client.delete("$host/restaurants?gid=$gid").status.isSuccess()
-                }
+                launch { success = client.delete("$host/restaurants?gid=$gid").status.isSuccess() }
             }
             success
         } catch (e: Exception) {
             throw e
         }
     }
-
 }
