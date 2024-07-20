@@ -1,7 +1,9 @@
 package com.example.mealmates.ui.views
 
+import android.graphics.BitmapFactory
 import android.graphics.Paint.Align
 import android.widget.Space
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -32,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -130,7 +133,8 @@ fun ListGroupsMainPage(OnNavigateToGroup: () -> Unit = {}) {
         modifier = Modifier
             .verticalScroll(rememberScrollState())
     ) {
-        for (i in 1..groupSize) {
+
+        for (i in 0..groupSize-1) {
             Column(
                 modifier = Modifier
                     .height(92.dp)
@@ -148,7 +152,12 @@ fun ListGroupsMainPage(OnNavigateToGroup: () -> Unit = {}) {
                     horizontalArrangement = Arrangement.Center
                 ) {
 //                Image(painter = , contentDescription = )
-                    Icon(
+                    var GroupNImage = BitmapFactory.decodeByteArray(groups[i].image,
+                        0, groups[i].image.size)
+//                    Text(text = "$tempI")
+                    if (GroupNImage!=null)
+                        Image(bitmap = GroupNImage.asImageBitmap(), contentDescription = "")
+                    else Icon(
                         Icons.Default.AddCircle,
                         "add",
                         tint = Color.LightGray,
@@ -164,9 +173,28 @@ fun ListGroupsMainPage(OnNavigateToGroup: () -> Unit = {}) {
                         verticalArrangement = Arrangement.Center,
                         horizontalAlignment = Alignment.Start
                     ) {
-                        Text("Group$i", fontWeight = FontWeight.Bold, fontSize = 24.sp)
+                        var GroupNName = groups[i].name
+                        Text(GroupNName, fontWeight = FontWeight.Bold, fontSize = 24.sp)
                         Spacer(modifier = Modifier.width(40.dp))
-                        Text("Tags: pizza, hamburger, ...", fontSize = 18.sp)
+                        var tagNames : String
+                        var tempSum = 0
+                        Row (
+
+                        ){
+                            Text(text = "tags: ")
+                            for(a in 0..<groups[i].preferences.size){
+                                tagNames = groups[i].preferences[a]
+                                tempSum += groups[i].preferences[0].length
+                                if( tempSum <= 20)
+                                    Text(text = "$tagNames,", fontSize = 18.sp)
+                                else {
+                                    Text(text = "...")
+                                    break
+                                }
+                            }
+                        }
+
+//                        Text("Tags: pizza, hamburger, ...", fontSize = 18.sp)
                     }
                 }
             }

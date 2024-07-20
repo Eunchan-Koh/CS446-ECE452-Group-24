@@ -1,6 +1,10 @@
 package com.example.mealmates.ui.views
 
+import android.graphics.BitmapFactory
 import android.widget.Toast
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -16,21 +20,25 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.internal.enableLiveLiterals
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.mealmates.apiCalls.UserApi
 import com.example.mealmates.constants.GlobalObjects
+import com.example.mealmates.models.User
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
@@ -61,7 +69,7 @@ fun UserProfileManagementPage(loginModel: LoginViewModel, onNavigateToSurvey: ()
                 .fillMaxWidth()
 //                .background(color = Color.Green),
                 )
-            ChoosePicProfile()
+            ChoosePicProfile(userCur)
             tempUserName = nameSetupProfile(userName)
             //Location is being shown using point only; need to be fixed to address later
             //Email section can be added - will work on it after some discussion
@@ -86,17 +94,34 @@ fun UserProfileManagementPage(loginModel: LoginViewModel, onNavigateToSurvey: ()
 
 
 @Composable
-fun ChoosePicProfile(){
-    Icon(
-        Icons.Default.AddCircle,
-        "add",
-        tint = Color.LightGray,
+fun ChoosePicProfile(userCur: User) {
+    val curCon = LocalContext.current
+    Column(
         modifier = Modifier
-            .padding(10.dp)
-//            .width(82.dp)
-//            .height(82.dp)
-            .size(110.dp),
-    )
+            .background(color = Color.White)
+            .clickable {
+                Toast.makeText(curCon, "Clicked on Image Selection area!",
+                Toast.LENGTH_SHORT).show()
+            }
+    ) {
+        var UserImage = BitmapFactory.decodeByteArray(userCur.image, 0, userCur.image.size)
+//                    Text(text = "$tempI")
+        if (UserImage!=null)
+            Image(bitmap = UserImage.asImageBitmap(), contentDescription = "")
+        else
+            Icon(
+                Icons.Default.AddCircle,
+                "add",
+                tint = Color.LightGray,
+                modifier = Modifier
+                    .padding(10.dp)
+    //            .width(82.dp)
+    //            .height(82.dp)
+                    .size(110.dp),
+            )
+
+    }
+
 }
 
 @Composable
