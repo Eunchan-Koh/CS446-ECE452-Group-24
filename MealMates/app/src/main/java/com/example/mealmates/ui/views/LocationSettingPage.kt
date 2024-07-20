@@ -36,7 +36,6 @@ import androidx.compose.ui.unit.sp
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.mealmates.apiCalls.UserApi
-import com.example.mealmates.models.Point2D
 import com.example.mealmates.ui.theme.md_theme_light_primary
 import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.google.android.gms.common.api.ApiException
@@ -139,7 +138,7 @@ class LocationSettingPage : AppCompatActivity() {
                     val mostLikelyPlaceLatLng = response.placeLikelihoods[0].place.latLng
                     val currentUser = this.loginModel.user
                     if (mostLikelyPlaceLatLng != null) {
-                        currentUser.location = Point2D(mostLikelyPlaceLatLng.latitude, mostLikelyPlaceLatLng.longitude)
+                        currentUser.location = mostLikelyPlaceLatLng
                     }
                     UserApi().updateUser(currentUser)
                     currentPlacesFound = true

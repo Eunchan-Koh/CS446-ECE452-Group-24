@@ -32,7 +32,6 @@ import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mealmates.apiCalls.UserApi
 import com.example.mealmates.constants.GlobalObjects
-import com.example.mealmates.models.Point2D
 import com.example.mealmates.ui.components.HeadlineLarge
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour

@@ -24,11 +24,6 @@ object LatLngSerializer : KSerializer<LatLng> {
     }
 }
 
-data class Point2D (
-    val x: Double,
-    val y: Double
-)
-
 @Serializable
 class User(
     var id: String? = null,
@@ -47,20 +42,12 @@ class User(
             try {
                 val jwt = JWT(id!!)
                 var idString = jwt.subject ?: "1"
-
-                println("huhuhhhhh")
-
                 if (idString.startsWith("auth0|")) {
-                    println("AAAAAAAAAA")
                     idString = idString.slice(6 until idString.length)
-                    println("!!!!!!!!")
                 }
                 id = idString
                 name = jwt.getClaim("name").asString() ?: ""
                 email = jwt.getClaim("email").asString() ?: ""
-                var locationString = jwt.getClaim("location").asString() ?: ""
-                println("......")
-                println(locationString)
             } catch (error: com.auth0.android.jwt.DecodeException) {
                 println(TAG + "Error occurred trying to decode JWT: $error ")
             }
