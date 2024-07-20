@@ -5,7 +5,8 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.context.annotation.ComponentScan
 import com.backend.mealmatesapi.models.Group
 import org.springframework.web.bind.annotation.*
-import java.awt.Point
+import java.awt.geom.Point2D
+import java.util.*
 
 @RestController
 @ComponentScan("com.backend.mealmatesapi.services")
@@ -19,39 +20,52 @@ class GroupController {
     @ResponseBody
     fun getGroup(@RequestParam("id") id: String): Group {
         val result: List<List<Any>>? = databaseService.query("SELECT * FROM Groups g where g.gid = '$id';")
-        if(result.isNullOrEmpty()) {
-            return Group(-1, "Group not found", listOf(), listOf(), listOf(), ByteArray(0), Point(0,0))
-        } else if(result[0][0] is String && result[0][1] is String && result[0][2] is String && result[0][3] is Array<*> &&
-            result[0][4] is Array<*>) {
+        if (result.isNullOrEmpty()) {
+            return Group(-1, "Group not found", listOf(), listOf(), listOf(), ByteArray(0), Point2D.Double())
+        } else if (result[0][0] is Int && result[0][1] is String && result[0][2] is Array<*> && result[0][3] is Array<*> &&
+            result[0][4] is Array<*>
+        ) {
             var image = ByteArray(0)
-            var location = Point(0,0)
-            if(result[0][5] is ByteArray) {
+            var location = Point2D.Double()
+            if (result[0][5] is String) {
+                // TODO: May need to convert this differently
                 image = result[0][5] as ByteArray
             }
-            if(result[0][6] is Point) {
-                location = result[0][6] as Point
+            if (result[0][6] is Point2D.Double) {
+                location = result[0][6] as Point2D.Double
             }
-            return Group(result[0][0] as Int, result[0][1] as String, (result[0][2] as Array<String>).toList(),
-                (result[0][3] as Array<String>).toList(), (result[0][4] as Array<String>).toList(), image, location)
+
+            return Group(
+                result[0][0] as Int, result[0][1] as String, (result[0][2] as Array<String>).toList(),
+                (result[0][3] as Array<String>).toList(), (result[0][4] as Array<String>).toList(), image, location
+            )
         } else {
-            return Group(-1, "Group not found", listOf(), listOf(), listOf(), ByteArray(0), Point(0,0))
+            return Group(-1, "Group not found", listOf(), listOf(), listOf(), ByteArray(0), Point2D.Double())
         }
     }
 
     @PostMapping("")
     @ResponseBody
     fun createGroup(@RequestBody group: Group): String {
-        val imageForQuery = if(group.image.isNotEmpty()) {
-            group.image
+        val imageForQuery = if (group.image.isNotEmpty()) {
+            "'${Base64.getEncoder().encodeToString(group.image)}'"
         } else {
-            ByteArray(0)
+            "NULL"
         }
-        val locationForQuery = if(group.location != Point(0,0)) {
-            group.location
+        val locationForQuery = if (group.location != Point2D.Double()) {
+            "point(${group.location.x}, ${group.location.y})"
         } else {
-            Point(0,0)
+            "NULL"
         }
-        val query = "INSERT INTO Groups (gid, name, uids, preferences, restrictions, image, location) VALUES ('${group.gid}', '${group.name}', ARRAY[${group.uids.joinToString(",")}]::text[], ARRAY[${group.preferences.joinToString(",")}]::text[], ARRAY[${group.restrictions.joinToString(",")}]::text[], ${imageForQuery}, ${locationForQuery}) RETURNING gid;"
+        val query =
+            "INSERT INTO Groups (name, uids, preferences, restrictions, image, location) VALUES ('${group.name}', ARRAY[${
+                group.uids.joinToString(",") { "'$it'" }
+            }]::text[], ARRAY[${group.preferences.joinToString(",") { "'$it'" }}]::text[], ARRAY[${
+                group.restrictions.joinToString(
+                    ","
+                ) { "'$it'" }
+            }]::text[], ${imageForQuery}, ${locationForQuery}) RETURNING gid;"
+
         databaseService.query(query)
         return "Inserted group with id ${group.gid}, name ${group.name}, uids ${group.uids}, preferences ${group.preferences}, restrictions ${group.restrictions}"
     }
@@ -59,33 +73,33 @@ class GroupController {
     @PutMapping("")
     @ResponseBody
     fun updateGroup(@RequestBody group: Group): String {
-        val imageForQuery = if(group.image.isNotEmpty()) {
-            group.image
+        val imageForQuery = if (group.image.isNotEmpty()) {
+            "'${Base64.getEncoder().encodeToString(group.image)}'"
         } else {
-            ByteArray(0)
+            "NULL"
         }
-        val locationForQuery = if(group.location != Point(0,0)) {
-            group.location
+        val locationForQuery = if (group.location != Point2D.Double()) {
+            "point(${group.location.x}, ${group.location.y})"
         } else {
-            Point(0,0)
+            "NULL"
         }
         var queryStr = "UPDATE Groups SET "
-        if(group.name.isNotEmpty()) {
+        if (group.name.isNotEmpty()) {
             queryStr += "name = '${group.name}', "
         }
-        if(group.uids.isNotEmpty()) {
-            queryStr += "uids = ARRAY[${group.uids.joinToString(",")}], "
+        if (group.uids.isNotEmpty()) {
+            queryStr += "uids = ARRAY[${group.uids.joinToString(",") { "'$it'" }}], "
         }
-        if(group.preferences.isNotEmpty()) {
-            queryStr += "preferences = ARRAY[${group.preferences.joinToString(",")}], "
+        if (group.preferences.isNotEmpty()) {
+            queryStr += "preferences = ARRAY[${group.preferences.joinToString(",") { "'$it'" }}], "
         }
-        if(group.restrictions.isNotEmpty()) {
-            queryStr += "restrictions = ARRAY[${group.restrictions.joinToString(",")}], "
+        if (group.restrictions.isNotEmpty()) {
+            queryStr += "restrictions = ARRAY[${group.restrictions.joinToString(",") { "'$it'" }}], "
         }
-        if(group.image.isNotEmpty()) {
+        if (group.image.isNotEmpty()) {
             queryStr += "image = ${imageForQuery}, "
         }
-        if(group.location != Point(0,0)) {
+        if (group.location != Point2D.Double()) {
             queryStr += "location = ${locationForQuery}, "
         }
         queryStr = queryStr.dropLast(2)

@@ -1,11 +1,7 @@
 package com.backend.mealmatesapi.models
 
 import kotlinx.serialization.*
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-import java.awt.Point
-import java.sql.Time
-import java.sql.Date
+import java.awt.geom.Point2D
 
 @Serializable
 data class User(
@@ -15,21 +11,9 @@ data class User(
     val preferences: List<String> = emptyList(),
     val restrictions: List<String> = emptyList(),
     val image: ByteArray = ByteArray(0),
-    @Serializable(with = PointSerializer::class)
-    val location: Point = Point(0, 0),
+    @Serializable(with = Group.Point2DSerializer::class)
+    val location: Point2D.Double = Point2D.Double(),
 ) {
-    @Serializer(forClass = Point::class)
-    class PointSerializer {
-
-        override fun serialize(encoder: Encoder, value: Point) {
-            encoder.encodeString("${value.x},${value.y}")
-        }
-
-        override fun deserialize(decoder: Decoder): Point {
-            val (x, y) = decoder.decodeString().split(",").map { it.toInt() }
-            return Point(x, y)
-        }
-    }
 
     override fun toString(): String {
         return "User(id=$id, email='$email', name='$name', preferences='$preferences', restrictions='$restrictions')"
