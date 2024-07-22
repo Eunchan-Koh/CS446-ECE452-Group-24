@@ -20,6 +20,12 @@
 | June 27, 2024 | 2.5h   |       |       |       |        | Worked on Report                                                                                                                         |
 | July 2, 2024  | 0.5h   | 0.5h  | 0.5h  | 0.5h  | 0.5h   | group discussion						                                                                                                             |
 | July 8, 2024  | 1.5h   |       |       |       |        | Worked on UI - created and refined pages                                                                                                 |
+| July 9, 2024  | 2.5h   |       |       |       |        | Worked on portion of D4                                                                                                                  |
+| July 15, 2024 | 2h     |       |       |       |        | frontend + little bit of backend                                                                                                         |
+| July 16, 2024 | 2h     |       |       |       |        | group discussion + frontend + little bit of backend                                                                                      |
+| July 18, 2024 | 1h     |       |       |       |        | Worked on D5                                                                                                                             |
+| July 21, 2024 | 4.5h   |       |       |       |        | Worked on front end and checked things about data class & functions                                                                      |
+| July 22, 2024 | 6h     |       |       |       |        | After updates from teammates, checked functions and used them for data usage. Fixed issues                                               |
 
 **How to update time log**<br />
 copy the line below. paste it below the table above, and modify the sections you need.<br />

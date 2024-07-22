@@ -104,4 +104,22 @@ class UserApi {
         }
     }
 
+    fun getUserByEmail(email: String): User {
+        return try {
+            var user: User? = null
+            runBlocking {
+                launch {
+                    user = client.get("$host/user?email=$email").body()
+                }
+            }
+            if (user != null) {
+                user as User
+            } else {
+                nullUser
+            }
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
 }

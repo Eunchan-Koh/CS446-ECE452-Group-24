@@ -14,7 +14,7 @@ data class Group(
     @Serializable(with = LatLngSerializer::class) var location: LatLng = LatLng(0.0, 0.0)
 ) {
     override fun toString(): String {
-        return "Group(id=$gid, uids='$uids', name='$name', preferences='$preferences', restrictions='$restrictions')"
+        return "Group(gid=$gid, uids='$uids', name='$name', preferences='$preferences', restrictions='$restrictions, image='${image.contentToString()}', location='$location)"
     }
 
     override fun equals(other: Any?): Boolean {

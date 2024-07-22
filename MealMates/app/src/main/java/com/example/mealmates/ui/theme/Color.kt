@@ -67,6 +67,7 @@ val md_theme_dark_scrim = Color(0xFF000000)
 val text_colour = Color(0xff0E3057)
 val container_colour = Color(0xffF1F5FF)
 val button_colour = Color(0xff3E69FE)
+val star_color = Color(0xffF3B807)
 
 val selectableList_colour = Color(0xffF9F9F9)
 

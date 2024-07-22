@@ -24,13 +24,17 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
+import androidx.navigation.navArgument
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.example.mealmates.constants.NavArguments
 import com.example.mealmates.constants.Routes
+import com.example.mealmates.models.Group
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.md_theme_dark_onPrimary
 import com.example.mealmates.ui.theme.md_theme_light_secondary
 import com.example.mealmates.ui.viewModels.LoginViewModel
+import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.net.PlacesClient
 
 data class NavigationItem(
@@ -38,6 +42,40 @@ data class NavigationItem(
     val label: String,
     val route: String
 )
+
+fun convertToByteArray(image: String): ByteArray {
+    return image.toByteArray()
+}
+
+fun convertToInt(string: String): Int {
+    return string.trim().toInt()
+}
+
+fun convertToStringList(string: String): List<String> {
+    val stringNoSpaces = string.trim()
+    val cleanedString = if (stringNoSpaces.startsWith("[") && stringNoSpaces.endsWith("]")) {
+        stringNoSpaces.substring(1, stringNoSpaces.length - 1)
+    } else {
+        stringNoSpaces
+    }
+
+    return cleanedString.split(",")
+        .map { it.trim() }
+        .filter { it.isNotEmpty() }
+}
+
+fun convertToLatLng(string: String): LatLng {
+    // Use a regular expression to extract the latitude and longitude values
+    val regex = Regex("""lat/lng: \(([^,]+),([^)]+)\)""")
+    val matchResult = regex.find(string.trim())
+
+    return if (matchResult != null) {
+        val (lat, lng) = matchResult.destructured
+        LatLng(lat.toDouble(), lng.toDouble())
+    } else {
+        throw IllegalArgumentException("Invalid LatLng format")
+    }
+}
 
 @RequiresApi(Build.VERSION_CODES.S)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter",
@@ -103,6 +141,20 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
         navController.navigate(Routes.PLACES_API_TEST)
     }
 
+    fun onNavigateToGroupInfo(group: Group) {
+        println("This is the group $group")
+        navController.navigate(
+            Routes.GROUP_INFO + "?" +
+            "${NavArguments.GROUP_INFO.GROUP_ID}= ${group.gid}&" +
+            "${NavArguments.GROUP_INFO.GROUP_NAME}= ${group.name}&" +
+            "${NavArguments.GROUP_INFO.RESTRICTIONS}= ${group.restrictions}&" +
+            "${NavArguments.GROUP_INFO.PREFERENCES}= ${group.preferences}&" +
+            "${NavArguments.GROUP_INFO.USERS}= ${group.uids}&" +
+            "${NavArguments.GROUP_INFO.IMAGE}= ${group.image}&" +
+            "${NavArguments.GROUP_INFO.LOCATION}= ${group.location}"
+        )
+    }
+
     showBottomBar = when (navBackStackEntry?.destination?.route) {
         "survey" -> false
         "location" -> false
@@ -153,11 +205,10 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
 
                 NavHost(
                     navController,
-                    startDestination = Routes.SURVEY
+                    startDestination = Routes.HOME
                 ) {
                     composable(Routes.HOME) {
-                        MainPage(loginModel, { onNavigateToRestaurantPrompts() },
-                            { onNavigateToGroup() }, { onNavigateToCreateNewGroup() })
+                        MainPage(loginModel, { group: Group -> onNavigateToGroupInfo(group) }, { onNavigateToCreateNewGroup() })
                     }
 
                     composable(Routes.SURVEY) {
@@ -198,6 +249,42 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                     composable(Routes.PLACES_API_TEST) {
                         PlacesTest(loginModel)
                     }
+
+                    composable(
+                        Routes.GROUP_INFO_WITH_ARGS,
+                        arguments = listOf(
+                            navArgument(NavArguments.GROUP_INFO.GROUP_ID) { defaultValue = "" },
+                            navArgument(NavArguments.GROUP_INFO.GROUP_NAME) { defaultValue = "" },
+                            navArgument(NavArguments.GROUP_INFO.USERS) { defaultValue = "" },
+                            navArgument(NavArguments.GROUP_INFO.PREFERENCES) { defaultValue = "" },
+                            navArgument(NavArguments.GROUP_INFO.RESTRICTIONS) { defaultValue = "" },
+                            navArgument(NavArguments.GROUP_INFO.IMAGE) { defaultValue = "" },
+                            navArgument(NavArguments.GROUP_INFO.LOCATION) { defaultValue = "" }
+                        )
+                    ) { backStackEntry ->
+                        val groupId = convertToInt(backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.GROUP_ID)
+                            ?: "")
+                        val groupName = backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.GROUP_NAME) ?: ""
+                        val uids = convertToStringList(backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.USERS) ?: "")
+                        val preferences = convertToStringList(backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.PREFERENCES) ?: "")
+                        val restrictions = convertToStringList(backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.RESTRICTIONS) ?: "")
+                        val image = backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.IMAGE) ?: ""
+                        val location = convertToLatLng(backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.LOCATION) ?: "0.0,0.0")
+
+
+                        GroupInfoPage(
+                            loginModel,
+                            0,
+                            groupName,
+                            preferences, // Simplified for debugging
+                            restrictions, // Simplified for debugging
+                            uids, // Simplified for debugging
+                            ByteArray(0), // Simplified for debugging
+                            location // Simplified for debugging
+                        ) { onNavigateToGroup() }
+                    }
+
+
                 }
             }
         }

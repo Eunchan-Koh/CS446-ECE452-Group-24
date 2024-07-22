@@ -8,6 +8,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.request.*
 import io.ktor.http.*
 import io.ktor.serialization.kotlinx.json.*
+import io.ktor.util.InternalAPI
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
@@ -96,6 +97,21 @@ class RestaurantsApi {
                 launch { success = client.delete("$host/restaurants?gid=$gid").status.isSuccess() }
             }
             success
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    @OptIn(InternalAPI::class)
+    fun getCompletedRestaurants(gid: String): List<Restaurants> {
+        return try {
+            var restaurants: List<Restaurants>? = null
+            runBlocking { launch { restaurants = client.get("$host/restaurants?gid=$gid").body() } }
+            if (restaurants != null) {
+                restaurants as List<Restaurants>
+            } else {
+                emptyList()
+            }
         } catch (e: Exception) {
             throw e
         }
