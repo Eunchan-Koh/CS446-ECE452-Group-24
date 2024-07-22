@@ -3,19 +3,20 @@ package com.example.mealmates.ui.views
 import android.graphics.BitmapFactory
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Edit
@@ -30,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalConfiguration
@@ -58,46 +60,74 @@ fun UserProfileManagementPage(
     onNavigateToLocationPage: () -> Unit = {}
 ) {
     val userCur = UserApi().getUser(GlobalObjects.user.id!!)
-    var tempUserName: String
-    var tempUserLocation: String
     val userName = userCur.name
     val userLocation = userCur.location
+    var tempUserName = userName
+    var tempUserLocation: String
 
     MealMatesTheme {
-        Box(Modifier.fillMaxSize().padding(30.dp)) {
-            Column(
-                modifier = Modifier.fillMaxSize(),
-                horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text(
-                        text = "User Settings",
-                        fontSize = 24.sp,
-                        textAlign = TextAlign.Center,
-                        fontWeight = FontWeight.Bold,
-                        color = md_theme_light_primary,
-                    )
-
-                    ChoosePicProfile(userCur)
-                    tempUserName = nameSetupProfile(userName)
-
-                    // Display email
-                    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
-                        Text(
-                            text = "Email",
-                            color = md_theme_light_primary,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 20.sp,
-                        )
-                        Text(text = userCur.email, fontSize = 16.sp, color = Color.Black)
+        Column(
+            modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+                Box(
+                    modifier =
+                        Modifier.fillMaxWidth()
+                            .background(
+                                brush =
+                                    Brush.verticalGradient(
+                                        colors = listOf(Color(0xFF2196F3), Color(0xFF21CBF3))))) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
+                            horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    text = "User Settings",
+                                    fontSize = 24.sp,
+                                    textAlign = TextAlign.Center,
+                                    fontWeight = FontWeight.Bold,
+                                    color = Color.Black,
+                                )
+                                ChoosePicProfile(userCur)
+                            }
                     }
+                Spacer(modifier = Modifier.height(8.dp))
+                Box(Modifier.fillMaxWidth().padding(horizontal = 20.dp)) {
+                    Column(
+                        modifier =
+                            Modifier.fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                                .background(
+                                    Color(0xfffaebd7),
+                                    shape =
+                                        RoundedCornerShape(
+                                            topStart = 30.dp,
+                                            topEnd = 30.dp,
+                                            bottomStart = 30.dp,
+                                            bottomEnd = 30.dp))
+                                .padding(
+                                    horizontal = 20.dp,
+                                    vertical = 8.dp) // Add padding inside the column
+                        ) {
+                            tempUserName = nameSetupProfile(userName)
 
-                    Preferences(userCur.preferences, onNavigateToSurvey)
+                            // Display email
+                            Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                                Text(
+                                    text = "Email",
+                                    color = md_theme_light_primary,
+                                    fontWeight = FontWeight.Bold,
+                                    fontSize = 20.sp,
+                                )
+                                Text(text = userCur.email, fontSize = 16.sp, color = Color.Black)
+                            }
 
-                    // Location is being shown using point only; need to be fixed to address later
-                    LocationSetupProfile(userLocation, onNavigateToLocationPage)
-                    Spacer(modifier = Modifier.height(20.dp).fillMaxWidth())
-                    SaveProfileButton(tempUserName)
+                            Preferences(userCur.preferences, onNavigateToSurvey)
+
+                            // Location is being shown using point only; need to be fixed to address
+                            // later
+                            LocationSetupProfile(userLocation, onNavigateToLocationPage)
+                        }
                 }
-        }
+                SaveProfileButton(tempUserName)
+            }
     }
 }
 
@@ -107,7 +137,7 @@ fun ChoosePicProfile(userCur: User) {
     Box(
         contentAlignment = Alignment.TopEnd,
         modifier =
-            Modifier.padding(top = 4.dp).clickable {
+            Modifier.clickable {
                 Toast.makeText(curCon, "Clicked on Image Selection area!", Toast.LENGTH_SHORT)
                     .show()
             }) {
@@ -118,13 +148,13 @@ fun ChoosePicProfile(userCur: User) {
                 Icon(
                     Icons.Default.AccountCircle,
                     "add",
-                    tint = Color.LightGray,
+                    tint = Color.Black,
                     modifier = Modifier.padding(10.dp).size(110.dp),
                 )
             Icon(
                 Icons.Default.Edit,
                 "Change profile photo",
-                tint = Color.LightGray,
+                tint = Color.Black,
                 modifier = Modifier.padding(6.dp))
         }
 }
@@ -244,7 +274,7 @@ fun Preferences(preferences: List<String>, onNavigateToSurvey: () -> Unit = {}) 
 @Composable
 fun SaveProfileButton(tempUserName: String) {
     val context = LocalContext.current
-    Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Bottom) {
+    Column(verticalArrangement = Arrangement.Bottom) {
         Button(
             onClick = {
                 // TODO: update user name and user location - save the values using update
