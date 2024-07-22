@@ -1,8 +1,6 @@
 package com.example.mealmates.ui.views
 
 import android.graphics.BitmapFactory
-import android.graphics.Paint.Align
-import android.widget.Space
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -30,16 +28,15 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -52,7 +49,7 @@ import com.example.mealmates.ui.theme.selectableList_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
 
 @Composable
-fun MainPage(loginModel: LoginViewModel, onNavigateToRestaurantPrompts: () -> Unit = {}, OnNavigateToGroup: () -> Unit = {}){
+fun MainPage(loginModel: LoginViewModel, onNavigateToGroup: (Group) -> Unit = {}) {
 
     val (TotalGroupNum, setGroupNum) = remember {
         mutableStateOf(2)
@@ -66,7 +63,7 @@ fun MainPage(loginModel: LoginViewModel, onNavigateToRestaurantPrompts: () -> Un
             Divider(color = Color.Black, thickness = 1.dp)
 //            SearchBarSectionMainPage()
 //            Divider(color = Color.Black, thickness = 1.dp)
-            ListGroupsMainPage(OnNavigateToGroup)
+            ListGroupsMainPage(onNavigateToGroup)
 
         }
         Column(
@@ -130,15 +127,17 @@ fun SearchBarSectionMainPage(){
 }
 
 @Composable
-fun ListGroupsMainPage(OnNavigateToGroup: () -> Unit = {}) {
+fun ListGroupsMainPage(OnNavigateToGroup: (Group) -> Unit = {}) {
     //TODO: Use this information of all the user's groups. Left to Eunchan.
 
     val userId = GlobalObjects.user.id
     var groups by remember { mutableStateOf<List<Group>>(emptyList()) }
 
-    if (userId != null) {
-        val fetchedGroups = UserApi().getUserGroups(userId)
-        groups = fetchedGroups
+    LaunchedEffect(userId) {
+        if (userId != null) {
+            val fetchedGroups = UserApi().getUserGroups(userId)
+            groups = fetchedGroups
+        }
     }
 
     val groupSize = groups.size
@@ -154,7 +153,7 @@ fun ListGroupsMainPage(OnNavigateToGroup: () -> Unit = {}) {
                     .height(92.dp)
                     .padding(horizontal = 0.dp, vertical = 0.dp)
                     .fillMaxWidth()
-                    .clickable { OnNavigateToGroup() }
+                    .clickable { OnNavigateToGroup(groups[i]) }
                     .background(color = selectableList_colour),
 //                    horizontalAlignment = Alignment.CenterHorizontally
 
