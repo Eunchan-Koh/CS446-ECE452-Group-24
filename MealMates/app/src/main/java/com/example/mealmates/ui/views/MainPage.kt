@@ -37,9 +37,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.modifier.modifierLocalMapOf
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mealmates.R
 import com.example.mealmates.apiCalls.UserApi
 import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.models.Group
@@ -94,7 +98,11 @@ fun AdvertisementSectionMainPage(){
         horizontalAlignment = Alignment.CenterHorizontally
 
     ){
-        Text("Advertisement Image Section")
+        Image(
+            painter = painterResource(id = R.drawable.mc_image),
+            contentDescription = "aa",
+            contentScale = ContentScale.FillBounds)
+//        Text("Advertisement Image Section")
     }
 }
 

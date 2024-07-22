@@ -83,15 +83,15 @@ fun getPlaceDetails(placeID: String): String {
     val client = HttpClient(Android)
     val apiKey = "AIzaSyAjTN0RQCtZ3sWV6g_bw-D75cZkk6bmL3s"
     return try {
-        var fieldMasks = "id,displayName,types,photos,adrFormatAddress,location,currentOpeningHours,priceLevel,rating,websiteUri"
+        var fieldMasks = "id,displayName,types,photos,shortFormattedAddress,location,currentOpeningHours,priceLevel,rating,websiteUri"
         var responseString = ""
         runBlocking {
             launch {
                 val res = client.get("https://places.googleapis.com/v1/places/${placeID}?fields=${fieldMasks}&key=${apiKey}")
                     .bodyAsText()
-                println("....")
-                println(res)
-                println(responseString)
+//                println("....")
+//                println(res)
+//                println(responseString)
                 responseString = res
             }
         }
