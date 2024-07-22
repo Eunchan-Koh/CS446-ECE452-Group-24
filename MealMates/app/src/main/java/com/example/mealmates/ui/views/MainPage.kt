@@ -156,6 +156,7 @@ fun ListGroupsMainPage(OnNavigateToGroup: (Group) -> Unit = {}) {
     ) {
 
         for (i in 0..groupSize-1) {
+
             Column(
                 modifier = Modifier
                     .height(92.dp)
@@ -166,7 +167,8 @@ fun ListGroupsMainPage(OnNavigateToGroup: (Group) -> Unit = {}) {
 //                    horizontalAlignment = Alignment.CenterHorizontally
 
                 ) {
-
+//                val taa=groups[i].gid
+//                Text(text = "$taa")
                 Row(
                     modifier = Modifier
                         .fillMaxSize(),
