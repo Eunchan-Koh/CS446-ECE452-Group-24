@@ -6,6 +6,7 @@ import com.google.gson.JsonParser
 class GetPlaceDetailsResponse(private var responseString: String) {
     fun getMealMatesPlace(): MealMatesPlace {
         try {
+            println(responseString)
             val placeJSONObject = JsonParser.parseString(responseString).asJsonObject
                 ?: throw Exception("invalid/empty GetPlaceDetailsResponse: empty `placeJSON` object")
             val id = placeJSONObject["id"].asString
@@ -14,7 +15,7 @@ class GetPlaceDetailsResponse(private var responseString: String) {
             for (type in types) {
                 typesListOfStrings.add(type.asString)
             }
-            val shortFormattedAddress = placeJSONObject["adrFormatAddress"].asString
+            val shortFormattedAddress = placeJSONObject["shortFormattedAddress"].asString
 
             val locationJSONObject = placeJSONObject["location"].asJsonObject
             val location =
