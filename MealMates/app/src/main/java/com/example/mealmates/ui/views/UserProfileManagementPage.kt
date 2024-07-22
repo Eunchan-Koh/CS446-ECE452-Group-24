@@ -59,10 +59,8 @@ fun UserProfileManagementPage(
 ) {
     val userCur = UserApi().getUser(GlobalObjects.user.id!!)
     var tempUserName: String
-    var tempUserEmail: String
     var tempUserLocation: String
     val userName = userCur.name
-    val userEmail = userCur.email
     val userLocation = userCur.location
 
     MealMatesTheme {
@@ -89,7 +87,7 @@ fun UserProfileManagementPage(
                             fontWeight = FontWeight.Bold,
                             fontSize = 20.sp,
                         )
-                        Text(text = userEmail, fontSize = 16.sp, color = Color.Black)
+                        Text(text = userCur.email, fontSize = 16.sp, color = Color.Black)
                     }
 
                     Preferences(userCur.preferences, onNavigateToSurvey)
@@ -99,7 +97,6 @@ fun UserProfileManagementPage(
                     Spacer(modifier = Modifier.height(20.dp).fillMaxWidth())
                     SaveProfileButton(tempUserName)
                 }
-            Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {}
         }
     }
 }
@@ -122,11 +119,7 @@ fun ChoosePicProfile(userCur: User) {
                     Icons.Default.AccountCircle,
                     "add",
                     tint = Color.LightGray,
-                    modifier =
-                        Modifier.padding(10.dp)
-                            //            .width(82.dp)
-                            //            .height(82.dp)
-                            .size(110.dp),
+                    modifier = Modifier.padding(10.dp).size(110.dp),
                 )
             Icon(
                 Icons.Default.Edit,
@@ -139,25 +132,24 @@ fun ChoosePicProfile(userCur: User) {
 @Composable
 fun nameSetupProfile(userName: String): String {
     val (value, setValue) = remember { mutableStateOf(userName) }
-    Column( // Search Section
-        modifier = Modifier.height(92.dp).fillMaxWidth().padding(vertical = 8.dp)) {
-            Text(
-                text = "Name",
-                color = md_theme_light_primary,
-                fontWeight = FontWeight.Bold,
-                fontSize = 20.sp,
-            )
-            OutlinedTextField(
-                value = value,
-                onValueChange = setValue,
-                modifier = Modifier.fillMaxWidth(),
-                colors =
-                    OutlinedTextFieldDefaults.colors(
-                        unfocusedLabelColor = md_theme_light_primary,
-                        unfocusedLeadingIconColor = Color.White),
-                singleLine = true,
-                placeholder = { Text("Name", color = Color.Gray, textAlign = TextAlign.Center) })
-        }
+    Column(modifier = Modifier.height(92.dp).fillMaxWidth().padding(vertical = 8.dp)) {
+        Text(
+            text = "Name",
+            color = md_theme_light_primary,
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+        )
+        OutlinedTextField(
+            value = value,
+            onValueChange = setValue,
+            modifier = Modifier.fillMaxWidth(),
+            colors =
+                OutlinedTextFieldDefaults.colors(
+                    unfocusedLabelColor = md_theme_light_primary,
+                    unfocusedLeadingIconColor = Color.White),
+            singleLine = true,
+            placeholder = { Text("Name", color = Color.Gray, textAlign = TextAlign.Center) })
+    }
     return value
 }
 
@@ -190,13 +182,8 @@ fun LocationSetupProfile(userLocation: LatLng, onNavigateToLocationPage: () -> U
                     position = CameraPosition.fromLatLngZoom(userLocation, 10f)
                 })
     }
-    //    Column(modifier = Modifier.padding(10.dp)) {
-    //        Button(
-    //            onClick = { onNavigateToLocationPage() },
-    //            colors = ButtonDefaults.buttonColors(containerColor = button_colour)) {
-    //                Text(text = "Change current location")
-    //            }
-    //    }
+    // TODO: Add ability to search for new location
+
     //    Column(//Search Section
     //        modifier = Modifier
     //            .height(92.dp)
@@ -260,7 +247,7 @@ fun SaveProfileButton(tempUserName: String) {
     Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Bottom) {
         Button(
             onClick = {
-                /*update user name and user location - save the values using update*/
+                // TODO: update user name and user location - save the values using update
                 Toast.makeText(context, "Saved Profile Changes", Toast.LENGTH_SHORT).show()
             },
             colors = ButtonDefaults.buttonColors(containerColor = button_colour)) {
