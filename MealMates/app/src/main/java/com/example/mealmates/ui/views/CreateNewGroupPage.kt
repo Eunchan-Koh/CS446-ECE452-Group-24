@@ -88,6 +88,7 @@ fun CreateNewGroupPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> U
                 placeholder = "My new group",
                 value = tempGroupName,
                 onValueChange = { tempGroupName = it })
+
         }
         Column(
             modifier = Modifier
