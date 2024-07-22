@@ -86,4 +86,34 @@ class GroupApi {
         }
     }
 
+    @OptIn(InternalAPI::class)
+    fun deleteGroup(id: String): Boolean {
+        return try {
+            var success = false
+            runBlocking {
+                launch {
+                    success = client.delete("$host/group?id=$id").status.isSuccess()
+                }
+            }
+            success
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    @OptIn(InternalAPI::class)
+    fun deleteUserFromGroup(uid: String, gid: String): Boolean {
+        return try {
+            var success = false
+            runBlocking {
+                launch {
+                    success = client.delete("$host/group/user?uid=$uid&gid=$gid").status.isSuccess()
+                }
+            }
+            success
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
 }
