@@ -3,10 +3,11 @@ package com.example.mealmates.ui.views
 import android.graphics.BitmapFactory
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,38 +16,47 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.internal.enableLiveLiterals
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.mealmates.apiCalls.UserApi
 import com.example.mealmates.constants.GlobalObjects
+import com.example.mealmates.constants.RESTAURANT_TYPE_LABEL_LIST
 import com.example.mealmates.models.User
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
+import com.example.mealmates.ui.theme.md_theme_light_primary
 import com.example.mealmates.ui.viewModels.LoginViewModel
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
-fun UserProfileManagementPage(loginModel: LoginViewModel, onNavigateToSurvey: () -> Unit = {}, onNavigateToLocationPage: () -> Unit = {}) {
+fun UserProfileManagementPage(
+    loginModel: LoginViewModel,
+    onNavigateToSurvey: () -> Unit = {},
+    onNavigateToLocationPage: () -> Unit = {}
+) {
     val userCur = UserApi().getUser(GlobalObjects.user.id!!)
     var tempUserName: String
     var tempUserEmail: String
@@ -55,174 +65,206 @@ fun UserProfileManagementPage(loginModel: LoginViewModel, onNavigateToSurvey: ()
     val userEmail = userCur.email
     val userLocation = userCur.location
 
-    MealMatesTheme{
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.92f)
-//                .background(color = Color.Gray)
-            ,
-            horizontalAlignment = Alignment.CenterHorizontally
-//                    color = MaterialTheme.colorScheme.background
-        ) {
-            Spacer(modifier = Modifier
-                .height(90.dp)
-                .fillMaxWidth()
-//                .background(color = Color.Green),
-                )
-            ChoosePicProfile(userCur)
-            tempUserName = nameSetupProfile(userName)
-            //Location is being shown using point only; need to be fixed to address later
-            //Email section can be added - will work on it after some discussion
-            LocationSetupProfile(userLocation, onNavigateToLocationPage)
-            Spacer(modifier = Modifier
-                .height(150.dp)
-//                .background(color = Color.Gray)
-                .fillMaxWidth())
-            EditPrefProfile(onNavigateToSurvey)
-            SaveButtonProfile(tempUserName)
+    MealMatesTheme {
+        Box(Modifier.fillMaxSize().padding(30.dp)) {
+            Column(
+                modifier = Modifier.fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(
+                        text = "User Settings",
+                        fontSize = 24.sp,
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.Bold,
+                        color = md_theme_light_primary,
+                    )
 
-        }
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Bottom
-        ){
-        }
+                    ChoosePicProfile(userCur)
+                    tempUserName = nameSetupProfile(userName)
 
+                    // Display email
+                    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+                        Text(
+                            text = "Email",
+                            color = md_theme_light_primary,
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 20.sp,
+                        )
+                        Text(text = userEmail, fontSize = 16.sp, color = Color.Black)
+                    }
+
+                    Preferences(userCur.preferences, onNavigateToSurvey)
+
+                    // Location is being shown using point only; need to be fixed to address later
+                    LocationSetupProfile(userLocation, onNavigateToLocationPage)
+                    Spacer(modifier = Modifier.height(20.dp).fillMaxWidth())
+                    SaveProfileButton(tempUserName)
+                }
+            Column(modifier = Modifier.fillMaxSize(), verticalArrangement = Arrangement.Bottom) {}
+        }
     }
 }
-
 
 @Composable
 fun ChoosePicProfile(userCur: User) {
     val curCon = LocalContext.current
-    Column(
-        modifier = Modifier
-            .background(color = Color.White)
-            .clickable {
-                Toast.makeText(curCon, "Clicked on Image Selection area!",
-                Toast.LENGTH_SHORT).show()
-            }
-    ) {
-        var UserImage = BitmapFactory.decodeByteArray(userCur.image, 0, userCur.image.size)
-//                    Text(text = "$tempI")
-        if (UserImage!=null)
-            Image(bitmap = UserImage.asImageBitmap(), contentDescription = "")
-        else
+    Box(
+        contentAlignment = Alignment.TopEnd,
+        modifier =
+            Modifier.padding(top = 4.dp).clickable {
+                Toast.makeText(curCon, "Clicked on Image Selection area!", Toast.LENGTH_SHORT)
+                    .show()
+            }) {
+            val userImage = BitmapFactory.decodeByteArray(userCur.image, 0, userCur.image.size)
+            if (userImage != null)
+                Image(bitmap = userImage.asImageBitmap(), contentDescription = "")
+            else
+                Icon(
+                    Icons.Default.AccountCircle,
+                    "add",
+                    tint = Color.LightGray,
+                    modifier =
+                        Modifier.padding(10.dp)
+                            //            .width(82.dp)
+                            //            .height(82.dp)
+                            .size(110.dp),
+                )
             Icon(
-                Icons.Default.AccountCircle,
-                "add",
+                Icons.Default.Edit,
+                "Change profile photo",
                 tint = Color.LightGray,
-                modifier = Modifier
-                    .padding(10.dp)
-    //            .width(82.dp)
-    //            .height(82.dp)
-                    .size(110.dp),
-            )
-
-    }
-
+                modifier = Modifier.padding(6.dp))
+        }
 }
 
 @Composable
-fun nameSetupProfile(userName: String) : String{
-    val (value, setValue) = remember {
-        mutableStateOf(userName)
-    }
-    Column(//Search Section
-        modifier = Modifier
-            .height(92.dp)
-            .fillMaxWidth()
-//            .background(color = Color.Green)
-            .padding(0.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-
-    ){
-        TextField(
-            value = value,
-            onValueChange = setValue,
-            modifier = Modifier
-                .width(150.dp)
-                .padding(10.dp),
-            placeholder = {
-                Text("John Doe", color = Color.Gray, textAlign = TextAlign.Center)
-            }
-        )
-    }
+fun nameSetupProfile(userName: String): String {
+    val (value, setValue) = remember { mutableStateOf(userName) }
+    Column( // Search Section
+        modifier = Modifier.height(92.dp).fillMaxWidth().padding(vertical = 8.dp)) {
+            Text(
+                text = "Name",
+                color = md_theme_light_primary,
+                fontWeight = FontWeight.Bold,
+                fontSize = 20.sp,
+            )
+            OutlinedTextField(
+                value = value,
+                onValueChange = setValue,
+                modifier = Modifier.fillMaxWidth(),
+                colors =
+                    OutlinedTextFieldDefaults.colors(
+                        unfocusedLabelColor = md_theme_light_primary,
+                        unfocusedLeadingIconColor = Color.White),
+                singleLine = true,
+                placeholder = { Text("Name", color = Color.Gray, textAlign = TextAlign.Center) })
+        }
     return value
 }
+
 @Composable
-fun LocationSetupProfile(userLocation: LatLng, onNavigateToLocationPage: () -> Unit = {}){
-    val (value, setValue) = remember {
-        mutableStateOf(userLocation.toString())
+fun LocationSetupProfile(userLocation: LatLng, onNavigateToLocationPage: () -> Unit = {}) {
+    val (value, setValue) = remember { mutableStateOf(userLocation.toString()) }
+    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(bottom = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "Location",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = md_theme_light_primary,
+                )
+                Icon(
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = "Edit location",
+                    tint = md_theme_light_primary,
+                    modifier = Modifier.size(24.dp).clickable { onNavigateToLocationPage() })
+            }
+        GoogleMap(
+            modifier =
+                Modifier.height((LocalConfiguration.current.screenHeightDp * 0.30).dp)
+                    .width((LocalConfiguration.current.screenWidthDp * 0.90).dp),
+            cameraPositionState =
+                rememberCameraPositionState {
+                    position = CameraPosition.fromLatLngZoom(userLocation, 10f)
+                })
     }
-    Column(
-        modifier = Modifier
-            .padding(10.dp)
-    ){
-        Button(
-            onClick = { onNavigateToLocationPage() },
-            colors = ButtonDefaults.buttonColors(containerColor = button_colour)
-        ) {
-            Text(text = "Change current location")
-        }
-    }
-//    Column(//Search Section
-//        modifier = Modifier
-//            .height(92.dp)
-//            .fillMaxWidth()
-////            .background(color = Color.Green)
-//            .padding(horizontal = 30.dp, vertical = 0.dp),
-//        verticalArrangement = Arrangement.Center,
-//        horizontalAlignment = Alignment.CenterHorizontally
-//
-//    ) {
-//        TextField(
-//            value = value,
-//            onValueChange = setValue,
-//            modifier = Modifier
-//                .fillMaxWidth()
-//                .padding(10.dp),
-//            placeholder = {
-//                Text("Location for search", color = Color.Gray)
-//            }
-//        )
-//    }
-//    return value
+    //    Column(modifier = Modifier.padding(10.dp)) {
+    //        Button(
+    //            onClick = { onNavigateToLocationPage() },
+    //            colors = ButtonDefaults.buttonColors(containerColor = button_colour)) {
+    //                Text(text = "Change current location")
+    //            }
+    //    }
+    //    Column(//Search Section
+    //        modifier = Modifier
+    //            .height(92.dp)
+    //            .fillMaxWidth()
+    ////            .background(color = Color.Green)
+    //            .padding(horizontal = 30.dp, vertical = 0.dp),
+    //        verticalArrangement = Arrangement.Center,
+    //        horizontalAlignment = Alignment.CenterHorizontally
+    //
+    //    ) {
+    //        TextField(
+    //            value = value,
+    //            onValueChange = setValue,
+    //            modifier = Modifier
+    //                .fillMaxWidth()
+    //                .padding(10.dp),
+    //            placeholder = {
+    //                Text("Location for search", color = Color.Gray)
+    //            }
+    //        )
+    //    }
+    //    return value
 }
 
 @Composable
-fun EditPrefProfile(onNavigateToSurvey: () -> Unit = {}){
-    Column(
-        modifier = Modifier.height(20.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        ClickableText(
-            AnnotatedString("Edit preferences & restrictions"),
-            onClick = {onNavigateToSurvey()}
+fun Preferences(preferences: List<String>, onNavigateToSurvey: () -> Unit = {}) {
+    val formattedPreferences =
+        preferences.map { preference ->
+            RESTAURANT_TYPE_LABEL_LIST.entries.find { it.value == preference }?.key ?: preference
+        }
+
+    Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = "Preferences",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = md_theme_light_primary,
+                )
+                Icon(
+                    imageVector = Icons.Filled.Edit,
+                    contentDescription = "Edit preferences",
+                    tint = md_theme_light_primary,
+                    modifier = Modifier.size(24.dp).clickable { onNavigateToSurvey() })
+            }
+        Text(
+            text = formattedPreferences.joinToString(", "),
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Normal,
+            color = Color.Black,
         )
     }
 }
 
 @Composable
-fun SaveButtonProfile(tempUserName: String){
+fun SaveProfileButton(tempUserName: String) {
     val context = LocalContext.current
-    Column(
-        modifier = Modifier.fillMaxHeight(),
-        verticalArrangement = Arrangement.Bottom
-    ){
+    Column(modifier = Modifier.fillMaxHeight(), verticalArrangement = Arrangement.Bottom) {
         Button(
             onClick = {
-            /*update user name and user location - save the values using update*/
+                /*update user name and user location - save the values using update*/
                 Toast.makeText(context, "Saved Profile Changes", Toast.LENGTH_SHORT).show()
             },
-            colors = ButtonDefaults.buttonColors(containerColor = button_colour)
-            ){
-            Text("Save")
-        }
+            colors = ButtonDefaults.buttonColors(containerColor = button_colour)) {
+                Text("Save")
+            }
     }
-
 }
