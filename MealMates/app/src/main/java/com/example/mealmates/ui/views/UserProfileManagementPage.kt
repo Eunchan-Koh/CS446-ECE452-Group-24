@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -45,7 +46,7 @@ import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.google.android.gms.maps.model.LatLng
 
 @Composable
-fun UserProfileManagementPage(loginModel: LoginViewModel, onNavigateToSurvey: () -> Unit = {}) {
+fun UserProfileManagementPage(loginModel: LoginViewModel, onNavigateToSurvey: () -> Unit = {}, onNavigateToLocationPage: () -> Unit = {}) {
     val userCur = UserApi().getUser(GlobalObjects.user.id!!)
     var tempUserName: String
     var tempUserEmail: String
@@ -73,7 +74,7 @@ fun UserProfileManagementPage(loginModel: LoginViewModel, onNavigateToSurvey: ()
             tempUserName = nameSetupProfile(userName)
             //Location is being shown using point only; need to be fixed to address later
             //Email section can be added - will work on it after some discussion
-            LocationSetupProfile(userLocation)
+            LocationSetupProfile(userLocation, onNavigateToLocationPage)
             Spacer(modifier = Modifier
                 .height(150.dp)
 //                .background(color = Color.Gray)
@@ -110,7 +111,7 @@ fun ChoosePicProfile(userCur: User) {
             Image(bitmap = UserImage.asImageBitmap(), contentDescription = "")
         else
             Icon(
-                Icons.Default.AddCircle,
+                Icons.Default.AccountCircle,
                 "add",
                 tint = Color.LightGray,
                 modifier = Modifier
@@ -153,31 +154,42 @@ fun nameSetupProfile(userName: String) : String{
     return value
 }
 @Composable
-fun LocationSetupProfile(userLocation: LatLng){
+fun LocationSetupProfile(userLocation: LatLng, onNavigateToLocationPage: () -> Unit = {}){
     val (value, setValue) = remember {
         mutableStateOf(userLocation.toString())
     }
-    Column(//Search Section
+    Column(
         modifier = Modifier
-            .height(92.dp)
-            .fillMaxWidth()
-//            .background(color = Color.Green)
-            .padding(horizontal = 30.dp, vertical = 0.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-
-    ) {
-        TextField(
-            value = value,
-            onValueChange = setValue,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(10.dp),
-            placeholder = {
-                Text("Location for search", color = Color.Gray)
-            }
-        )
+            .padding(10.dp)
+    ){
+        Button(
+            onClick = { onNavigateToLocationPage() },
+            colors = ButtonDefaults.buttonColors(containerColor = button_colour)
+        ) {
+            Text(text = "Change current location")
+        }
     }
+//    Column(//Search Section
+//        modifier = Modifier
+//            .height(92.dp)
+//            .fillMaxWidth()
+////            .background(color = Color.Green)
+//            .padding(horizontal = 30.dp, vertical = 0.dp),
+//        verticalArrangement = Arrangement.Center,
+//        horizontalAlignment = Alignment.CenterHorizontally
+//
+//    ) {
+//        TextField(
+//            value = value,
+//            onValueChange = setValue,
+//            modifier = Modifier
+//                .fillMaxWidth()
+//                .padding(10.dp),
+//            placeholder = {
+//                Text("Location for search", color = Color.Gray)
+//            }
+//        )
+//    }
 //    return value
 }
 
