@@ -71,10 +71,10 @@ class UserController {
             "NULL"
         }
         var queryStr = "UPDATE Users SET "
-        if(user.email.isNotEmpty()) {
+        if (user.email.isNotEmpty()) {
             queryStr += "email = '${user.email}', "
         }
-        if(user.name.isNotEmpty()) {
+        if (user.name.isNotEmpty()) {
             queryStr += "name = '${user.name}', "
         }
         if (user.preferences.isNotEmpty()) {
@@ -83,7 +83,7 @@ class UserController {
         if (user.restrictions.isNotEmpty()) {
             queryStr += "restrictions = ARRAY[${user.restrictions.joinToString(",") { "'$it'" }}], "
         }
-        if(user.location != Point(0,0)) {
+        if (user.location != Point(0, 0)) {
             queryStr += "location = ${locationForQuery}, "
         }
         queryStr = queryStr.dropLast(2)
@@ -103,13 +103,24 @@ class UserController {
         } else {
             val groups = mutableListOf<Group>()
             for (group in result) {
+                var image = ByteArray(0)
+                var location = Point2D.Double()
+                if (group[5] is String) {
+                    // TODO: May need to convert this differently
+                    image = group[5] as ByteArray
+                }
+                if (group[6] is Point2D.Double) {
+                    location = group[6] as Point2D.Double
+                }
                 groups.add(
                     Group(
                         group[0] as Int,
                         group[1] as String,
                         (group[2] as Array<String>).toList(),
                         (group[3] as Array<String>).toList(),
-                        (group[4] as Array<String>).toList()
+                        (group[4] as Array<String>).toList(),
+                        image,
+                        location
                     )
                 )
             }
