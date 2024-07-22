@@ -1,7 +1,7 @@
 package com.example.mealmates.constants
 
-import com.example.mealmates.ui.views.RestaurantInfo
 import com.example.mealmates.models.User
+import com.example.mealmates.ui.views.RestaurantInfo
 
 object GlobalObjects {
     var user: User = User()
@@ -13,6 +13,7 @@ enum class GROUP_STATE {
     FINAL
 }
 
+// TODO: Delete when able
 val RESTAURANT_DATA =
     listOf(
         RestaurantInfo(

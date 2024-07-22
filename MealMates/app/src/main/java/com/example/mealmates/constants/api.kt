@@ -47,6 +47,7 @@ object RestaurantTypes {
     val VIETNAMESE = "vietnamese_restaurant"
 }
 
+// Undesired labels are removed from the list
 val RESTAURANT_TYPE_LABEL_LIST = mapOf<String, String>(
     "American" to RestaurantTypes.AMERICAN,
     "Bakery" to RestaurantTypes.BAKERY,
@@ -68,14 +69,11 @@ val RESTAURANT_TYPE_LABEL_LIST = mapOf<String, String>(
     "Japanese" to RestaurantTypes.JAPANESE,
     "Korean" to RestaurantTypes.KOREAN,
     "Lebanese" to RestaurantTypes.LEBANESE,
-    "Meal Delivery" to RestaurantTypes.MEAL_DELIVERY,
-    "Meal Takeaway" to RestaurantTypes.MEAL_TAKEAWAY,
     "Mediterranean" to RestaurantTypes.MEDITERRANEAN,
     "Mexican" to RestaurantTypes.MEXICAN,
     "Middle Eastern" to RestaurantTypes.MIDDLE_EASTERN,
     "Pizza" to RestaurantTypes.PIZZA,
     "Ramen" to RestaurantTypes.RAMEN,
-    "Restaurant" to RestaurantTypes.RESTAURANT,
     "Sandwich" to RestaurantTypes.SANDWICH,
     "Seafood" to RestaurantTypes.SEAFOOD,
     "Spanish" to RestaurantTypes.SPANISH,
@@ -88,7 +86,7 @@ val RESTAURANT_TYPE_LABEL_LIST = mapOf<String, String>(
     "Vietnamese" to RestaurantTypes.VIETNAMESE,
     )
 
-// This is a reverse mapping of RestaurantTypes above with undesired labels removed
+// Reverse mapping of RestaurantTypes above with undesired labels removed
 val RestaurantTypeToLabel =
     mapOf(
         "american_restaurant" to "AMERICAN",

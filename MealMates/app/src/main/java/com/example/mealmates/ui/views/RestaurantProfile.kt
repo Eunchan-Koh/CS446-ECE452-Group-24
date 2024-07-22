@@ -7,10 +7,10 @@ import android.net.Uri
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,6 +23,13 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.SuggestionChip
@@ -30,7 +37,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -40,7 +46,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
-import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -59,6 +64,10 @@ import com.example.mealmates.models.MealMatesPlace
 import com.example.mealmates.models.Restaurants
 import com.example.mealmates.models.SearchNearbyRequest
 import com.example.mealmates.models.SearchNearbyResponse
+import com.example.mealmates.ui.theme.md_theme_light_errorContainer
+import com.example.mealmates.ui.theme.md_theme_light_onTertiary
+import com.example.mealmates.ui.theme.md_theme_light_tertiary
+import com.example.mealmates.ui.theme.star_color
 import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.google.gson.Gson
 import io.ktor.client.HttpClient
@@ -105,7 +114,7 @@ fun fetchNearbyRestaurants(groupId: String): List<MealMatesPlace> {
     return response.listPlaces()
 }
 
-fun updateDatabaseOnSwipeCompletion(
+fun updateDatabaseOnLikeCompletion(
     userId: String,
     groupId: String,
     allRestaurants: List<MealMatesPlace>,
@@ -164,8 +173,6 @@ fun updateDatabaseOnSwipeCompletion(
     }
 }
 
-const val swipeThreshold = 300f
-
 // TODO: Replace with dynamic grouping
 const val groupId = "3"
 
@@ -176,7 +183,6 @@ fun RestaurantPrompt(
 ) {
     var isLoading by remember { mutableStateOf(true) }
     var places by remember { mutableStateOf(emptyList<MealMatesPlace>()) }
-    var offset by remember { mutableFloatStateOf(0f) }
     var index by remember { mutableIntStateOf(0) }
     var likedRestaurants by remember { mutableStateOf(emptyList<String>()) }
 
@@ -204,37 +210,25 @@ fun RestaurantPrompt(
         return
     }
 
-    Box(
-        contentAlignment = Alignment.CenterStart,
-        modifier =
-            Modifier.pointerInput(Unit) {
-                detectHorizontalDragGestures(
-                    onDragEnd = {
-                        when {
-                            // swipe right
-                            offset > swipeThreshold -> {
-                                likedRestaurants += places[index].id
-                                index++
-                            }
-                            // swipe left
-                            offset < -swipeThreshold -> {
-                                index++
-                            }
-                        }
-                    }) { change, dragAmount ->
-                        change.consume()
-                        offset += dragAmount
-                    }
-            }) {
-            // Swiping complete
-            if (index == places.size) {
-                updateDatabaseOnSwipeCompletion(
-                    GlobalObjects.user.id!!, groupId, places, likedRestaurants)
-                onNavigateToMatchedRestaurants()
-            } else {
-                RestaurantProfile(places[index])
-            }
+    fun onDislike() {
+        index++
+    }
+
+    fun onLike() {
+        likedRestaurants += places[index].id
+        index++
+    }
+
+    Box(contentAlignment = Alignment.CenterStart) {
+        // Liking complete
+        if (index == places.size) {
+            updateDatabaseOnLikeCompletion(
+                GlobalObjects.user.id!!, groupId, places, likedRestaurants)
+            onNavigateToMatchedRestaurants()
+        } else {
+            RestaurantProfile(places[index], { onDislike() }, { onLike() })
         }
+    }
 }
 
 fun convertImageByteArrayToBitmap(imageData: ByteArray): Bitmap {
@@ -267,24 +261,49 @@ fun fetchPlacePhoto(photoReference: String): ByteArray {
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun PagerIndicator(pagerState: PagerState) {
+fun ImageCarouselBottomRow(
+    pagerState: PagerState,
+    onDislike: () -> Unit = {},
+    onLike: () -> Unit = {}
+) {
     Row(
         modifier = Modifier.wrapContentHeight().fillMaxWidth().offset(y = -(32).dp),
-        horizontalArrangement = Arrangement.Center) {
-            repeat(pagerState.pageCount) { iteration ->
-                val color = if (pagerState.currentPage == iteration) Color.Blue else Color.LightGray
-                Box(
-                    modifier =
-                        Modifier.padding(2.dp).clip(CircleShape).background(color).size(10.dp))
+        horizontalArrangement = Arrangement.SpaceBetween) {
+            Button(
+                onClick = onDislike,
+                modifier = Modifier.padding(start = 8.dp).size(45.dp).offset(y = -(22).dp),
+                shape = CircleShape,
+                colors = ButtonDefaults.buttonColors(containerColor = md_theme_light_tertiary),
+                contentPadding = PaddingValues(0.dp)) {
+                    Icon(Icons.Default.Clear, "dislike", tint = md_theme_light_onTertiary)
+                }
+            Row(horizontalArrangement = Arrangement.Center) {
+                repeat(pagerState.pageCount) { iteration ->
+                    val color =
+                        if (pagerState.currentPage == iteration) Color.Blue else Color.LightGray
+                    Box(
+                        modifier =
+                            Modifier.padding(2.dp).clip(CircleShape).background(color).size(10.dp))
+                }
             }
+            Button(
+                onClick = onLike,
+                modifier = Modifier.padding(end = 8.dp).size(45.dp).offset(y = -(22).dp),
+                shape = CircleShape,
+                colors =
+                    ButtonDefaults.buttonColors(containerColor = md_theme_light_errorContainer),
+                contentPadding = PaddingValues(0.dp)) {
+                    Icon(Icons.Default.FavoriteBorder, "like", tint = Color.Black)
+                }
         }
 }
 
 const val MAX_IMAGES = 8
+const val MAX_LABELS = 4
 
-@OptIn(ExperimentalFoundationApi::class)
+@OptIn(ExperimentalFoundationApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun RestaurantProfile(place: MealMatesPlace) {
+fun RestaurantProfile(place: MealMatesPlace, onDislike: () -> Unit, onLike: () -> Unit) {
     val photoCache = remember { mutableMapOf<String, ByteArray>() }
 
     Column(modifier = Modifier.fillMaxSize()) {
@@ -308,26 +327,43 @@ fun RestaurantProfile(place: MealMatesPlace) {
                 }
             }
 
-        PagerIndicator(pagerState)
+        ImageCarouselBottomRow(pagerState, onDislike, onLike)
 
-        Column(modifier = Modifier.weight(1f).fillMaxWidth().padding(horizontal = 8.dp)) {
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(text = place.displayName, fontWeight = FontWeight.Bold)
-                // OpenWebsiteButton(url = info.website)
-            }
-            Text(text = place.shortFormattedAddress, fontSize = 15.sp)
-            Row(verticalAlignment = Alignment.CenterVertically) {
-                for (type in place.types) {
-                    if (RestaurantTypeToLabel[type] != null) {
-                        SuggestionChip(
-                            onClick = {},
-                            label = { Text(RestaurantTypeToLabel[type]!!) },
-                            modifier = Modifier.padding(end = 8.dp),
-                        )
+        Column(
+            modifier =
+                Modifier.weight(1f)
+                    .fillMaxWidth()
+                    .padding(horizontal = 8.dp)
+                    .offset(y = -(30).dp)) {
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(text = place.displayName, fontWeight = FontWeight.Bold)
+                    Row(modifier = Modifier.padding(start = 4.dp)) {
+                        Icon(Icons.Default.Star, "rating", tint = star_color)
+                        Text(
+                            text = place.rating.toString(),
+                            fontSize = 15.sp,
+                            modifier = Modifier.padding(start = 4.dp))
+                    }
+
+                    // OpenWebsiteButton(url = info.website)
+                }
+
+                // Remove city from address
+                val address = place.shortFormattedAddress.split(",").dropLast(1).joinToString()
+                Text(text = address, fontSize = 15.sp)
+
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    for (type in place.types.take(MAX_LABELS)) {
+                        if (RestaurantTypeToLabel[type] != null) {
+                            SuggestionChip(
+                                onClick = {},
+                                label = { Text(RestaurantTypeToLabel[type]!!) },
+                                modifier = Modifier.padding(end = 8.dp),
+                            )
+                        }
                     }
                 }
             }
-        }
     }
 }
 
