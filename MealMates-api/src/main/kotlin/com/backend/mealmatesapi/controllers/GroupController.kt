@@ -107,4 +107,18 @@ class GroupController {
         databaseService.query(queryStr)
         return "Updated group with id ${group.gid}, name ${group.name}, uids ${group.uids}, preferences ${group.preferences}, restrictions ${group.restrictions}, image ${group.image}, location ${group.location} RETURNING gid"
     }
+
+    @DeleteMapping("")
+    @ResponseBody
+    fun deleteGroup(@RequestParam("id") id: String): String {
+        databaseService.query("DELETE FROM Groups WHERE gid = $id RETURNING gid;")
+        return "Deleted group with id $id"
+    }
+
+    @DeleteMapping("/user")
+    @ResponseBody
+    fun deleteUserFromGroup(@RequestParam("uid") uid: String, @RequestParam("gid") gid: String): String {
+        databaseService.query("UPDATE Groups SET uids = array_remove(uids, '$uid') WHERE gid = $gid RETURNING gid;")
+        return "Deleted user $uid from group $gid"
+    }
 }

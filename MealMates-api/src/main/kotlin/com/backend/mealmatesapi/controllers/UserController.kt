@@ -47,6 +47,35 @@ class UserController {
         }
     }
 
+    @GetMapping("/email")
+    @ResponseBody
+    fun getUserByEmail(@RequestParam("email") email: String): User {
+        val result: List<List<Any>>? = databaseService.query("SELECT * FROM Users u where u.email = '$email';")
+        if (result.isNullOrEmpty()) {
+            return User("", "User not found", "User not found", listOf(), listOf(), ByteArray(0), Point2D.Double())
+        } else if (result[0][0] is String && result[0][1] is String && result[0][2] is String && result[0][3] is Array<*> &&
+            result[0][4] is Array<*>
+        ) {
+
+            var image = ByteArray(0)
+            var location = Point2D.Double()
+            if (result[0][5] is String) {
+                // TODO: May need to convert this differently
+                image = result[0][5] as ByteArray
+            }
+            if (result[0][6] is Point2D.Double) {
+                location = result[0][6] as Point2D.Double
+            }
+
+            return User(
+                result[0][0] as String, result[0][1] as String, result[0][2] as String,
+                (result[0][3] as Array<String>).toList(), (result[0][4] as Array<String>).toList(), image, location
+            )
+        } else {
+            return User("", "User not found", "User not found", listOf(), listOf(), ByteArray(0), Point2D.Double())
+        }
+    }
+
     @PostMapping("")
     @ResponseBody
     fun createUser(@RequestBody user: User): String {
