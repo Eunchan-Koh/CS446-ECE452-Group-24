@@ -164,7 +164,6 @@ fun ListGroupsMainPage(OnNavigateToGroup: (Group) -> Unit = {}) {
                     .clickable { OnNavigateToGroup(groups[i]) }
                     .background(color = selectableList_colour),
 //                    horizontalAlignment = Alignment.CenterHorizontally
-
                 ) {
 
                 Row(

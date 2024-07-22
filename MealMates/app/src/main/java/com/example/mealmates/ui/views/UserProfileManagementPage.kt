@@ -3,7 +3,6 @@ package com.example.mealmates.ui.views
 import android.graphics.BitmapFactory
 import android.widget.Toast
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,12 +20,10 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.internal.enableLiveLiterals
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -99,7 +96,7 @@ fun ChoosePicProfile(userCur: User) {
     val curCon = LocalContext.current
     Column(
         modifier = Modifier
-            .background(color = Color.White)
+//            .background(color = Color.White)
             .clickable {
                 Toast.makeText(curCon, "Clicked on Image Selection area!",
                 Toast.LENGTH_SHORT).show()
