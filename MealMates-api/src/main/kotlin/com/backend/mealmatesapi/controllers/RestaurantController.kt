@@ -68,4 +68,22 @@ class RestaurantController {
         return "Deleted restaurants with rid ${result?.get(0)?.get(0)}"
     }
 
+    @GetMapping("/completed")
+    @ResponseBody
+    fun getCompletedRestaurants(@RequestParam gid: String): List<Restaurants> {
+        val result: List<List<Any>>? =
+            databaseService.query("SELECT * FROM Restaurants r WHERE r.gid = '$gid' AND r.suggested IS NOT NULL;")
+        if (result.isNullOrEmpty()) {
+            return listOf()
+        } else {
+            return result.map {
+                Restaurants(
+                    it[0] as Int,
+                    it[1] as Int,
+                    it[2] as JsonObject,
+                    (it[3] as Array<String>).toList()
+                )
+            }
+        }
+    }
 }
