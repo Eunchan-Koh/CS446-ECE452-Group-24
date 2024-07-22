@@ -86,6 +86,10 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
         navController.navigate(Routes.GROUP)
     }
 
+    fun onNavigateToCreateNewGroup() {
+        navController.navigate(Routes.CREATE_NEW_GROUP)
+    }
+
     fun onNavigateToGroupMembers() {
         navController.navigate(Routes.GROUP_MEMBERS)
     }
@@ -153,7 +157,7 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                 ) {
                     composable(Routes.HOME) {
                         MainPage(loginModel, { onNavigateToRestaurantPrompts() },
-                            { onNavigateToGroup() })
+                            { onNavigateToGroup() }, { onNavigateToCreateNewGroup() })
                     }
 
                     composable(Routes.SURVEY) {
@@ -175,6 +179,10 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
 
                     composable(Routes.GROUP) {
                         GroupPage(loginModel, { onNavigateToGroupMembers() }, { onNavigateToRestaurantPrompts() })
+                    }
+
+                    composable(Routes.CREATE_NEW_GROUP) {
+                        CreateNewGroupPage(loginModel) { onNavigateToMainPage() }
                     }
 
                     composable(Routes.GROUP_MEMBERS) {

@@ -7,6 +7,7 @@ object Routes {
     val RESTAURANT_PROMPTS = "restaurant_prompts"
     val MATCHED_RESTAURANTS = "matched_restaurants"
     val GROUP = "group"
+    val CREATE_NEW_GROUP = "create_new_group"
     val GROUP_MEMBERS = "group_members"
     val PLACES_API_TEST = "places_test"
     val PROFILE = "profile"

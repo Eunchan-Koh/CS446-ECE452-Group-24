@@ -52,7 +52,7 @@ import com.example.mealmates.ui.theme.selectableList_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
 
 @Composable
-fun MainPage(loginModel: LoginViewModel, onNavigateToRestaurantPrompts: () -> Unit = {}, OnNavigateToGroup: () -> Unit = {}){
+fun MainPage(loginModel: LoginViewModel, onNavigateToRestaurantPrompts: () -> Unit = {}, OnNavigateToGroup: () -> Unit = {}, OnNavigateToCreateNewGroup: () -> Unit = {}){
 
     val (TotalGroupNum, setGroupNum) = remember {
         mutableStateOf(2)
@@ -78,7 +78,7 @@ fun MainPage(loginModel: LoginViewModel, onNavigateToRestaurantPrompts: () -> Un
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomEnd
             ){
-                FloatingActionButMainPage()
+                FloatingActionButMainPage(OnNavigateToCreateNewGroup)
             }
         }
 
@@ -225,8 +225,8 @@ fun ListGroupsMainPage(OnNavigateToGroup: () -> Unit = {}) {
 
 
 @Composable
-fun FloatingActionButMainPage(){
-    FloatingActionButton(onClick = { /*open up create group page*/ },
+fun FloatingActionButMainPage(OnNavigateToCreateNewGroup: () -> Unit = {}){
+    FloatingActionButton(onClick = { OnNavigateToCreateNewGroup() },
         modifier = Modifier
             .padding(30.dp)
             .size(50.dp),
