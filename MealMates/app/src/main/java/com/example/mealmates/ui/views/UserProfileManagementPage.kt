@@ -22,6 +22,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
@@ -59,9 +60,9 @@ fun UserProfileManagementPage(
     onNavigateToSurvey: () -> Unit = {},
     onNavigateToLocationPage: () -> Unit = {}
 ) {
-    val userCur = UserApi().getUser(GlobalObjects.user.id!!)
-    val userName = userCur.name
-    val userLocation = userCur.location
+    val currentUser = UserApi().getUser(GlobalObjects.user.id!!)
+    val userName = currentUser.name
+    val userLocation = currentUser.location
     var tempUserName = userName
     var tempUserLocation: String
 
@@ -85,7 +86,7 @@ fun UserProfileManagementPage(
                                     fontWeight = FontWeight.Bold,
                                     color = Color.Black,
                                 )
-                                ChoosePicProfile(userCur)
+                                ChoosePicProfile(currentUser)
                             }
                     }
                 Spacer(modifier = Modifier.height(8.dp))
@@ -116,23 +117,27 @@ fun UserProfileManagementPage(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 20.sp,
                                 )
-                                Text(text = userCur.email, fontSize = 16.sp, color = Color.Black)
+                                Text(
+                                    text = currentUser.email, fontSize = 16.sp, color = Color.Black)
                             }
-
-                            Preferences(userCur.preferences, onNavigateToSurvey)
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = Color.Gray,
+                                modifier = Modifier.padding(vertical = 4.dp))
+                            Preferences(currentUser.preferences, onNavigateToSurvey)
 
                             // Location is being shown using point only; need to be fixed to address
                             // later
                             LocationSetupProfile(userLocation, onNavigateToLocationPage)
                         }
                 }
-                SaveProfileButton(tempUserName)
+                SaveProfileButton(currentUser, tempUserName)
             }
     }
 }
 
 @Composable
-fun ChoosePicProfile(userCur: User) {
+fun ChoosePicProfile(currentUser: User) {
     val curCon = LocalContext.current
     Box(
         contentAlignment = Alignment.TopEnd,
@@ -141,7 +146,8 @@ fun ChoosePicProfile(userCur: User) {
                 Toast.makeText(curCon, "Clicked on Image Selection area!", Toast.LENGTH_SHORT)
                     .show()
             }) {
-            val userImage = BitmapFactory.decodeByteArray(userCur.image, 0, userCur.image.size)
+            val userImage =
+                BitmapFactory.decodeByteArray(currentUser.image, 0, currentUser.image.size)
             if (userImage != null)
                 Image(bitmap = userImage.asImageBitmap(), contentDescription = "")
             else
@@ -271,13 +277,19 @@ fun Preferences(preferences: List<String>, onNavigateToSurvey: () -> Unit = {}) 
     }
 }
 
+// TODO: Currently only saves name changes. Make it work for profile picture and email
+fun onSave(currentUser: User, newName: String) {
+    currentUser.name = newName
+    UserApi().updateUser(currentUser)
+}
+
 @Composable
-fun SaveProfileButton(tempUserName: String) {
+fun SaveProfileButton(currentUser: User, tempUserName: String) {
     val context = LocalContext.current
     Column(verticalArrangement = Arrangement.Bottom) {
         Button(
             onClick = {
-                // TODO: update user name and user location - save the values using update
+                onSave(currentUser, tempUserName)
                 Toast.makeText(context, "Saved Profile Changes", Toast.LENGTH_SHORT).show()
             },
             colors = ButtonDefaults.buttonColors(containerColor = button_colour)) {
