@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Home
 import androidx.compose.material.icons.rounded.Settings
@@ -24,9 +23,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
-import androidx.navigation.navArgument
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.mealmates.constants.NavArguments
 import com.example.mealmates.constants.Routes
 import com.example.mealmates.models.Group
@@ -151,6 +151,22 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
         )
     }
 
+    fun onNavigateToGroupSettings(group: Group) {
+//        navController.navigate(Routes.GROUP_SETTINGS)
+        println("This is the group $group")
+        navController.navigate(
+            Routes.GROUP_SETTINGS + "?" +
+            "${NavArguments.GROUP_INFO.GROUP_ID}= ${group.gid}&" +
+            "${NavArguments.GROUP_INFO.GROUP_NAME}= ${group.name}&" +
+            "${NavArguments.GROUP_INFO.RESTRICTIONS}= ${group.restrictions}&" +
+            "${NavArguments.GROUP_INFO.PREFERENCES}= ${group.preferences}&" +
+            "${NavArguments.GROUP_INFO.USERS}= ${group.uids}&" +
+            "${NavArguments.GROUP_INFO.IMAGE}= ${group.image}&" +
+            "${NavArguments.GROUP_INFO.LOCATION}= ${group.location}"
+        )
+    }
+
+
     showBottomBar = when (navBackStackEntry?.destination?.route) {
         "survey" -> false
         "location" -> false
@@ -232,11 +248,40 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
 
                     composable(Routes.GROUP_MEMBERS) {
                         GroupMembersPage(loginModel)
-
                     }
 
                     composable(Routes.PROFILE) {
                         UserProfileManagementPage(loginModel) { onNavigateToSurvey() }
+                    }
+
+                    composable(
+                        Routes.GROUP_SETTINGS_WITH_ARGS,
+                        arguments = listOf(
+                        navArgument(NavArguments.GROUP_INFO.GROUP_ID) { defaultValue = "" },
+                        navArgument(NavArguments.GROUP_INFO.GROUP_NAME) { defaultValue = "" },
+                        navArgument(NavArguments.GROUP_INFO.USERS) { defaultValue = "" },
+                        navArgument(NavArguments.GROUP_INFO.PREFERENCES) { defaultValue = "" },
+                        navArgument(NavArguments.GROUP_INFO.IMAGE) { defaultValue = "" },
+                        navArgument(NavArguments.GROUP_INFO.LOCATION) { defaultValue = "" }
+                    )) {backStackEntry ->
+                        val groupId = convertToInt(backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.GROUP_ID) ?: "")
+                        val groupName = backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.GROUP_NAME) ?: ""
+                        val uids = convertToStringList(backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.USERS) ?: "")
+                        val preferences = convertToStringList(backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.PREFERENCES) ?: "")
+                        val restrictions = convertToStringList(backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.RESTRICTIONS) ?: "")
+                        val image = backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.IMAGE) ?: ""
+                        val location = convertToLatLng(backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.LOCATION) ?: "0.0,0.0")
+
+                        GroupSettings(
+                            loginModel,
+                            groupId,
+                            groupName,
+                            preferences, // Simplified for debugging
+                            restrictions, // Simplified for debugging
+                            uids, // Simplified for debugging
+                            ByteArray(0), // Simplified for debugging
+                            location // Simplified for debugging
+                        ) { onNavigateToGroup() }
                     }
 
                     // test
@@ -268,17 +313,17 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
 
                         GroupInfoPage(
                             loginModel,
-                            0,
+                            groupId,
                             groupName,
                             preferences, // Simplified for debugging
                             restrictions, // Simplified for debugging
                             uids, // Simplified for debugging
                             ByteArray(0), // Simplified for debugging
                             location // Simplified for debugging
-                        ) { onNavigateToGroup() }
+                        ) { group: Group ->
+                            onNavigateToGroupSettings(group)
+                        }
                     }
-
-
                 }
             }
         }
