@@ -172,7 +172,7 @@ fun GroupSettings(
                 }
 //                GroupName(uids, curUserID, name, new_group_name)
 
-                GroupMembers(groupInfo, (uids[0] == curUserID), gid, true)
+                GroupMembers(groupInfo, (uids[0] == curUserID), gid)
 
                 FoodPreferences(groupInfo)
 
@@ -368,8 +368,7 @@ fun GroupName(uids: List<String>, curUserID: String, groupName: String, new_grou
 fun GroupMembers(
     groupInfo: GroupInfo,
     isAdmin: Boolean,
-    gid: Int,
-    isExistingGroup: Boolean
+    gid: Int
 ) {
     Column(
         modifier = Modifier
