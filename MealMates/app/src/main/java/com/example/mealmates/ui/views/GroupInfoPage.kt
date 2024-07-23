@@ -70,13 +70,17 @@ fun GroupInfoPage(
         preferences.map { preference ->
             RESTAURANT_TYPE_LABEL_LIST.entries.find { it.value == preference }?.key ?: preference
         }
+    val formattedRestrictions =
+        restrictions.map { restriction ->
+            RESTAURANT_TYPE_LABEL_LIST.entries.find { it.value == restriction }?.key ?: restriction
+        }
     val groupInfo =
         GroupInfo(
             imageUrl = null,
             groupName = name,
             members = users,
             preferences = formattedPreferences.joinToString(", "),
-            restrictions = formattedPreferences.joinToString(", "),
+            restrictions = formattedRestrictions.joinToString(", "),
             location = location)
 
     Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
@@ -210,7 +214,7 @@ fun InfoRow(icon: ImageVector, label: String, value: String) {
             Spacer(modifier = Modifier.width(8.dp))
             Column {
                 Text(text = label, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text(text = value, fontSize = 16.sp)
+                Text(text = value.ifEmpty { "None" }, fontSize = 16.sp)
             }
         }
 }
