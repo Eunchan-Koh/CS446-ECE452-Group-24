@@ -214,13 +214,15 @@ fun RestaurantPrompt(loginModel: LoginViewModel, groupId: String, onNavigateToHo
     }
 
     Box(contentAlignment = Alignment.CenterStart) {
-        // Liking complete
-        if (index == places.size) {
+        if (index > places.size) {
+            onNavigateToHome()
+        } else if (index == places.size) {
+            // Liking complete
             val context = LocalContext.current
             updateDatabaseOnLikeCompletion(
                 GlobalObjects.user.id!!, groupId, places, likedRestaurants)
             Toast.makeText(context, "Completed Liking Restaurants!", Toast.LENGTH_SHORT).show()
-            onNavigateToHome()
+            index++
         } else {
             RestaurantProfile(places[index], { onDislike() }, { onLike() })
         }
