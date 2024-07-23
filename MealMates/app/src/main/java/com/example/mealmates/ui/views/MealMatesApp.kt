@@ -101,11 +101,12 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
 
     fun onNavigateToRestaurantPrompts(groupId: Int) {
         navController.navigate(
-            Routes.RESTAURANT_PROMPTS + "?" + "${NavArguments.GROUP_INFO.GROUP_ID}=$groupId")
+            Routes.RESTAURANT_PROMPTS + "?" + "${NavArguments.GROUP_INFO.GROUP_ID}= $groupId")
     }
 
-    fun onNavigateToMatchedRestaurants() {
-        navController.navigate(Routes.MATCHED_RESTAURANTS)
+    fun onNavigateToMatchedRestaurants(groupId: Int) {
+        navController.navigate(
+            Routes.MATCHED_RESTAURANTS + "?" + " ${NavArguments.GROUP_INFO.GROUP_ID}= $groupId")
     }
 
     fun onNavigateToGroup() {
@@ -219,12 +220,23 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                                     backStackEntry.arguments?.getString(
                                         NavArguments.GROUP_INFO.GROUP_ID) ?: ""
                                 RestaurantPrompt(
-                                    loginModel, { onNavigateToMatchedRestaurants() }, groupId)
+                                    loginModel, { onNavigateToMatchedRestaurants(-1) }, groupId)
                             }
 
-                        composable(Routes.MATCHED_RESTAURANTS) {
-                            ListOfMatchedRestaurantsPage(loginModel) { onNavigateToMainPage() }
-                        }
+                        composable(
+                            Routes.MATCHED_RESTAURANTS,
+                            arguments =
+                                listOf(
+                                    navArgument(NavArguments.GROUP_INFO.GROUP_ID) {
+                                        defaultValue = ""
+                                    })) { backStackEntry ->
+                                val groupId =
+                                    backStackEntry.arguments?.getString(
+                                        NavArguments.GROUP_INFO.GROUP_ID) ?: ""
+                                ListOfMatchedRestaurantsPage(loginModel, groupId) {
+                                    onNavigateToMainPage()
+                                }
+                            }
 
                         composable(Routes.GROUP) {
                             GroupPage(
@@ -367,7 +379,8 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                                     ByteArray(0), // Simplified for debugging
                                     location, // Simplified for debugging
                                     { group: Group -> onNavigateToGroupSettings(group) },
-                                    { onNavigateToRestaurantPrompts(groupId) })
+                                    { onNavigateToRestaurantPrompts(groupId) },
+                                    { onNavigateToMatchedRestaurants(groupId) })
                             }
                     }
                 }

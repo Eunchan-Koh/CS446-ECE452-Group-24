@@ -46,8 +46,7 @@ import com.example.mealmates.ui.theme.selectableList_colour
 import com.google.gson.Gson
 
 @Composable
-fun ListOfMatchedRestaurantsPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit) {
-
+fun ListOfMatchedRestaurantsPage(loginModel: LoginViewModel, groupId: String, onNavigateToMainPage: () -> Unit) {
     MealMatesTheme{
         Column(
             modifier = Modifier
@@ -55,15 +54,13 @@ fun ListOfMatchedRestaurantsPage(loginModel: LoginViewModel, onNavigateToMainPag
                 .verticalScroll(rememberScrollState())
         ) {
 //                    Image
-
-
             /*testing from here------------------------------------------------------------*/
             val userId = GlobalObjects.user.id!!
             val fetchedGroups = UserApi().getUserGroups(userId)
             val groups = fetchedGroups
             val tempaa: RestaurantsApi = RestaurantsApi()
 //            //TODO: fixed this groups[0].gid(=3) to this group's gid. groups[1].gid is for using hardcoded values for now.
-            val grRes: Restaurants = tempaa.getRestaurants(3.toString())
+            val grRes: Restaurants = tempaa.getRestaurants(groupId)
 //            val taa = 3
 //            Text(text = "$taa")
 //            Text(text = "$grRes")
