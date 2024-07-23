@@ -58,7 +58,7 @@ class LoginViewModel : ViewModel() {
                         GlobalObjects.user = user
                         userIsComplete = true
                     } else {
-                        GlobalObjects.user = User(result.idToken)
+                        GlobalObjects.user = User(accessToken)
                     }
 
                     userIsAuthenticated = true

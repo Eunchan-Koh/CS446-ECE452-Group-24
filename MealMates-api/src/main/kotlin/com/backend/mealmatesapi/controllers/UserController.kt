@@ -80,12 +80,17 @@ class UserController {
     @ResponseBody
     fun createUser(@RequestBody user: User): String {
         //TODO: Support for image and location. See GroupController.kt for example
+        val locationForQuery = if (user.location != Point2D.Double()) {
+            "point(${user.location.x}, ${user.location.y})"
+        } else {
+            "NULL"
+        }
         databaseService.query(
-            "INSERT INTO Users (name, email, preferences, restrictions, image, location) VALUES ('${user.name}', '${user.email}', ARRAY[${
+            "INSERT INTO Users (uid, name, email, preferences, restrictions, image, location) VALUES ('${user.id}','${user.name}', '${user.email}', ARRAY[${
                 user.preferences.joinToString(
                     ","
                 ) { "'$it'" }
-            }]::text[], ARRAY[${user.restrictions.joinToString(",") { "'$it'" }}]::text[], null, null) RETURNING uid;"
+            }]::text[], ARRAY[${user.restrictions.joinToString(",") { "'$it'" }}]::text[], null, $locationForQuery) RETURNING uid;"
         )
         return "Inserted user with id ${user.id}, email ${user.email}, name ${user.name}, preferences ${user.preferences}, restrictions ${user.restrictions}"
     }

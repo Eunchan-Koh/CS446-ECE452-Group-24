@@ -26,6 +26,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,6 +62,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.style.TextAlign
+import com.example.mealmates.constants.GlobalObjects
 import com.google.maps.android.compose.rememberMarkerState
 
 class LocationSettingPage : AppCompatActivity() {
@@ -72,12 +74,12 @@ class LocationSettingPage : AppCompatActivity() {
     var enterLocationPrompt by mutableStateOf(false)
     var currentPlaceLatLng by mutableStateOf(LatLng(0.0, 0.0))
     @Composable
-    fun LocationSettings(loginModel: LoginViewModel, placesClient: PlacesClient, onNavigateToMainPage: () -> Unit = {}) {
+    fun LocationSettings(loginModel: LoginViewModel, placesClient: PlacesClient, onNavigateToMainPage: () -> Unit = {}, onNavigateToProfilePage: () -> Unit) {
         this.placesClient = placesClient
         this.loginModel = loginModel
         this.context = LocalContext.current
         checkPermission()
-        FindCurrentLocationButton(onNavigateToMainPage, currentPlacesFound)
+        FindCurrentLocationButton(onNavigateToMainPage, onNavigateToProfilePage, currentPlacesFound)
     }
 
     private fun checkPermission() {
@@ -107,7 +109,7 @@ class LocationSettingPage : AppCompatActivity() {
         }
     }
 
-    private fun checkPermissionThenFindCurrentPlace() {
+    private fun checkPermissionThenFindCurrentPlace(onNavigateToProfilePage: () -> Unit) {
         when {
             (ContextCompat.checkSelfPermission(
                 context,
@@ -117,7 +119,7 @@ class LocationSettingPage : AppCompatActivity() {
                 ACCESS_COARSE_LOCATION
             ) == PackageManager.PERMISSION_GRANTED) -> {
                 println("permission granted, find current place")
-                findCurrentPlace()
+                findCurrentPlace(onNavigateToProfilePage)
             }
 
             else -> {
@@ -133,7 +135,7 @@ class LocationSettingPage : AppCompatActivity() {
      * most likely to be at currently.
      */
     @RequiresPermission(anyOf = [ACCESS_COARSE_LOCATION, ACCESS_FINE_LOCATION])
-    private fun findCurrentPlace() {
+    private fun findCurrentPlace(onNavigateToProfilePage: () -> Unit) {
         val placeFields: List<Place.Field> =
             listOf(Place.Field.NAME, Place.Field.ID, Place.Field.ADDRESS, Place.Field.LAT_LNG)
         val request = FindCurrentPlaceRequest.newInstance(placeFields)
@@ -156,10 +158,13 @@ class LocationSettingPage : AppCompatActivity() {
                         )
                     }
                     val mostLikelyPlaceLatLng = response.placeLikelihoods[0].place.latLng
-                    val currentUser = this.loginModel.user
+                    val currentUser = GlobalObjects.user
                     if (mostLikelyPlaceLatLng != null) {
                         currentUser.location = mostLikelyPlaceLatLng
-                        UserApi().updateUser(currentUser)
+                        if(!mostLikelyPlaceLatLng.equals(GlobalObjects.user.location)) {
+                            GlobalObjects.user.location = mostLikelyPlaceLatLng
+                            onNavigateToProfilePage();
+                        }
                         currentPlacesFound = true
                         currentPlaceLatLng = mostLikelyPlaceLatLng
                     }
@@ -179,6 +184,7 @@ class LocationSettingPage : AppCompatActivity() {
     @Composable
     fun FindCurrentLocationButton(
         onNavigateToMainPage: () -> Unit,
+        onNavigateToProfilePage: () -> Unit,
         locationFound: Boolean
     ) {
         Column(
@@ -197,11 +203,16 @@ class LocationSettingPage : AppCompatActivity() {
                 color = md_theme_light_primary,
             )
             if (!enterLocationPrompt || locationFound) {
+                println(locationFound)
+                println(currentPlaceLatLng)
                 Button(
                     onClick = {
                         if (!locationFound) {
-                            checkPermissionThenFindCurrentPlace()
+                            checkPermissionThenFindCurrentPlace(onNavigateToProfilePage)
                         } else {
+                            GlobalObjects.user.location = currentPlaceLatLng
+                            UserApi().addUser(GlobalObjects.user)
+                            println("Navigating to main")
                             onNavigateToMainPage()
                         } },
                     colors = ButtonDefaults.buttonColors(

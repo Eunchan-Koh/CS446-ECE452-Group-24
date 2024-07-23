@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.example.mealmates.apiCalls.UserApi
 import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.constants.RESTAURANT_TYPE_LABEL_LIST
 import com.example.mealmates.ui.theme.md_theme_light_primary
@@ -46,7 +47,12 @@ import com.example.mealmates.ui.viewModels.LoginViewModel
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun PreferenceAndRestrictions(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit = {}) {
+fun PreferenceAndRestrictions(
+    loginModel: LoginViewModel,
+    onNavigateToMainPage: () -> Unit = {},
+    onNavigateToLocationPage: () -> Unit,
+    onNavigateToProfilePage: () -> Unit,
+) {
     val selectedPreferences = remember { mutableStateListOf<String>() }
 
     Box(
@@ -104,14 +110,14 @@ fun PreferenceAndRestrictions(loginModel: LoginViewModel, onNavigateToMainPage: 
                 }
             }
 
-            SaveChangesButton(loginModel, onNavigateToMainPage, selectedPreferences);
+            SaveChangesButton(loginModel, onNavigateToMainPage, onNavigateToLocationPage, onNavigateToProfilePage, selectedPreferences);
         }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
-fun SaveChangesButton(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit = {}, selectedPreferences: List<String>) {
+fun SaveChangesButton(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit = {}, onNavigateToLocationPage: () -> Unit = {}, onNavigateToProfilePage: () -> Unit = {}, selectedPreferences: List<String>) {
     val buttonColor = remember { mutableStateOf(md_theme_light_primary) }
 
     Row(
@@ -123,9 +129,16 @@ fun SaveChangesButton(loginModel: LoginViewModel, onNavigateToMainPage: () -> Un
     ) {
         Button(
             onClick = {
-                onNavigateToMainPage();
+                val oldPreferences = GlobalObjects.user.preferences;
                 GlobalObjects.user.preferences = selectedPreferences;
                 GlobalObjects.user.restrictions = selectedPreferences;
+                if(GlobalObjects.user.location.latitude.equals(0.0) && GlobalObjects.user.location.longitude.equals(0.0)) {
+                    onNavigateToLocationPage();
+                } else if(oldPreferences != GlobalObjects.user.preferences) {
+                    onNavigateToProfilePage();
+                } else {
+                    onNavigateToMainPage();
+                }
             },
             colors = ButtonDefaults.buttonColors(
                 md_theme_light_primary
