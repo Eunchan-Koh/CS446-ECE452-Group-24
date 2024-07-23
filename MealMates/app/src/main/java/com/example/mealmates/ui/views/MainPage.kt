@@ -57,7 +57,8 @@ import com.example.mealmates.ui.viewModels.LoginViewModel
 fun MainPage(
     loginModel: LoginViewModel,
     onNavigateToGroup: (Group) -> Unit = {},
-    onNavigateToMatches: (Int) -> Unit = {}
+    onNavigateToMatches: (Int) -> Unit = {},
+    onNavigateToCreateNewGroup: () -> Unit = {}
 ) {
     val (TotalGroupNum, setGroupNum) = remember {
         mutableStateOf(2)
@@ -77,8 +78,8 @@ fun MainPage(
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomEnd
-            ) {
-                FloatingActionButMainPage()
+            ){
+                FloatingActionButMainPage(onNavigateToCreateNewGroup)
             }
         }
     }
@@ -244,8 +245,8 @@ fun ListGroupsMainPage(
 
 
 @Composable
-fun FloatingActionButMainPage(){
-    FloatingActionButton(onClick = { /*open up create group page*/ },
+fun FloatingActionButMainPage(OnNavigateToCreateNewGroup: () -> Unit = {}){
+    FloatingActionButton(onClick = { OnNavigateToCreateNewGroup() },
         modifier = Modifier
             .padding(30.dp)
             .size(50.dp),

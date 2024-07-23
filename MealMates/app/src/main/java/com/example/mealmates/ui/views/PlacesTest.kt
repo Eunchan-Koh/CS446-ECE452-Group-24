@@ -89,9 +89,6 @@ fun getPlaceDetails(placeID: String): String {
             launch {
                 val res = client.get("https://places.googleapis.com/v1/places/${placeID}?fields=${fieldMasks}&key=${apiKey}")
                     .bodyAsText()
-//                println("....")
-//                println(res)
-//                println(responseString)
                 responseString = res
             }
         }

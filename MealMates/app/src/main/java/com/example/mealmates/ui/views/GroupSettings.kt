@@ -37,6 +37,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -68,6 +69,7 @@ import com.example.mealmates.apiCalls.UserApi
 import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.constants.RESTAURANT_TYPE_LABEL_LIST
 import com.example.mealmates.models.Group
+import com.example.mealmates.models.User
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.md_theme_light_primary
 import com.example.mealmates.ui.viewModels.LoginViewModel
@@ -170,7 +172,7 @@ fun GroupSettings(
                 }
 //                GroupName(uids, curUserID, name, new_group_name)
 
-                GroupMembers(groupInfo, uids, curUserID, gid)
+                GroupMembers(groupInfo, (uids[0] == curUserID), gid)
 
                 FoodPreferences(groupInfo)
 
@@ -255,6 +257,11 @@ fun TopBar(onNavigateToGroupInfo: (Group) -> Unit, group: Group){
 
 @Composable
 fun ChooseGroupPicture(groupInfo: GroupInfo) {
+    ChooseGroupPicture(imageUrl = groupInfo.imageUrl)
+}
+
+@Composable
+fun ChooseGroupPicture(imageUrl: String?) {
     val curCon = LocalContext.current
 
     Column(
@@ -273,10 +280,10 @@ fun ChooseGroupPicture(groupInfo: GroupInfo) {
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val painter =
-            if (groupInfo.imageUrl.isNullOrEmpty()) {
+            if (imageUrl.isNullOrEmpty()) {
                 painterResource(id = R.drawable.ic_group_default)
             } else {
-                rememberAsyncImagePainter(model = groupInfo.imageUrl)
+                rememberAsyncImagePainter(model = imageUrl)
             }
 
         Image(
@@ -358,7 +365,11 @@ fun GroupName(uids: List<String>, curUserID: String, groupName: String, new_grou
 }
 
 @Composable
-fun GroupMembers(groupInfo: GroupInfo, uids: List<String>, curUserID: String, gid: Int) {
+fun GroupMembers(
+    groupInfo: GroupInfo,
+    isAdmin: Boolean,
+    gid: Int
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -394,7 +405,7 @@ fun GroupMembers(groupInfo: GroupInfo, uids: List<String>, curUserID: String, gi
                 color = md_theme_light_primary,
             )
 
-            if (uids[0] == curUserID) {
+            if (isAdmin) {
                 Icon(
                     imageVector = Icons.Filled.Add,
                     contentDescription = "back",
@@ -465,7 +476,7 @@ fun GroupMembers(groupInfo: GroupInfo, uids: List<String>, curUserID: String, gi
                     }
 
                 }
-                if (uids[0] == curUserID) {
+                if (isAdmin) {
                     Icon(
                         imageVector = Icons.Default.Clear,
                         contentDescription = "remove $member_name from group",
