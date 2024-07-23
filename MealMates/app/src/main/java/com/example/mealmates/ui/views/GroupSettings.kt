@@ -1,6 +1,5 @@
 package com.example.mealmates.ui.views
 
-import android.graphics.BitmapFactory
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -28,7 +27,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
@@ -54,7 +52,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
@@ -96,7 +93,7 @@ fun GroupSettings(
     val users = mutableListOf<GroupMember>()
     for (i in uids.indices) {
         val user = UserApi().getUser(uids[i])
-        users.add(GroupMember(user.name, i == 0))
+        users.add(GroupMember(user.name, i == 0, uids[i]))
     }
     // Format preferences so that it shows nicely using maps from constants.
     val formattedPreferences =
@@ -116,15 +113,12 @@ fun GroupSettings(
 
     val curGroup = GroupApi().getGroup(gid.toString())
     val curUserID = GlobalObjects.user.id.toString()
-    val curUser = UserApi().getUser(curUserID)
 
     val notification = rememberSaveable { mutableStateOf("") }
     if (notification.value.isNotEmpty()) {
         Toast.makeText(LocalContext.current, notification.value, Toast.LENGTH_LONG).show()
         notification.value = ""
     }
-
-    var new_group_name by rememberSaveable { mutableStateOf(name) }
 
     MealMatesTheme {
         Box(
@@ -139,65 +133,11 @@ fun GroupSettings(
                     .verticalScroll(ScrollState(0)),
             ) {
 
-                Box {
-                    IconButton(
-                        onClick = { onNavigateToGroupInfo(curGroup) },
-                        modifier = Modifier.align(Alignment.TopStart)) {
-                        Icon(
-                            imageVector = Icons.Filled.KeyboardArrowLeft,
-                            contentDescription = "Back",
-                            tint = Color.Black,
-                            modifier = Modifier
-                                .size(40.dp)
-                        )
-                    }
+                TopBar({ onNavigateToGroupInfo(curGroup) }, curGroup)
 
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 10.dp),
-                        horizontalArrangement = Arrangement.Center,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Group Settings",
-                            fontSize = 24.sp,
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Bold,
-                            color = md_theme_light_primary,
-                        )
-                    }
-                }
+                ChooseGroupPicture(groupInfo)
 
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight()
-                        .padding(12.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    val painter =
-                        if (groupInfo.imageUrl.isNullOrEmpty()) {
-                            painterResource(id = R.drawable.ic_group_default)
-                        } else {
-                            rememberAsyncImagePainter(model = groupInfo.imageUrl)
-                        }
-
-                    Image(
-                        painter = painter,
-                        contentDescription = null,
-                        modifier = Modifier
-                            .size(110.dp)
-                            .aspectRatio(1F, matchHeightConstraintsFirst = false)
-                            .border(
-                                width = 1.dp,
-                                color = Color.LightGray,
-                                shape = CircleShape
-                            )
-                            .clip(CircleShape)
-                    )
-                }
-
+                var new_group_name by rememberSaveable { mutableStateOf(name) }
 
                 Column(
                     modifier = Modifier
@@ -234,65 +174,17 @@ fun GroupSettings(
                         )
                     }
                 }
+//                GroupName(uids, curUserID, name, new_group_name)
 
+                GroupMembers(groupInfo, uids, curUserID, gid)
 
-                GroupMembers(groupInfo, uids, curUserID)
+                FoodPreferences(groupInfo)
 
-                Spacer(modifier = Modifier.height(20.dp))
-                Text(
-                    text = "Preferences",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = md_theme_light_primary,
-                )
-                Text(
-                    text = groupInfo.preferences,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color.Black,
-                )
+                GroupLocation(groupInfo, uids, curUserID)
 
                 Spacer(modifier = Modifier.height(20.dp))
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .fillMaxHeight(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Group Location",
-                        fontSize = 20.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = md_theme_light_primary,
-                    )
-                    if (uids[0] == curUserID) {
-                        Icon(
-                            imageVector = Icons.Filled.Edit,
-                            contentDescription = "back",
-                            tint = md_theme_light_primary,
-                            modifier = Modifier
-                                .size(24.dp)
-                                .clickable {
-                                    notification.value = "Change Group Location"
-                                }
-                        )
-                    }
-                }
-                Spacer(modifier = Modifier.height(5.dp))
-                GoogleMap(
-                    modifier =
-                    Modifier
-                        .height(250.dp)
-                        .width((LocalConfiguration.current.screenWidthDp * 0.90).dp),
-                    cameraPositionState =
-                    rememberCameraPositionState {
-                        position = CameraPosition.fromLatLngZoom(groupInfo.location, 10f)
-                    })
-
 
                 Spacer(modifier = Modifier.weight(1f))
-                Spacer(modifier = Modifier.height(20.dp))
 
                 Column(
                     modifier = Modifier
@@ -305,7 +197,10 @@ fun GroupSettings(
                         Text(
                             text = "Delete Group",
                             textAlign = TextAlign.Start,
-                            modifier = Modifier.clickable { notification.value = "DeleteGroup" },
+                            modifier = Modifier.clickable {
+                                GroupApi().deleteGroup(gid.toString())
+                                notification.value = "Delete Group"
+                            },
                             fontWeight = FontWeight.SemiBold,
                             textDecoration = TextDecoration.Underline,
                             color = Color.Red,
@@ -314,25 +209,164 @@ fun GroupSettings(
                         Text(
                             text = "Leave Group",
                             textAlign = TextAlign.Start,
-                            modifier = Modifier.clickable { notification.value = "LeaveGroup" },
+                            modifier = Modifier.clickable {
+                                GroupApi().deleteUserFromGroup(curUserID, gid.toString())
+                                notification.value = "Leave Group"
+                            },
                             fontWeight = FontWeight.SemiBold,
                             textDecoration = TextDecoration.Underline,
                             color = Color.Red,
                         )
                     }
 
-                    Spacer(modifier = Modifier.height(30.dp))
+                    Spacer(modifier = Modifier.height(20.dp))
 
-                    SaveButton()
+                    SaveButton(loginModel, { onNavigateToGroupInfo(curGroup) }, curGroup, new_group_name)
                 }
             }
         }
     }
 }
 
+@Composable
+fun TopBar(onNavigateToGroupInfo: (Group) -> Unit, group: Group){
+    Box {
+        IconButton(
+            onClick = { onNavigateToGroupInfo(group) },
+            modifier = Modifier.align(Alignment.TopStart)) {
+            Icon(
+                imageVector = Icons.Filled.KeyboardArrowLeft,
+                contentDescription = "Back",
+                tint = Color.Black,
+                modifier = Modifier
+                    .size(40.dp)
+            )
+        }
+
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 10.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Group Settings",
+                fontSize = 24.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Bold,
+                color = md_theme_light_primary,
+            )
+        }
+    }
+}
 
 @Composable
-fun GroupMembers(groupInfo: GroupInfo, uids: List<String>, curUserID: String) {
+fun ChooseGroupPicture(groupInfo: GroupInfo) {
+    val curCon = LocalContext.current
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .fillMaxHeight()
+            .padding(12.dp)
+            .clickable {
+                Toast
+                    .makeText(
+                        curCon, "Clicked on Image Selection area!",
+                        Toast.LENGTH_SHORT
+                    )
+                    .show()
+            },
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        val painter =
+            if (groupInfo.imageUrl.isNullOrEmpty()) {
+                painterResource(id = R.drawable.ic_group_default)
+            } else {
+                rememberAsyncImagePainter(model = groupInfo.imageUrl)
+            }
+
+        Image(
+            painter = painter,
+            contentDescription = null,
+            modifier = Modifier
+                .size(110.dp)
+                .aspectRatio(1F, matchHeightConstraintsFirst = false)
+                .border(
+                    width = 1.dp,
+                    color = Color.LightGray,
+                    shape = CircleShape
+                )
+                .clip(CircleShape)
+        )
+    }
+//    val curCon = LocalContext.current
+//    Column(
+//        modifier = Modifier
+//            .clickable {
+//                Toast.makeText(curCon, "Clicked on Image Selection area!",
+//                    Toast.LENGTH_SHORT).show()
+//            }
+//    ) {
+//        var UserImage = BitmapFactory.decodeByteArray(image, 0, image.size)
+//        if (UserImage!=null)
+//            Image(bitmap = UserImage.asImageBitmap(), contentDescription = "")
+//        else
+//            Icon(
+//                Icons.Default.AddCircle,
+//                "add",
+//                tint = Color.LightGray,
+//                modifier = Modifier
+//                    .padding(10.dp)
+//                    .size(110.dp),
+//            )
+//    }
+}
+
+@Composable
+fun GroupName(uids: List<String>, curUserID: String, groupName: String, new_group_namea: String) {
+    var new_group_name by rememberSaveable { mutableStateOf(groupName) }
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+    ) {
+        Text(
+            text = "Group Name",
+            color = md_theme_light_primary,
+            fontWeight = FontWeight.Bold,
+            fontSize = 20.sp,
+        )
+        if (uids[0] == curUserID) {
+            OutlinedTextField(
+                value = new_group_name,
+                onValueChange = { new_group_name = it },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedLabelColor = md_theme_light_primary,
+                    unfocusedLeadingIconColor = Color.White
+                ),
+                singleLine = true,
+            )
+        } else {
+            OutlinedTextField(
+                value = new_group_name,
+                onValueChange = { new_group_name = it },
+                modifier = Modifier.fillMaxWidth(),
+                colors = OutlinedTextFieldDefaults.colors(
+                    unfocusedLabelColor = md_theme_light_primary,
+                    unfocusedLeadingIconColor = Color.White
+                ),
+                singleLine = true,
+                readOnly = true,
+            )
+        }
+    }
+}
+
+@Composable
+fun GroupMembers(groupInfo: GroupInfo, uids: List<String>, curUserID: String, gid: Int) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -346,13 +380,13 @@ fun GroupMembers(groupInfo: GroupInfo, uids: List<String>, curUserID: String) {
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            val openAlertDialog = remember { mutableStateOf(false) };
+            val openNewMemberDialog = remember { mutableStateOf(false) };
             when {
-                openAlertDialog.value -> {
+                openNewMemberDialog.value -> {
                     AlertDialogAddNewMember(
-                        onDismissRequest = { openAlertDialog.value = false },
+                        onDismissRequest = { openNewMemberDialog.value = false },
                         onConfirmation = {
-                            openAlertDialog.value = false
+                            openNewMemberDialog.value = false
                             println("Confirmation registered") // Add logic here to handle confirmation.
                         },
                         dialogTitle = "Add Member",
@@ -376,8 +410,7 @@ fun GroupMembers(groupInfo: GroupInfo, uids: List<String>, curUserID: String) {
                     modifier = Modifier
                         .size(24.dp)
                         .clickable {
-                            openAlertDialog.value = !openAlertDialog.value
-//                            notification.value = "Add member to group"
+                            openNewMemberDialog.value = !openNewMemberDialog.value
                         }
                 )
             }
@@ -385,6 +418,25 @@ fun GroupMembers(groupInfo: GroupInfo, uids: List<String>, curUserID: String) {
         Spacer(modifier = Modifier.width(20.dp))
 
         for (member in groupInfo.members) {
+            var member_name = member.name
+
+            val openRemoveMemberDialog = remember { mutableStateOf(false) };
+            when {
+                openRemoveMemberDialog.value -> {
+                    AlertDialogDeleteRemoveMember(
+                        onDismissRequest = { openRemoveMemberDialog.value = false },
+                        onConfirmation = {
+                            GroupApi().deleteUserFromGroup(member.uid, gid.toString())
+                            openRemoveMemberDialog.value = false
+                            println("Confirmation registered") // Add logic here to handle confirmation.
+                        },
+                        dialogTitle = "Remove Member",
+                        dialogText = "Are you sure you want to remove $member_name from the group?",
+                        icon = Icons.Default.AccountBox
+                    )
+                };
+            }
+
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -422,7 +474,6 @@ fun GroupMembers(groupInfo: GroupInfo, uids: List<String>, curUserID: String) {
 
                 }
                 if (uids[0] == curUserID) {
-                    var member_name = member.name
                     Icon(
                         imageVector = Icons.Default.Clear,
                         contentDescription = "remove $member_name from group",
@@ -431,6 +482,7 @@ fun GroupMembers(groupInfo: GroupInfo, uids: List<String>, curUserID: String) {
                             .size(30.dp)
                             .padding(end = 8.dp)
                             .clickable {
+                                openRemoveMemberDialog.value = !openRemoveMemberDialog.value
 //                                notification.value = "remove $member_name from group"
                             }
                     )
@@ -440,103 +492,73 @@ fun GroupMembers(groupInfo: GroupInfo, uids: List<String>, curUserID: String) {
     }
 }
 
-
-
-
 @Composable
-fun ChooseGroupPicture(image: ByteArray,) {
-    val curCon = LocalContext.current
-    Column(
-        modifier = Modifier
-            .clickable {
-                Toast.makeText(curCon, "Clicked on Image Selection area!",
-                    Toast.LENGTH_SHORT).show()
-            }
-    ) {
-        var UserImage = BitmapFactory.decodeByteArray(image, 0, image.size)
-        if (UserImage!=null)
-            Image(bitmap = UserImage.asImageBitmap(), contentDescription = "")
-        else
-            Icon(
-                Icons.Default.AddCircle,
-                "add",
-                tint = Color.LightGray,
-                modifier = Modifier
-                    .padding(10.dp)
-                    .size(110.dp),
-            )
-    }
+fun FoodPreferences(groupInfo: GroupInfo) {
+    Spacer(modifier = Modifier.height(20.dp))
+    Text(
+        text = "Preferences",
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        color = md_theme_light_primary,
+    )
+    Text(
+        text = groupInfo.preferences,
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Normal,
+        color = Color.Black,
+    )
 }
 
-@RequiresApi(Build.VERSION_CODES.S)
 @Composable
-fun SaveChangeButton(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit = {}, selectedPreferences: List<String>) {
-    val buttonColor = remember { mutableStateOf(md_theme_light_primary) }
-
+fun GroupLocation(groupInfo: GroupInfo, uids: List<String>, curUserID: String) {
+    Spacer(modifier = Modifier.height(20.dp))
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(30.dp),
-        verticalAlignment = Alignment.Bottom,
-        horizontalArrangement = Arrangement.Center,
+            .fillMaxHeight(),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
     ) {
-        Button(
-            onClick = {
-                onNavigateToMainPage();
-                GlobalObjects.user.preferences = selectedPreferences;
-                GlobalObjects.user.restrictions = selectedPreferences;
-            },
-            colors = ButtonDefaults.buttonColors(
-                md_theme_light_primary
-            ),
-            modifier = Modifier
-                .height(50.dp),
-            shape = CircleShape
-        ) {
-            Text(text = "Save Changes", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+        Text(
+            text = "Group Location",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            color = md_theme_light_primary,
+        )
+        if (uids[0] == curUserID) {
+            Icon(
+                imageVector = Icons.Filled.Edit,
+                contentDescription = "back",
+                tint = md_theme_light_primary,
+                modifier = Modifier
+                    .size(24.dp)
+                    .clickable {
+//                        notification.value = "Change Group Location"
+                    }
+            )
         }
     }
+    Spacer(modifier = Modifier.height(5.dp))
+    GoogleMap(
+        modifier =
+        Modifier
+            .height(250.dp)
+            .width((LocalConfiguration.current.screenWidthDp * 0.90).dp),
+        cameraPositionState =
+        rememberCameraPositionState {
+            position = CameraPosition.fromLatLngZoom(groupInfo.location, 10f)
+        })
 }
 
 @Composable
-fun DeleteGroupButton() {
-    Button(
-        onClick = { /* Handle delete group */ },
-        colors = ButtonDefaults.buttonColors(
-            Color.Red
-        ),
-        modifier = Modifier
-            .height(50.dp)
-            .padding(end = 10.dp),
-        shape = CircleShape
-    ) {
-        Text(text = "Delete Group", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-    }
-}
+fun SaveButton(loginModel: LoginViewModel, onNavigateToGroupInfo: (Group) -> Unit = {}, group: Group, new_group_name: String) {
+    group.name = new_group_name;
 
-
-@Composable
-fun LeaveGroupButton() {
-    Button(
-        onClick = { /* Handle leave group */ },
-        colors = ButtonDefaults.buttonColors(
-            Color.Red
-        ),
-        modifier = Modifier
-            .height(50.dp)
-            .padding(end = 10.dp),
-        shape = CircleShape
-    ) {
-        Text(text = "Leave Group", fontSize = 16.sp, fontWeight = FontWeight.Bold)
-    }
-}
-
-@Composable
-fun SaveButton() {
     Button(
         onClick = {
-//            onNavigateToMainPage();
             /* Handle Save */
+            GroupApi().updateGroup(group)
+            onNavigateToGroupInfo(group)
         },
         colors = ButtonDefaults.buttonColors(
             md_theme_light_primary
@@ -583,6 +605,55 @@ fun AlertDialogAddNewMember(
                     modifier = Modifier.fillMaxWidth()
                 )
             }
+        },
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    onConfirmation()
+                }
+            ) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onDismissRequest()
+                }
+            ) {
+                Text("Dismiss")
+            }
+        }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun AlertDialogDeleteRemoveMember(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    dialogTitle: String,
+    dialogText: String,
+    icon: ImageVector,
+) {
+    AlertDialog(
+        icon = {
+            Icon(
+                icon,
+                contentDescription = "Warning Icon",
+                tint = Color.Gray,
+                modifier = Modifier
+                    .size(50.dp),
+            )
+        },
+        title = {
+            Text(text = dialogTitle)
+        },
+        text = {
+            Text(text = dialogText)
         },
         onDismissRequest = {
             onDismissRequest()

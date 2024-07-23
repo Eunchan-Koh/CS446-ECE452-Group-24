@@ -51,7 +51,7 @@ import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.rememberCameraPositionState
 
-data class GroupMember(val name: String, val isAdmin: Boolean)
+data class GroupMember(val name: String, val isAdmin: Boolean, val uid: String)
 
 data class GroupInfo(
     val imageUrl: String?,
@@ -78,7 +78,7 @@ fun GroupInfoPage(
     val users = mutableListOf<GroupMember>()
     for (i in uids.indices) {
         val user = UserApi().getUser(uids[i])
-        users.add(GroupMember(user.name, i == 0))
+        users.add(GroupMember(user.name, i == 0, uids[i]))
     }
     // Format preferences so that it shows nicely using maps from constants.
     val formattedPreferences =
@@ -199,10 +199,6 @@ fun ContentSection(groupInfo: GroupInfo) {
             HorizontalDivider(thickness = 1.dp, color = Color.Gray)
             Spacer(modifier = Modifier.height(16.dp))
             InfoRow(icon = Icons.Default.List, label = "Preferences", value = groupInfo.preferences)
-//            InfoRow(
-//                icon = Icons.Default.Warning,
-//                label = "Restrictions",
-//                value = groupInfo.restrictions)
             Spacer(modifier = Modifier.height(16.dp))
             HorizontalDivider(thickness = 1.dp, color = Color.Gray)
             Spacer(modifier = Modifier.height(16.dp))
