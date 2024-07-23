@@ -45,10 +45,10 @@ class RestaurantsApi {
                 }
             }
             println("Restaurants: $restaurants")
-            restaurants ?: listOf(nullRestaurants)
+            restaurants ?: listOf()
         } catch (e: Exception) {
             e.printStackTrace()
-            listOf(nullRestaurants)
+            listOf()
         }
     }
 
