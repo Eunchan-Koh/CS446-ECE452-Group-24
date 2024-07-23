@@ -82,15 +82,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 
-// TODO: Remove when able
-data class RestaurantInfo(
-    val name: String,
-    val address: String,
-    val website: String,
-    val photos: List<String>,
-    val tags: List<String>
-)
-
 const val MAX_RESULT_COUNT = 10
 
 fun fetchNearbyRestaurants(groupId: String): List<MealMatesPlace> {
@@ -173,13 +164,11 @@ fun updateDatabaseOnLikeCompletion(
     }
 }
 
-// TODO: Replace with dynamic grouping
-const val groupId = "3"
-
 @Composable
 fun RestaurantPrompt(
     loginModel: LoginViewModel,
     onNavigateToMatchedRestaurants: () -> Unit,
+    groupId: String
 ) {
     var isLoading by remember { mutableStateOf(true) }
     var places by remember { mutableStateOf(emptyList<MealMatesPlace>()) }

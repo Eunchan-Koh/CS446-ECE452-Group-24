@@ -22,6 +22,8 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -43,6 +45,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.mealmates.R
 import com.example.mealmates.apiCalls.GroupApi
 import com.example.mealmates.apiCalls.UserApi
+import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.constants.RESTAURANT_TYPE_LABEL_LIST
 import com.example.mealmates.models.Group
 import com.example.mealmates.ui.viewModels.LoginViewModel
@@ -73,7 +76,8 @@ fun GroupInfoPage(
     uids: List<String>,
     image: ByteArray,
     location: LatLng,
-    onNavigateToGroupSettings: (Group) -> Unit
+    onNavigateToGroupSettings: (Group) -> Unit,
+    onNavigateToRestaurantPrompts: () -> Unit
 ) {
     val users = mutableListOf<GroupMember>()
     for (i in uids.indices) {
@@ -98,16 +102,27 @@ fun GroupInfoPage(
             restrictions = formattedRestrictions.joinToString(", "),
             location = location)
 
-    val group =  GroupApi().getGroup(gid.toString())
+    val group = GroupApi().getGroup(gid.toString())
 
     Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
-        HeaderSection(groupInfo, { onNavigateToGroupSettings(group) }, group)
+        HeaderSection(
+            groupInfo,
+            { onNavigateToGroupSettings(group) },
+            { onNavigateToRestaurantPrompts() },
+            group)
         ContentSection(groupInfo)
     }
 }
 
 @Composable
-fun HeaderSection(groupInfo: GroupInfo, onNavigateToGroupSettings: (Group) -> Unit, group: Group) {
+fun HeaderSection(
+    groupInfo: GroupInfo,
+    onNavigateToGroupSettings: (Group) -> Unit,
+    onNavigateToRestaurantPrompts: () -> Unit,
+    group: Group
+) {
+    val currentUserId = GlobalObjects.user.id
+
     Box(
         modifier =
             Modifier.fillMaxWidth()
@@ -129,13 +144,20 @@ fun HeaderSection(groupInfo: GroupInfo, onNavigateToGroupSettings: (Group) -> Un
                     Image(
                         painter = painter,
                         contentDescription = null,
-                        modifier = Modifier.size(170.dp).clip(CircleShape))
-                    Spacer(modifier = Modifier.height(8.dp))
+                        modifier = Modifier.size(150.dp).clip(CircleShape))
                     Text(
                         text = groupInfo.groupName,
-                        fontSize = 32.sp,
+                        fontSize = 30.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black)
+                    if (groupInfo.members.find { it.uid == currentUserId }?.isAdmin == true) {
+                        Button(
+                            modifier = Modifier.padding(top = 8.dp),
+                            onClick = { onNavigateToRestaurantPrompts() },
+                            colors = ButtonDefaults.buttonColors(containerColor = Color.Black)) {
+                                Text("View Restaurants")
+                            }
+                    }
                 }
             IconButton(
                 onClick = { onNavigateToGroupSettings(group) },
@@ -212,14 +234,14 @@ fun ContentSection(groupInfo: GroupInfo) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 8.dp))
             GoogleMap(
-                    modifier =
-                        Modifier.height((LocalConfiguration.current.screenHeightDp * 0.60).dp)
-                            .width((LocalConfiguration.current.screenWidthDp * 0.90).dp),
-                    cameraPositionState =
-                        rememberCameraPositionState {
-                            position = CameraPosition.fromLatLngZoom(groupInfo.location, 10f)
-                        })
-            }
+                modifier =
+                    Modifier.height((LocalConfiguration.current.screenHeightDp * 0.60).dp)
+                        .width((LocalConfiguration.current.screenWidthDp * 0.90).dp),
+                cameraPositionState =
+                    rememberCameraPositionState {
+                        position = CameraPosition.fromLatLngZoom(groupInfo.location, 10f)
+                    })
+        }
 }
 
 @Composable
