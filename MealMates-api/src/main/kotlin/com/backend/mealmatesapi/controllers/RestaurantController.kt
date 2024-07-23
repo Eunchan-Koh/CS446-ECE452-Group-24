@@ -17,19 +17,21 @@ class RestaurantController {
 
     @GetMapping("")
     @ResponseBody
-    fun getRestaurants(@RequestParam("gid") gid: String): Restaurants {
+    fun getRestaurants(@RequestParam("gid") gid: String): List<Restaurants> {
         val result: List<List<Any>>? = databaseService.query("SELECT * FROM Restaurants r where r.gid = '$gid';")
+        println(result)
+        println(gid)
         if (result.isNullOrEmpty()) {
-            return Restaurants(-1, -1)
-        } else if (result[0][0] is Int && result[0][1] is Int && result[0][2] is JsonObject && result[0][3] is Array<*>) {
-            return Restaurants(
-                result[0][0] as Int,
-                result[0][1] as Int,
-                result[0][2] as JsonObject,
-                (result[0][3] as Array<String>).toList()
-            )
+            return listOf(Restaurants(-1, -1))
         } else {
-            return Restaurants(-1, -1)
+            return result.map {
+                Restaurants(
+                    it[0] as Int,
+                    it[1] as Int,
+                    it[2] as JsonObject,
+                    (it[3] as Array<String>).toList()
+                )
+            }
         }
     }
 
@@ -72,7 +74,7 @@ class RestaurantController {
     @ResponseBody
     fun getCompletedRestaurants(@RequestParam gid: String): List<Restaurants> {
         val result: List<List<Any>>? =
-            databaseService.query("SELECT * FROM Restaurants r WHERE r.gid = '$gid' AND r.suggested IS NOT NULL;")
+            databaseService.query("SELECT r.* FROM restaurants r JOIN groups g ON r.gid = g.gid WHERE r.gid = $gid AND jsonb_array_length(r.matched -> 'completed') >= array_length(g.uids, 1);")
         if (result.isNullOrEmpty()) {
             return listOf()
         } else {
@@ -84,6 +86,23 @@ class RestaurantController {
                     (it[3] as Array<String>).toList()
                 )
             }
+        }
+    }
+
+    @GetMapping("/single")
+    @ResponseBody
+    fun getSingleRestaurant(@RequestParam rid: String): Restaurants {
+        val result: List<List<Any>>? = databaseService.query("SELECT * FROM Restaurants r where r.rid = '$rid';")
+        println(result)
+        if (result.isNullOrEmpty()) {
+            return Restaurants(-1, -1)
+        } else {
+            return Restaurants(
+                result[0][0] as Int,
+                result[0][1] as Int,
+                result[0][2] as JsonObject,
+                (result[0][3] as Array<String>).toList()
+            )
         }
     }
 }

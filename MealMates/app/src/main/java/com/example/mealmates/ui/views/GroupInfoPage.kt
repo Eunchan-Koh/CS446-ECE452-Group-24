@@ -153,8 +153,8 @@ fun ActionButton(
     var matchedInfo by remember { mutableStateOf(Matched()) }
 
     LaunchedEffect(Unit) {
-        val res: Restaurants = RestaurantsApi().getRestaurants(gid.toString())
-        matchedInfo = Gson().fromJson(res.matched.toString(), Matched::class.java)
+        val res: List<Restaurants> = RestaurantsApi().getRestaurants(gid.toString())
+        matchedInfo = Gson().fromJson(res[0].matched.toString(), Matched::class.java)
     }
 
     if (isMatchCompleted(matchedInfo, groupInfo)) {
