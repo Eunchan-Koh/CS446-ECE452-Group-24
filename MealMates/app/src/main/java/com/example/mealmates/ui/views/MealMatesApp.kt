@@ -217,6 +217,8 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                     navController,
                     startDestination = if (GlobalObjects.user.preferences.isEmpty()) {
                         Routes.SURVEY
+                    } else if (GlobalObjects.user.preferences.isNotEmpty() && GlobalObjects.user.location.latitude.equals(0.0) && GlobalObjects.user.location.longitude.equals(0.0)) {
+                        Routes.LOCATION
                     } else {
                         Routes.HOME
                     }
@@ -230,14 +232,12 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                     }
 
                     composable(Routes.SURVEY) {
-                        PreferenceAndRestrictions(loginModel, { onNavigateToMainPage() }, { onNavigateToLocationPage() })
+                        PreferenceAndRestrictions(loginModel, { onNavigateToMainPage() }, { onNavigateToLocationPage() }, { onNavigateToProfile() })
                     }
 
                     composable(Routes.LOCATION) {
                         val locationSettingPage = LocationSettingPage()
-                        locationSettingPage.LocationSettings(loginModel, placesClient) {
-                            onNavigateToMainPage()
-                        }
+                        locationSettingPage.LocationSettings(loginModel, placesClient, { onNavigateToMainPage() }, { onNavigateToProfile() })
                     }
 
                     composable(
@@ -286,7 +286,7 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                     composable(Routes.GROUP_MEMBERS) { GroupMembersPage(loginModel) }
 
                     composable(Routes.PROFILE) {
-                        UserProfileManagementPage(loginModel) { onNavigateToSurvey() }
+                        UserProfileManagementPage(loginModel, { onNavigateToSurvey() }, { onNavigateToLocationPage() })
                     }
 
                     composable(

@@ -60,7 +60,7 @@ fun UserProfileManagementPage(
     onNavigateToSurvey: () -> Unit = {},
     onNavigateToLocationPage: () -> Unit = {}
 ) {
-    val currentUser = UserApi().getUser(GlobalObjects.user.id!!)
+    val currentUser = GlobalObjects.user
     val userName = currentUser.name
     val userLocation = currentUser.location
     var tempUserName = userName
