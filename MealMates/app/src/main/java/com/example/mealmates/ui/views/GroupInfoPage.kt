@@ -173,7 +173,7 @@ fun ActionButton(
             enabled = isEnabled) {
                 val text: String =
                     if (isEnabled) {
-                        "Start Swiping"
+                        "Start Liking!"
                     } else if (userHasCompletedSwiping(matchedInfo)) {
                         "Wait for others in the group to finish liking!"
                     } else {

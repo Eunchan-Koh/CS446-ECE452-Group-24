@@ -87,6 +87,10 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
             NavigationItem(
                 icon = Icons.Rounded.AccountBox, label = "Profile", route = Routes.PROFILE))
 
+    fun onNavigateToHome() {
+        navController.navigate(Routes.HOME)
+    }
+
     fun onNavigateToSurvey() {
         navController.navigate(Routes.SURVEY)
     }
@@ -219,8 +223,7 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                                 val groupId =
                                     backStackEntry.arguments?.getString(
                                         NavArguments.GROUP_INFO.GROUP_ID) ?: ""
-                                RestaurantPrompt(
-                                    loginModel, { onNavigateToMatchedRestaurants(-1) }, groupId)
+                                RestaurantPrompt(loginModel, groupId) { onNavigateToHome() }
                             }
 
                         composable(

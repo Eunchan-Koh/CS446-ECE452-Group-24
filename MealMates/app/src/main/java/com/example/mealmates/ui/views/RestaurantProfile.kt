@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -165,11 +166,7 @@ fun updateDatabaseOnLikeCompletion(
 }
 
 @Composable
-fun RestaurantPrompt(
-    loginModel: LoginViewModel,
-    onNavigateToMatchedRestaurants: () -> Unit,
-    groupId: String
-) {
+fun RestaurantPrompt(loginModel: LoginViewModel, groupId: String, onNavigateToHome: () -> Unit) {
     var isLoading by remember { mutableStateOf(true) }
     var places by remember { mutableStateOf(emptyList<MealMatesPlace>()) }
     var index by remember { mutableIntStateOf(0) }
@@ -211,9 +208,11 @@ fun RestaurantPrompt(
     Box(contentAlignment = Alignment.CenterStart) {
         // Liking complete
         if (index == places.size) {
+            val context = LocalContext.current
             updateDatabaseOnLikeCompletion(
                 GlobalObjects.user.id!!, groupId, places, likedRestaurants)
-            onNavigateToMatchedRestaurants()
+            Toast.makeText(context, "Completed Liking Restaurants!", Toast.LENGTH_SHORT).show()
+            onNavigateToHome()
         } else {
             RestaurantProfile(places[index], { onDislike() }, { onLike() })
         }
