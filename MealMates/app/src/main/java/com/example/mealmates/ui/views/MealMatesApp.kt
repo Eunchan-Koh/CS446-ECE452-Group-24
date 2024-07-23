@@ -451,8 +451,7 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                             ByteArray(0), // Simplified for debugging
                             location, // Simplified for debugging
                             { group: Group -> onNavigateToGroupSettings(group) },
-                            { onNavigateToRestaurantPrompts(groupId) },
-                            { onNavigateToMatchedRestaurants(groupId) })
+                            { onNavigateToRestaurantPrompts(groupId) })
                     }
 
                     composable(
