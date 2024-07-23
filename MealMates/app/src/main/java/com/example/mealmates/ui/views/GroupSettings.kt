@@ -114,12 +114,6 @@ fun GroupSettings(
     val curGroup = GroupApi().getGroup(gid.toString())
     val curUserID = GlobalObjects.user.id.toString()
 
-    val notification = rememberSaveable { mutableStateOf("") }
-    if (notification.value.isNotEmpty()) {
-        Toast.makeText(LocalContext.current, notification.value, Toast.LENGTH_LONG).show()
-        notification.value = ""
-    }
-
     MealMatesTheme {
         Box(
             Modifier
@@ -199,7 +193,6 @@ fun GroupSettings(
                             textAlign = TextAlign.Start,
                             modifier = Modifier.clickable {
                                 GroupApi().deleteGroup(gid.toString())
-                                notification.value = "Delete Group"
                             },
                             fontWeight = FontWeight.SemiBold,
                             textDecoration = TextDecoration.Underline,
@@ -211,7 +204,6 @@ fun GroupSettings(
                             textAlign = TextAlign.Start,
                             modifier = Modifier.clickable {
                                 GroupApi().deleteUserFromGroup(curUserID, gid.toString())
-                                notification.value = "Leave Group"
                             },
                             fontWeight = FontWeight.SemiBold,
                             textDecoration = TextDecoration.Underline,
@@ -533,7 +525,7 @@ fun GroupLocation(groupInfo: GroupInfo, uids: List<String>, curUserID: String) {
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {
-//                        notification.value = "Change Group Location"
+                        // TODO: Add ability to search for new location
                     }
             )
         }
