@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -81,15 +82,6 @@ import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.encodeToJsonElement
-
-// TODO: Remove when able
-data class RestaurantInfo(
-    val name: String,
-    val address: String,
-    val website: String,
-    val photos: List<String>,
-    val tags: List<String>
-)
 
 const val MAX_RESULT_COUNT = 10
 
@@ -173,14 +165,8 @@ fun updateDatabaseOnLikeCompletion(
     }
 }
 
-// TODO: Replace with dynamic grouping
-const val groupId = "3"
-
 @Composable
-fun RestaurantPrompt(
-    loginModel: LoginViewModel,
-    onNavigateToMatchedRestaurants: () -> Unit,
-) {
+fun RestaurantPrompt(loginModel: LoginViewModel, groupId: String, onNavigateToHome: () -> Unit) {
     var isLoading by remember { mutableStateOf(true) }
     var places by remember { mutableStateOf(emptyList<MealMatesPlace>()) }
     var index by remember { mutableIntStateOf(0) }
@@ -222,9 +208,11 @@ fun RestaurantPrompt(
     Box(contentAlignment = Alignment.CenterStart) {
         // Liking complete
         if (index == places.size) {
+            val context = LocalContext.current
             updateDatabaseOnLikeCompletion(
                 GlobalObjects.user.id!!, groupId, places, likedRestaurants)
-            onNavigateToMatchedRestaurants()
+            Toast.makeText(context, "Completed Liking Restaurants!", Toast.LENGTH_SHORT).show()
+            onNavigateToHome()
         } else {
             RestaurantProfile(places[index], { onDislike() }, { onLike() })
         }

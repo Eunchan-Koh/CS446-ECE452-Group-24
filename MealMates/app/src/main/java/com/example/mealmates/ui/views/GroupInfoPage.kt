@@ -22,12 +22,19 @@ import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Person
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -42,12 +49,17 @@ import androidx.compose.ui.unit.sp
 import coil.compose.rememberAsyncImagePainter
 import com.example.mealmates.R
 import com.example.mealmates.apiCalls.GroupApi
+import com.example.mealmates.apiCalls.RestaurantsApi
 import com.example.mealmates.apiCalls.UserApi
+import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.constants.RESTAURANT_TYPE_LABEL_LIST
 import com.example.mealmates.models.Group
+import com.example.mealmates.models.Matched
+import com.example.mealmates.models.Restaurants
 import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.gson.Gson
 import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.rememberCameraPositionState
 
@@ -73,7 +85,9 @@ fun GroupInfoPage(
     uids: List<String>,
     image: ByteArray,
     location: LatLng,
-    onNavigateToGroupSettings: (Group) -> Unit
+    onNavigateToGroupSettings: (Group) -> Unit,
+    onNavigateToRestaurantPrompts: () -> Unit,
+    onNavigateToMatchedRestaurants: () -> Unit
 ) {
     val users = mutableListOf<GroupMember>()
     for (i in uids.indices) {
@@ -98,16 +112,86 @@ fun GroupInfoPage(
             restrictions = formattedRestrictions.joinToString(", "),
             location = location)
 
-    val group =  GroupApi().getGroup(gid.toString())
+    val group = GroupApi().getGroup(gid.toString())
 
     Column(modifier = Modifier.fillMaxSize().background(Color.White)) {
-        HeaderSection(groupInfo, { onNavigateToGroupSettings(group) }, group)
+        HeaderSection(
+            groupInfo,
+            group,
+            { onNavigateToGroupSettings(group) },
+            { onNavigateToRestaurantPrompts() },
+            { onNavigateToMatchedRestaurants() })
         ContentSection(groupInfo)
     }
 }
 
+fun userHasCompletedSwiping(matchedInfo: Matched): Boolean {
+    val currentUserId = GlobalObjects.user.id
+    return matchedInfo.completed.contains(currentUserId)
+}
+
+fun userCanViewPrompts(matchedInfo: Matched, groupInfo: GroupInfo): Boolean {
+    val currentUserId = GlobalObjects.user.id
+    val user = groupInfo.members.find { it.uid == currentUserId }
+    if (userHasCompletedSwiping(matchedInfo)) {
+        return false
+    }
+    return user?.isAdmin == true || matchedInfo.completed.isNotEmpty()
+}
+
+fun isMatchCompleted(matchedInfo: Matched, groupInfo: GroupInfo): Boolean {
+    return matchedInfo.completed.size == groupInfo.members.size
+}
+
 @Composable
-fun HeaderSection(groupInfo: GroupInfo, onNavigateToGroupSettings: (Group) -> Unit, group: Group) {
+fun ActionButton(
+    gid: Int,
+    groupInfo: GroupInfo,
+    onNavigateToRestaurantPrompts: () -> Unit,
+    onNavigateToMatchedRestaurants: () -> Unit,
+) {
+    var matchedInfo by remember { mutableStateOf(Matched()) }
+
+    LaunchedEffect(Unit) {
+        val res: Restaurants = RestaurantsApi().getRestaurants(gid.toString())
+        matchedInfo = Gson().fromJson(res.matched.toString(), Matched::class.java)
+    }
+
+    if (isMatchCompleted(matchedInfo, groupInfo)) {
+        Button(
+            modifier = Modifier.padding(top = 8.dp),
+            onClick = { onNavigateToMatchedRestaurants() },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Black)) {
+                Text("View Match Results!")
+            }
+    } else {
+        val isEnabled = userCanViewPrompts(matchedInfo, groupInfo)
+        Button(
+            modifier = Modifier.padding(top = 8.dp),
+            onClick = { onNavigateToRestaurantPrompts() },
+            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+            enabled = isEnabled) {
+                val text: String =
+                    if (isEnabled) {
+                        "Start Liking!"
+                    } else if (userHasCompletedSwiping(matchedInfo)) {
+                        "Wait for others in the group to finish liking!"
+                    } else {
+                        "Wait for admin to start the match process!"
+                    }
+                Text(text)
+            }
+    }
+}
+
+@Composable
+fun HeaderSection(
+    groupInfo: GroupInfo,
+    group: Group,
+    onNavigateToGroupSettings: (Group) -> Unit,
+    onNavigateToRestaurantPrompts: () -> Unit,
+    onNavigateToMatchedRestaurants: () -> Unit
+) {
     Box(
         modifier =
             Modifier.fillMaxWidth()
@@ -129,13 +213,17 @@ fun HeaderSection(groupInfo: GroupInfo, onNavigateToGroupSettings: (Group) -> Un
                     Image(
                         painter = painter,
                         contentDescription = null,
-                        modifier = Modifier.size(170.dp).clip(CircleShape))
-                    Spacer(modifier = Modifier.height(8.dp))
+                        modifier = Modifier.size(150.dp).clip(CircleShape))
                     Text(
                         text = groupInfo.groupName,
-                        fontSize = 32.sp,
+                        fontSize = 30.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black)
+                    ActionButton(
+                        group.gid,
+                        groupInfo,
+                        onNavigateToRestaurantPrompts,
+                        onNavigateToMatchedRestaurants)
                 }
             IconButton(
                 onClick = { onNavigateToGroupSettings(group) },
@@ -212,14 +300,14 @@ fun ContentSection(groupInfo: GroupInfo) {
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 8.dp))
             GoogleMap(
-                    modifier =
-                        Modifier.height((LocalConfiguration.current.screenHeightDp * 0.60).dp)
-                            .width((LocalConfiguration.current.screenWidthDp * 0.90).dp),
-                    cameraPositionState =
-                        rememberCameraPositionState {
-                            position = CameraPosition.fromLatLngZoom(groupInfo.location, 10f)
-                        })
-            }
+                modifier =
+                    Modifier.height((LocalConfiguration.current.screenHeightDp * 0.60).dp)
+                        .width((LocalConfiguration.current.screenWidthDp * 0.90).dp),
+                cameraPositionState =
+                    rememberCameraPositionState {
+                        position = CameraPosition.fromLatLngZoom(groupInfo.location, 10f)
+                    })
+        }
 }
 
 @Composable

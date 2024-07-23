@@ -13,7 +13,15 @@ object Routes {
     val GROUP_INFO = "group_info"
     val GROUP_SETTINGS = "group_settings"
 
-    val GROUP_INFO_WITH_ARGS = GROUP_INFO + "?" +
+    val RESTAURANT_PROMPTS_WITH_ARGS =
+        RESTAURANT_PROMPTS + "?" + "${NavArguments.GROUP_INFO.GROUP_ID}={groupId}"
+
+    val MATCHED_RESTAURANTS_WITH_ARGS =
+        MATCHED_RESTAURANTS + "?" + "${NavArguments.GROUP_INFO.GROUP_ID}={groupId}"
+
+    val GROUP_INFO_WITH_ARGS =
+        GROUP_INFO +
+            "?" +
             "${NavArguments.GROUP_INFO.GROUP_ID}={groupId}&" +
             "${NavArguments.GROUP_INFO.GROUP_NAME}={groupName}&" +
             "${NavArguments.GROUP_INFO.USERS}={users}&" +
@@ -22,7 +30,9 @@ object Routes {
             "${NavArguments.GROUP_INFO.IMAGE}={image}&" +
             "${NavArguments.GROUP_INFO.LOCATION}={location}"
 
-    val GROUP_SETTINGS_WITH_ARGS = GROUP_SETTINGS + "?" +
+    val GROUP_SETTINGS_WITH_ARGS =
+        GROUP_SETTINGS +
+            "?" +
             "${NavArguments.GROUP_INFO.GROUP_ID}={groupId}&" +
             "${NavArguments.GROUP_INFO.GROUP_NAME}={groupName}&" +
             "${NavArguments.GROUP_INFO.USERS}={users}&" +
@@ -43,5 +53,3 @@ object NavArguments {
         val LOCATION = "location"
     }
 }
-
-
