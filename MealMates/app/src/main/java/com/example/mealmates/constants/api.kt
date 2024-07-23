@@ -123,6 +123,6 @@ val RestaurantTypeToLabel =
         "turkish_restaurant" to "TURKISH",
         "vegan_restaurant" to "VEGAN",
         "vegetarian_restaurant" to "VEGETARIAN",
-        "vietnamese_restaurant" to "VIETNAMESE")
-
+        "vietnamese_restaurant" to "VIETNAMESE"
+    )
     

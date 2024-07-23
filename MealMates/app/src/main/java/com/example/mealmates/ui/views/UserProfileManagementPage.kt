@@ -125,7 +125,10 @@ fun UserProfileManagementPage(
                                 color = Color.Gray,
                                 modifier = Modifier.padding(vertical = 4.dp))
                             Preferences(currentUser.preferences, onNavigateToSurvey)
-
+                            HorizontalDivider(
+                                thickness = 1.dp,
+                                color = Color.Gray,
+                                modifier = Modifier.padding(vertical = 4.dp))
                             // Location is being shown using point only; need to be fixed to address
                             // later
                             LocationSetupProfile(userLocation, onNavigateToLocationPage)
@@ -139,6 +142,7 @@ fun UserProfileManagementPage(
 @Composable
 fun ChoosePicProfile(currentUser: User) {
     val curCon = LocalContext.current
+
     Box(
         contentAlignment = Alignment.TopEnd,
         modifier =
@@ -286,14 +290,12 @@ fun onSave(currentUser: User, newName: String) {
 @Composable
 fun SaveProfileButton(currentUser: User, tempUserName: String) {
     val context = LocalContext.current
-    Column(verticalArrangement = Arrangement.Bottom) {
-        Button(
-            onClick = {
-                onSave(currentUser, tempUserName)
-                Toast.makeText(context, "Saved Profile Changes", Toast.LENGTH_SHORT).show()
-            },
-            colors = ButtonDefaults.buttonColors(containerColor = button_colour)) {
-                Text("Save")
-            }
-    }
+    Button(
+        onClick = {
+            onSave(currentUser, tempUserName)
+            Toast.makeText(context, "Saved Profile Changes", Toast.LENGTH_SHORT).show()
+        },
+        colors = ButtonDefaults.buttonColors(containerColor = button_colour)) {
+            Text("Save Changes")
+        }
 }

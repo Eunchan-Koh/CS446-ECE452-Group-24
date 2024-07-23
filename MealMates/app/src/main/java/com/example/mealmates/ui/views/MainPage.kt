@@ -20,8 +20,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -38,7 +38,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,6 +45,7 @@ import androidx.compose.ui.unit.sp
 import com.example.mealmates.R
 import com.example.mealmates.apiCalls.UserApi
 import com.example.mealmates.constants.GlobalObjects
+import com.example.mealmates.constants.RestaurantTypeToLabel
 import com.example.mealmates.models.Group
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
@@ -165,14 +165,14 @@ fun ListGroupsMainPage(OnNavigateToGroup: (Group) -> Unit = {}) {
                     .clickable { OnNavigateToGroup(groups[i]) }
                     .background(color = selectableList_colour),
 //                    horizontalAlignment = Alignment.CenterHorizontally
-
                 ) {
 //                val taa=groups[i].gid
 //                Text(text = "$taa")
                 Row(
                     modifier = Modifier
-                        .fillMaxSize(),
-                    horizontalArrangement = Arrangement.Center
+                        .fillMaxSize()
+                        .padding(10.dp),
+                    horizontalArrangement = Arrangement.Start
                 ) {
 //                Image(painter = , contentDescription = )
                     var GroupNImage = BitmapFactory.decodeByteArray(groups[i].image,
@@ -181,7 +181,7 @@ fun ListGroupsMainPage(OnNavigateToGroup: (Group) -> Unit = {}) {
                     if (GroupNImage!=null)
                         Image(bitmap = GroupNImage.asImageBitmap(), contentDescription = "")
                     else Icon(
-                        Icons.Default.AddCircle,
+                        Icons.Default.AccountCircle,
                         "add",
                         tint = Color.LightGray,
                         modifier = Modifier
@@ -199,19 +199,23 @@ fun ListGroupsMainPage(OnNavigateToGroup: (Group) -> Unit = {}) {
                         var GroupNName = groups[i].name
                         Text(GroupNName, fontWeight = FontWeight.Bold, fontSize = 24.sp)
                         Spacer(modifier = Modifier.width(40.dp))
+                        Spacer(modifier = Modifier.height(2.dp))
                         var tagNames : String
                         var tempSum = 0
                         Row (
 
                         ){
-                            Text(text = "tags: ")
+                            Text(text = "Tags: ")
                             for(a in 0..<groups[i].preferences.size){
-                                tagNames = groups[i].preferences[a]
+                                tagNames = RestaurantTypeToLabel[groups[i].preferences[a]].toString()
                                 tempSum += groups[i].preferences[0].length
-                                if( tempSum <= 20)
-                                    Text(text = "$tagNames,", fontSize = 18.sp)
+                                if( tempSum <= 40)
+                                    if (a == 0)
+                                        Text(text = "$tagNames", fontSize = 18.sp)
+                                    else
+                                        Text(text = ", $tagNames", fontSize = 18.sp)
                                 else {
-                                    Text(text = "...")
+                                    Text(text = ",...")
                                     break
                                 }
                             }

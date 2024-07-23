@@ -7,10 +7,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
-import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AccountBox
 import androidx.compose.material.icons.rounded.Home
-import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -20,19 +19,20 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.compose.NavHost
-import androidx.navigation.navArgument
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.mealmates.constants.NavArguments
 import com.example.mealmates.constants.Routes
 import com.example.mealmates.models.Group
 import com.example.mealmates.ui.theme.MealMatesTheme
-import com.example.mealmates.ui.theme.md_theme_dark_onPrimary
-import com.example.mealmates.ui.theme.md_theme_light_secondary
+import com.example.mealmates.ui.theme.md_theme_light_primary
 import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.net.PlacesClient
@@ -94,7 +94,7 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
             route = Routes.HOME
         ),
         NavigationItem(
-            icon = Icons.Rounded.Settings,
+            icon = Icons.Rounded.AccountBox,
             label = "Profile",
             route = Routes.PROFILE
         )
@@ -151,6 +151,22 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
         )
     }
 
+    fun onNavigateToGroupSettings(group: Group) {
+//        navController.navigate(Routes.GROUP_SETTINGS)
+        println("This is the group $group")
+        navController.navigate(
+            Routes.GROUP_SETTINGS + "?" +
+            "${NavArguments.GROUP_INFO.GROUP_ID}= ${group.gid}&" +
+            "${NavArguments.GROUP_INFO.GROUP_NAME}= ${group.name}&" +
+            "${NavArguments.GROUP_INFO.RESTRICTIONS}= ${group.restrictions}&" +
+            "${NavArguments.GROUP_INFO.PREFERENCES}= ${group.preferences}&" +
+            "${NavArguments.GROUP_INFO.USERS}= ${group.uids}&" +
+            "${NavArguments.GROUP_INFO.IMAGE}= ${group.image}&" +
+            "${NavArguments.GROUP_INFO.LOCATION}= ${group.location}"
+        )
+    }
+
+
     showBottomBar = when (navBackStackEntry?.destination?.route) {
         "survey" -> false
         "location" -> false
@@ -163,7 +179,7 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
             bottomBar = {
                 if (showBottomBar)
                 BottomNavigation(
-                    backgroundColor = md_theme_light_secondary,
+                    backgroundColor = md_theme_light_primary,
                     modifier = Modifier.padding(horizontal = 0.dp, vertical = 0.dp)
                 ) {
                     val currentDestination = navBackStackEntry?.destination
@@ -175,13 +191,14 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                                 Icon(
                                     navItem.icon,
                                     contentDescription = null,
-                                    tint = md_theme_dark_onPrimary,
+                                    tint = Color.White,
                                 )
                             },
                             label = {
                                 Text(
                                     navItem.label,
-                                    maxLines = 1
+                                    maxLines = 1,
+                                    color = Color.White
                                 )
                             },
                             selected = currentDestination?.hierarchy?.any { it.route == navItem.route } == true,
@@ -232,11 +249,42 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
 
                     composable(Routes.GROUP_MEMBERS) {
                         GroupMembersPage(loginModel)
-
                     }
 
                     composable(Routes.PROFILE) {
                         UserProfileManagementPage(loginModel) { onNavigateToSurvey() }
+                    }
+
+                    composable(
+                        Routes.GROUP_SETTINGS_WITH_ARGS,
+                        arguments = listOf(
+                        navArgument(NavArguments.GROUP_INFO.GROUP_ID) { defaultValue = "" },
+                        navArgument(NavArguments.GROUP_INFO.GROUP_NAME) { defaultValue = "" },
+                        navArgument(NavArguments.GROUP_INFO.USERS) { defaultValue = "" },
+                        navArgument(NavArguments.GROUP_INFO.PREFERENCES) { defaultValue = "" },
+                        navArgument(NavArguments.GROUP_INFO.IMAGE) { defaultValue = "" },
+                        navArgument(NavArguments.GROUP_INFO.LOCATION) { defaultValue = "" }
+                    )) {backStackEntry ->
+                        val groupId = convertToInt(backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.GROUP_ID) ?: "")
+                        val groupName = backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.GROUP_NAME) ?: ""
+                        val uids = convertToStringList(backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.USERS) ?: "")
+                        val preferences = convertToStringList(backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.PREFERENCES) ?: "")
+                        val restrictions = convertToStringList(backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.RESTRICTIONS) ?: "")
+                        val image = backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.IMAGE) ?: ""
+                        val location = convertToLatLng(backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.LOCATION) ?: "0.0,0.0")
+
+                        GroupSettings(
+                            loginModel,
+                            groupId,
+                            groupName,
+                            preferences, // Simplified for debugging
+                            restrictions, // Simplified for debugging
+                            uids, // Simplified for debugging
+                            ByteArray(0), // Simplified for debugging
+                            location // Simplified for debugging
+                        ) { group: Group ->
+                            onNavigateToGroupInfo(group)
+                        }
                     }
 
                     // test
@@ -268,17 +316,17 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
 
                         GroupInfoPage(
                             loginModel,
-                            0,
+                            groupId,
                             groupName,
                             preferences, // Simplified for debugging
                             restrictions, // Simplified for debugging
                             uids, // Simplified for debugging
                             ByteArray(0), // Simplified for debugging
                             location // Simplified for debugging
-                        ) { onNavigateToGroup() }
+                        ) { group: Group ->
+                            onNavigateToGroupSettings(group)
+                        }
                     }
-
-
                 }
             }
         }
