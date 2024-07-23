@@ -86,8 +86,7 @@ fun GroupInfoPage(
     image: ByteArray,
     location: LatLng,
     onNavigateToGroupSettings: (Group) -> Unit,
-    onNavigateToRestaurantPrompts: () -> Unit,
-    onNavigateToMatchedRestaurants: () -> Unit
+    onNavigateToRestaurantPrompts: () -> Unit
 ) {
     val users = mutableListOf<GroupMember>()
     for (i in uids.indices) {
@@ -119,28 +118,28 @@ fun GroupInfoPage(
             groupInfo,
             group,
             { onNavigateToGroupSettings(group) },
-            { onNavigateToRestaurantPrompts() },
-            { onNavigateToMatchedRestaurants() })
+            { onNavigateToRestaurantPrompts() })
         ContentSection(groupInfo)
     }
 }
 
-fun userHasCompletedSwiping(matchedInfo: Matched): Boolean {
-    val currentUserId = GlobalObjects.user.id
-    return matchedInfo.completed.contains(currentUserId)
+fun matchIsOngoing(latestResMatchedInfo: Matched?, groupInfo: GroupInfo): Boolean {
+    return latestResMatchedInfo != null &&
+        latestResMatchedInfo.completed.size != groupInfo.members.size
 }
 
-fun userCanViewPrompts(matchedInfo: Matched, groupInfo: GroupInfo): Boolean {
+fun userHasCompletedSwiping(latestResMatchedInfo: Matched): Boolean {
+    val currentUserId = GlobalObjects.user.id
+    return latestResMatchedInfo.completed.contains(currentUserId)
+}
+
+fun userCanStartLiking(latestResMatchedInfo: Matched?, groupInfo: GroupInfo): Boolean {
     val currentUserId = GlobalObjects.user.id
     val user = groupInfo.members.find { it.uid == currentUserId }
-    if (userHasCompletedSwiping(matchedInfo)) {
-        return false
+    if (!matchIsOngoing(latestResMatchedInfo, groupInfo)) {
+        return user?.isAdmin == true
     }
-    return user?.isAdmin == true || matchedInfo.completed.isNotEmpty()
-}
-
-fun isMatchCompleted(matchedInfo: Matched, groupInfo: GroupInfo): Boolean {
-    return matchedInfo.completed.size == groupInfo.members.size
+    return !userHasCompletedSwiping(latestResMatchedInfo!!)
 }
 
 @Composable
@@ -148,40 +147,35 @@ fun ActionButton(
     gid: Int,
     groupInfo: GroupInfo,
     onNavigateToRestaurantPrompts: () -> Unit,
-    onNavigateToMatchedRestaurants: () -> Unit,
 ) {
-    var matchedInfo by remember { mutableStateOf(Matched()) }
+    var latestResMatchedInfo: Matched? by remember { mutableStateOf(Matched()) }
 
     LaunchedEffect(Unit) {
         val res: List<Restaurants> = RestaurantsApi().getRestaurants(gid.toString())
-        matchedInfo = Gson().fromJson(res[0].matched.toString(), Matched::class.java)
+        val latestRes: Restaurants? = if (res.isEmpty()) null else res.last()
+        latestResMatchedInfo =
+            if (latestRes != null)
+                Gson().fromJson(latestRes.matched.toString(), Matched::class.java)
+            else null
     }
 
-    if (isMatchCompleted(matchedInfo, groupInfo)) {
-        Button(
-            modifier = Modifier.padding(top = 8.dp),
-            onClick = { onNavigateToMatchedRestaurants() },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Black)) {
-                Text("View Match Results!")
-            }
-    } else {
-        val isEnabled = userCanViewPrompts(matchedInfo, groupInfo)
-        Button(
-            modifier = Modifier.padding(top = 8.dp),
-            onClick = { onNavigateToRestaurantPrompts() },
-            colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
-            enabled = isEnabled) {
-                val text: String =
-                    if (isEnabled) {
-                        "Start Liking!"
-                    } else if (userHasCompletedSwiping(matchedInfo)) {
-                        "Wait for others in the group to finish liking!"
-                    } else {
-                        "Wait for admin to start the match process!"
-                    }
-                Text(text)
-            }
-    }
+    val isEnabled = userCanStartLiking(latestResMatchedInfo, groupInfo)
+    Button(
+        modifier = Modifier.padding(top = 8.dp),
+        onClick = { onNavigateToRestaurantPrompts() },
+        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+        enabled = isEnabled) {
+            val text: String =
+                if (isEnabled) {
+                    "Start Liking!"
+                } else if (matchIsOngoing(latestResMatchedInfo, groupInfo) &&
+                    userHasCompletedSwiping(latestResMatchedInfo!!)) {
+                    "Wait for others in the group to finish liking!"
+                } else {
+                    "Wait for admin to start the match process!"
+                }
+            Text(text)
+        }
 }
 
 @Composable
@@ -190,7 +184,6 @@ fun HeaderSection(
     group: Group,
     onNavigateToGroupSettings: (Group) -> Unit,
     onNavigateToRestaurantPrompts: () -> Unit,
-    onNavigateToMatchedRestaurants: () -> Unit
 ) {
     Box(
         modifier =
@@ -219,11 +212,7 @@ fun HeaderSection(
                         fontSize = 30.sp,
                         fontWeight = FontWeight.Bold,
                         color = Color.Black)
-                    ActionButton(
-                        group.gid,
-                        groupInfo,
-                        onNavigateToRestaurantPrompts,
-                        onNavigateToMatchedRestaurants)
+                    ActionButton(group.gid, groupInfo, onNavigateToRestaurantPrompts)
                 }
             IconButton(
                 onClick = { onNavigateToGroupSettings(group) },
