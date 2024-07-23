@@ -2,9 +2,11 @@ package com.example.mealmates.ui.views
 
 import TextInput
 import android.widget.Toast
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AccountCircle
@@ -28,6 +31,8 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
@@ -46,9 +51,12 @@ import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import com.example.mealmates.apiCalls.GroupApi
 import com.example.mealmates.models.GetPlaceDetailsResponse
@@ -66,42 +74,47 @@ fun CreateNewGroupPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> U
         mutableStateOf(listOf(userCur))
     }
 
-    val placeResponse = getPlaceDetails("ChIJj61dQgK6j4AR4GeTYWZsKWw")
-    val Resto = GetPlaceDetailsResponse(placeResponse).getMealMatesPlace()
-
-    MealMatesTheme{
+    Box(
+        Modifier
+            .fillMaxSize()
+            .padding(30.dp)
+    ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.92f),
-            horizontalAlignment = Alignment.CenterHorizontally
+            Modifier
+                .fillMaxSize()
+                .fillMaxHeight()
+                .verticalScroll(ScrollState(0)),
         ) {
-            // row with "cancel             save (only clickable when filled out info)
-            // upload group image
-            // enter new group name
-            // edit/add group members
-            CancelAndSaveRow(onNavigateToMainPage, tempGroupName, tempGroupLocation, tempGroupProfilePic, tempGroupMembers)
-            ChooseGroupProfilePic()
-            TextInput(
-                label = "Enter a group name",
-                placeholder = "My new group",
-                value = tempGroupName,
-                onValueChange = { tempGroupName = it })
-            Spacer(modifier = Modifier.height(16.dp))
+            CancelAndCreateRow(onNavigateToMainPage, tempGroupName, tempGroupLocation, tempGroupProfilePic, tempGroupMembers)
+            ChooseGroupPicture(null)
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+            ) {
+                Text(
+                    text = "Group Name",
+                    color = md_theme_light_primary,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 20.sp,
+                )
+                OutlinedTextField(
+                    value = tempGroupName,
+                    onValueChange = { tempGroupName = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        unfocusedLabelColor = md_theme_light_primary,
+                        unfocusedLeadingIconColor = Color.White
+                    ),
+                    singleLine = true,
+                )
+            }
             GroupMembersSection(tempGroupMembers, setTempGroupMembers, userCur)
         }
-        Column(
-            modifier = Modifier
-                .fillMaxSize(),
-            verticalArrangement = Arrangement.Bottom
-        ){
-        }
-
     }
 }
 
 @Composable
-fun CancelAndSaveRow(
+fun CancelAndCreateRow(
     onNavigateToMainPage: () -> Unit,
     tempGroupName: String,
     tempGroupLocation: LatLng,
@@ -134,7 +147,7 @@ fun CancelAndSaveRow(
             shape = CircleShape,
             enabled = tempGroupName != ""
         ) {
-            Text("Save")
+            Text("Create")
         }
     }
 }
@@ -244,8 +257,6 @@ fun GroupMembersSection(
             )
         }
         Spacer(modifier = Modifier.height(8.dp))
-        // input field with plus button
-        // for all current temp group members...
         for (groupUser in tempGroupMembers) {
             var curGroupUserName = groupUser.name
             var curGroupUserEmail = groupUser.email
