@@ -103,14 +103,15 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
         navController.navigate(Routes.LOCATION)
     }
 
-    fun onNavigateToRestaurantPrompts(groupId: Int) {
-        navController.navigate(
-            Routes.RESTAURANT_PROMPTS + "?" + "${NavArguments.GROUP_INFO.GROUP_ID}= $groupId")
+    fun onNavigateToRestaurantPrompts() {
+        navController.navigate(Routes.RESTAURANT_PROMPTS)
     }
 
-    fun onNavigateToMatchedRestaurants(groupId: Int) {
+    fun onNavigateToMatchedRestaurants(rid: Int) {
         navController.navigate(
-            Routes.MATCHED_RESTAURANTS + "?" + "${NavArguments.GROUP_INFO.GROUP_ID}= $groupId")
+            Routes.MATCHED_RESTAURANTS + "?" +
+            "${NavArguments.RESTAURANT_INFO.RESTAURANT_ID}= $rid"
+        )
     }
 
     fun onNavigateToGroup() {
@@ -159,12 +160,20 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                 "${NavArguments.GROUP_INFO.LOCATION}= ${group.location}")
     }
 
-    showBottomBar =
-        when (navBackStackEntry?.destination?.route) {
-            "survey" -> false
-            "location" -> false
-            else -> true
-        }
+    fun onNavigateToMatchList(groupId: Int) {
+        navController.navigate(
+            Routes.MATCH_LIST + "?" +
+            "${NavArguments.GROUP_INFO.GROUP_ID}= $groupId"
+        )
+    }
+
+
+    showBottomBar = when (navBackStackEntry?.destination?.route) {
+        "survey" -> false
+        "location" -> false
+        else -> true
+    }
+
 
     MealMatesTheme {
         Scaffold(
@@ -194,199 +203,262 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                                         } == true,
                                     onClick = { navController.navigate(navItem.route) })
                             }
-                        }
-            }) { innerPadding ->
-                Column(modifier = Modifier.padding(innerPadding).padding(0.dp)) {
-                    NavHost(navController, startDestination = Routes.HOME) {
-                        composable(Routes.HOME) {
-                            MainPage(loginModel) { group: Group -> onNavigateToGroupInfo(group) }
-                        }
+                    }
+                }
+        ) { innerPadding ->
+            Column(
+                modifier = Modifier
+                    .padding(innerPadding)
+                    .padding(0.dp)
+            ) {
 
-                        composable(Routes.SURVEY) {
-                            PreferenceAndRestrictions(loginModel) { onNavigateToLocationPage() }
-                        }
+                NavHost(
+                    navController,
+                    startDestination = Routes.HOME
+                ) {
+                    composable(Routes.HOME) {
+                        MainPage(
+                            loginModel,
+                            onNavigateToGroup = { group -> onNavigateToGroupInfo(group) },
+                            onNavigateToMatches = { gid -> onNavigateToMatchList(gid) }
+                        )
+                    }
 
-                        composable(Routes.LOCATION) {
-                            val locationSettingPage = LocationSettingPage()
-                            locationSettingPage.LocationSettings(loginModel, placesClient) {
-                                onNavigateToMainPage()
+                    composable(Routes.SURVEY) {
+                        PreferenceAndRestrictions(loginModel) { onNavigateToLocationPage() }
+                    }
+
+                    composable(Routes.LOCATION) {
+                        val locationSettingPage = LocationSettingPage()
+                        locationSettingPage.LocationSettings(loginModel, placesClient) {
+                            onNavigateToMainPage()
+                        }
+                    }
+
+                    composable(
+                        Routes.RESTAURANT_PROMPTS_WITH_ARGS,
+                        arguments =
+                        listOf(
+                            navArgument(NavArguments.GROUP_INFO.GROUP_ID) {
+                                defaultValue = ""
+                            })
+                    ) { backStackEntry ->
+                        val groupId =
+                            backStackEntry.arguments?.getString(
+                                NavArguments.GROUP_INFO.GROUP_ID
+                            ) ?: ""
+                        RestaurantPrompt(loginModel, groupId) { onNavigateToHome() }
+                    }
+
+                    composable(
+                        Routes.MATCHED_RESTAURANTS_WITH_ARGS,
+                        arguments = listOf(
+                            navArgument(NavArguments.RESTAURANT_INFO.RESTAURANT_ID) {
+                                defaultValue = ""
                             }
+                        )
+                    ) {
+                        val restaurantId =
+                            convertToInt(
+                                it.arguments?.getString(
+                                    NavArguments.RESTAURANT_INFO.RESTAURANT_ID
+                                ) ?: ""
+                            )
+                        println("This is the arguments: $restaurantId")
+                        ListOfMatchedRestaurantsPage(
+                            loginModel,
+                            restaurantId
+                        ) { onNavigateToHome() }
+                    }
+
+                    composable(Routes.GROUP) {
+                        GroupPage(
+                            loginModel,
+                            { onNavigateToGroupMembers() },
+                            { onNavigateToMatchList(-1) })
+                    }
+
+                    composable(Routes.GROUP_MEMBERS) { GroupMembersPage(loginModel) }
+
+                    composable(Routes.PROFILE) {
+                        UserProfileManagementPage(loginModel) { onNavigateToSurvey() }
+                    }
+
+                    composable(
+                        Routes.GROUP_SETTINGS_WITH_ARGS,
+                        arguments =
+                        listOf(
+                            navArgument(NavArguments.GROUP_INFO.GROUP_ID) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.GROUP_NAME) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.USERS) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.PREFERENCES) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.IMAGE) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.LOCATION) {
+                                defaultValue = ""
+                            })
+                    ) { backStackEntry ->
+                        val groupId =
+                            convertToInt(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.GROUP_ID
+                                ) ?: ""
+                            )
+                        val groupName =
+                            backStackEntry.arguments?.getString(
+                                NavArguments.GROUP_INFO.GROUP_NAME
+                            ) ?: ""
+                        val uids =
+                            convertToStringList(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.USERS
+                                ) ?: ""
+                            )
+                        val preferences =
+                            convertToStringList(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.PREFERENCES
+                                ) ?: ""
+                            )
+                        val restrictions =
+                            convertToStringList(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.RESTRICTIONS
+                                ) ?: ""
+                            )
+                        val image =
+                            backStackEntry.arguments?.getString(
+                                NavArguments.GROUP_INFO.IMAGE
+                            ) ?: ""
+                        val location =
+                            convertToLatLng(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.LOCATION
+                                ) ?: "0.0,0.0"
+                            )
+
+                        GroupSettings(
+                            loginModel,
+                            groupId,
+                            groupName,
+                            preferences, // Simplified for debugging
+                            restrictions, // Simplified for debugging
+                            uids, // Simplified for debugging
+                            ByteArray(0), // Simplified for debugging
+                            location // Simplified for debugging
+                        ) { group: Group ->
+                            onNavigateToGroupInfo(group)
                         }
+                    }
 
-                        composable(
-                            Routes.RESTAURANT_PROMPTS_WITH_ARGS,
-                            arguments =
-                                listOf(
-                                    navArgument(NavArguments.GROUP_INFO.GROUP_ID) {
-                                        defaultValue = ""
-                                    })) { backStackEntry ->
-                                val groupId =
-                                    backStackEntry.arguments?.getString(
-                                        NavArguments.GROUP_INFO.GROUP_ID) ?: ""
-                                RestaurantPrompt(loginModel, groupId) { onNavigateToHome() }
-                            }
+                    // test
+                    composable(Routes.PLACES_API_TEST) { PlacesTest(loginModel) }
 
-                        composable(
-                            Routes.MATCHED_RESTAURANTS_WITH_ARGS,
-                            arguments =
-                                listOf(
-                                    navArgument(NavArguments.GROUP_INFO.GROUP_ID) {
-                                        defaultValue = ""
-                                    })) { backStackEntry ->
-                                val groupId =
-                                    backStackEntry.arguments?.getString(
-                                        NavArguments.GROUP_INFO.GROUP_ID) ?: ""
-                                ListOfMatchedRestaurantsPage(loginModel, groupId) {
-                                    onNavigateToMainPage()
-                                }
-                            }
+                    composable(
+                        Routes.GROUP_INFO_WITH_ARGS,
+                        arguments =
+                        listOf(
+                            navArgument(NavArguments.GROUP_INFO.GROUP_ID) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.GROUP_NAME) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.USERS) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.PREFERENCES) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.RESTRICTIONS) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.IMAGE) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.LOCATION) {
+                                defaultValue = ""
+                            })
+                    ) { backStackEntry ->
+                        val groupId =
+                            convertToInt(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.GROUP_ID
+                                ) ?: ""
+                            )
+                        val groupName =
+                            backStackEntry.arguments?.getString(
+                                NavArguments.GROUP_INFO.GROUP_NAME
+                            ) ?: ""
+                        val uids =
+                            convertToStringList(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.USERS
+                                ) ?: ""
+                            )
+                        val preferences =
+                            convertToStringList(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.PREFERENCES
+                                ) ?: ""
+                            )
+                        val restrictions =
+                            convertToStringList(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.RESTRICTIONS
+                                ) ?: ""
+                            )
+                        val image =
+                            backStackEntry.arguments?.getString(
+                                NavArguments.GROUP_INFO.IMAGE
+                            ) ?: ""
+                        val location =
+                            convertToLatLng(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.LOCATION
+                                ) ?: "0.0,0.0"
+                            )
 
-                        composable(Routes.GROUP) {
-                            GroupPage(
-                                loginModel,
-                                { onNavigateToGroupMembers() },
-                                { onNavigateToRestaurantPrompts(-1) })
+                        GroupInfoPage(
+                            loginModel,
+                            groupId,
+                            groupName,
+                            preferences, // Simplified for debugging
+                            restrictions, // Simplified for debugging
+                            uids, // Simplified for debugging
+                            ByteArray(0), // Simplified for debugging
+                            location, // Simplified for debugging
+                            { group: Group -> onNavigateToGroupSettings(group) },
+                            { onNavigateToRestaurantPrompts() },
+                            { onNavigateToMatchedRestaurants(groupId) })
+                    }
+
+                    composable(
+                        Routes.MATCH_LIST_WITH_ARGS,
+                        arguments = listOf(
+                            navArgument(NavArguments.GROUP_INFO.GROUP_ID) { defaultValue = "" }
+                        )
+                    ) { backStackEntry ->
+                        val groupId = convertToInt(
+                            backStackEntry.arguments?.getString(NavArguments.GROUP_INFO.GROUP_ID)
+                                ?: ""
+                        )
+
+                        MatchListPage(loginModel, groupId) { rid ->
+                            onNavigateToMatchedRestaurants(rid)
                         }
-
-                        composable(Routes.GROUP_MEMBERS) { GroupMembersPage(loginModel) }
-
-                        composable(Routes.PROFILE) {
-                            UserProfileManagementPage(loginModel) { onNavigateToSurvey() }
-                        }
-
-                        composable(
-                            Routes.GROUP_SETTINGS_WITH_ARGS,
-                            arguments =
-                                listOf(
-                                    navArgument(NavArguments.GROUP_INFO.GROUP_ID) {
-                                        defaultValue = ""
-                                    },
-                                    navArgument(NavArguments.GROUP_INFO.GROUP_NAME) {
-                                        defaultValue = ""
-                                    },
-                                    navArgument(NavArguments.GROUP_INFO.USERS) {
-                                        defaultValue = ""
-                                    },
-                                    navArgument(NavArguments.GROUP_INFO.PREFERENCES) {
-                                        defaultValue = ""
-                                    },
-                                    navArgument(NavArguments.GROUP_INFO.IMAGE) {
-                                        defaultValue = ""
-                                    },
-                                    navArgument(NavArguments.GROUP_INFO.LOCATION) {
-                                        defaultValue = ""
-                                    })) { backStackEntry ->
-                                val groupId =
-                                    convertToInt(
-                                        backStackEntry.arguments?.getString(
-                                            NavArguments.GROUP_INFO.GROUP_ID) ?: "")
-                                val groupName =
-                                    backStackEntry.arguments?.getString(
-                                        NavArguments.GROUP_INFO.GROUP_NAME) ?: ""
-                                val uids =
-                                    convertToStringList(
-                                        backStackEntry.arguments?.getString(
-                                            NavArguments.GROUP_INFO.USERS) ?: "")
-                                val preferences =
-                                    convertToStringList(
-                                        backStackEntry.arguments?.getString(
-                                            NavArguments.GROUP_INFO.PREFERENCES) ?: "")
-                                val restrictions =
-                                    convertToStringList(
-                                        backStackEntry.arguments?.getString(
-                                            NavArguments.GROUP_INFO.RESTRICTIONS) ?: "")
-                                val image =
-                                    backStackEntry.arguments?.getString(
-                                        NavArguments.GROUP_INFO.IMAGE) ?: ""
-                                val location =
-                                    convertToLatLng(
-                                        backStackEntry.arguments?.getString(
-                                            NavArguments.GROUP_INFO.LOCATION) ?: "0.0,0.0")
-
-                                GroupSettings(
-                                    loginModel,
-                                    groupId,
-                                    groupName,
-                                    preferences, // Simplified for debugging
-                                    restrictions, // Simplified for debugging
-                                    uids, // Simplified for debugging
-                                    ByteArray(0), // Simplified for debugging
-                                    location // Simplified for debugging
-                                    ) { group: Group ->
-                                        onNavigateToGroupInfo(group)
-                                    }
-                            }
-
-                        // test
-                        composable(Routes.PLACES_API_TEST) { PlacesTest(loginModel) }
-
-                        composable(
-                            Routes.GROUP_INFO_WITH_ARGS,
-                            arguments =
-                                listOf(
-                                    navArgument(NavArguments.GROUP_INFO.GROUP_ID) {
-                                        defaultValue = ""
-                                    },
-                                    navArgument(NavArguments.GROUP_INFO.GROUP_NAME) {
-                                        defaultValue = ""
-                                    },
-                                    navArgument(NavArguments.GROUP_INFO.USERS) {
-                                        defaultValue = ""
-                                    },
-                                    navArgument(NavArguments.GROUP_INFO.PREFERENCES) {
-                                        defaultValue = ""
-                                    },
-                                    navArgument(NavArguments.GROUP_INFO.RESTRICTIONS) {
-                                        defaultValue = ""
-                                    },
-                                    navArgument(NavArguments.GROUP_INFO.IMAGE) {
-                                        defaultValue = ""
-                                    },
-                                    navArgument(NavArguments.GROUP_INFO.LOCATION) {
-                                        defaultValue = ""
-                                    })) { backStackEntry ->
-                                val groupId =
-                                    convertToInt(
-                                        backStackEntry.arguments?.getString(
-                                            NavArguments.GROUP_INFO.GROUP_ID) ?: "")
-                                val groupName =
-                                    backStackEntry.arguments?.getString(
-                                        NavArguments.GROUP_INFO.GROUP_NAME) ?: ""
-                                val uids =
-                                    convertToStringList(
-                                        backStackEntry.arguments?.getString(
-                                            NavArguments.GROUP_INFO.USERS) ?: "")
-                                val preferences =
-                                    convertToStringList(
-                                        backStackEntry.arguments?.getString(
-                                            NavArguments.GROUP_INFO.PREFERENCES) ?: "")
-                                val restrictions =
-                                    convertToStringList(
-                                        backStackEntry.arguments?.getString(
-                                            NavArguments.GROUP_INFO.RESTRICTIONS) ?: "")
-                                val image =
-                                    backStackEntry.arguments?.getString(
-                                        NavArguments.GROUP_INFO.IMAGE) ?: ""
-                                val location =
-                                    convertToLatLng(
-                                        backStackEntry.arguments?.getString(
-                                            NavArguments.GROUP_INFO.LOCATION) ?: "0.0,0.0")
-
-                                GroupInfoPage(
-                                    loginModel,
-                                    groupId,
-                                    groupName,
-                                    preferences, // Simplified for debugging
-                                    restrictions, // Simplified for debugging
-                                    uids, // Simplified for debugging
-                                    ByteArray(0), // Simplified for debugging
-                                    location, // Simplified for debugging
-                                    { group: Group -> onNavigateToGroupSettings(group) },
-                                    { onNavigateToRestaurantPrompts(groupId) },
-                                    { onNavigateToMatchedRestaurants(groupId) })
-                            }
                     }
                 }
             }
+        }
     }
 }

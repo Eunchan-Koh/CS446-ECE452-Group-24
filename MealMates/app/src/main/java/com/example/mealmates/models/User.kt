@@ -38,7 +38,8 @@ class User(
     private val TAG = "User"
 
     init {
-        if (id != null) {
+        if (id != null)
+        {
             try {
                 val jwt = JWT(id!!)
                 var idString = jwt.subject ?: "1"

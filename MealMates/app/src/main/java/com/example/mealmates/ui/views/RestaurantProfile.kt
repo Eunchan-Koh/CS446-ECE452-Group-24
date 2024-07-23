@@ -112,14 +112,14 @@ fun updateDatabaseOnLikeCompletion(
     allRestaurants: List<MealMatesPlace>,
     likedRestaurants: List<String>
 ) {
-    val res: Restaurants = RestaurantsApi().getRestaurants(groupId)
+    val res: List<Restaurants> = RestaurantsApi().getRestaurants(groupId)
     var rids = mutableListOf<String>()
     var liked = mutableListOf<Int>()
     var completed = mutableListOf<String>()
 
     // Table row already exists
-    if (res.rid != -1) {
-        val matchedInfo: Matched = Gson().fromJson(res.matched.toString(), Matched::class.java)
+    if (res[0].rid != -1) {
+        val matchedInfo: Matched = Gson().fromJson(res[0].matched.toString(), Matched::class.java)
 
         // User has already completed the matching process, skip
         if (matchedInfo.completed.contains(userId)) {
@@ -154,13 +154,13 @@ fun updateDatabaseOnLikeCompletion(
                 "completed" to Json.encodeToJsonElement(completed)))
 
     // Table row does not exist, so create
-    if (res.rid == -1) {
+    if (res[0].rid == -1) {
         // TODO: RID is hardcoded. Replace api call once the parameter is fixed
         val updatedInfo = Restaurants(0, groupId.toInt(), updatedMatched, emptyList())
         RestaurantsApi().addRestaurants(updatedInfo)
     } else {
         // Table row exists, so update
-        val updatedInfo = Restaurants(res.rid, res.gid, updatedMatched, res.suggested)
+        val updatedInfo = Restaurants(res[0].rid, res[0].gid, updatedMatched, res[0].suggested)
         RestaurantsApi().editRestaurants(updatedInfo)
     }
 }
