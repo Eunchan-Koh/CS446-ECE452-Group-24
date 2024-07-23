@@ -3,7 +3,11 @@ package com.example.mealmates.models
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.json.JsonObject
 
-data class Matched(val rids: List<String>, val liked: List<Int>, val completed: List<String>)
+data class Matched(
+    val rids: List<String> = emptyList(),
+    val liked: List<Int> = emptyList(),
+    val completed: List<String> = emptyList()
+)
 
 @Serializable
 data class Restaurants(

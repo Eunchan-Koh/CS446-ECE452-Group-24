@@ -4,6 +4,7 @@ import android.content.Intent
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
+import android.widget.Toast
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -82,15 +83,6 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonObject
 import kotlinx.serialization.json.encodeToJsonElement
 
-// TODO: Remove when able
-data class RestaurantInfo(
-    val name: String,
-    val address: String,
-    val website: String,
-    val photos: List<String>,
-    val tags: List<String>
-)
-
 const val MAX_RESULT_COUNT = 10
 
 fun fetchNearbyRestaurants(groupId: String): List<MealMatesPlace> {
@@ -120,14 +112,14 @@ fun updateDatabaseOnLikeCompletion(
     allRestaurants: List<MealMatesPlace>,
     likedRestaurants: List<String>
 ) {
-    val res: Restaurants = RestaurantsApi().getRestaurants(groupId)
+    val res: List<Restaurants> = RestaurantsApi().getRestaurants(groupId)
     var rids = mutableListOf<String>()
     var liked = mutableListOf<Int>()
     var completed = mutableListOf<String>()
 
     // Table row already exists
-    if (res.rid != -1) {
-        val matchedInfo: Matched = Gson().fromJson(res.matched.toString(), Matched::class.java)
+    if (res[0].rid != -1) {
+        val matchedInfo: Matched = Gson().fromJson(res[0].matched.toString(), Matched::class.java)
 
         // User has already completed the matching process, skip
         if (matchedInfo.completed.contains(userId)) {
@@ -162,25 +154,19 @@ fun updateDatabaseOnLikeCompletion(
                 "completed" to Json.encodeToJsonElement(completed)))
 
     // Table row does not exist, so create
-    if (res.rid == -1) {
+    if (res[0].rid == -1) {
         // TODO: RID is hardcoded. Replace api call once the parameter is fixed
         val updatedInfo = Restaurants(0, groupId.toInt(), updatedMatched, emptyList())
         RestaurantsApi().addRestaurants(updatedInfo)
     } else {
         // Table row exists, so update
-        val updatedInfo = Restaurants(res.rid, res.gid, updatedMatched, res.suggested)
+        val updatedInfo = Restaurants(res[0].rid, res[0].gid, updatedMatched, res[0].suggested)
         RestaurantsApi().editRestaurants(updatedInfo)
     }
 }
 
-// TODO: Replace with dynamic grouping
-const val groupId = "3"
-
 @Composable
-fun RestaurantPrompt(
-    loginModel: LoginViewModel,
-    onNavigateToMatchedRestaurants: () -> Unit,
-) {
+fun RestaurantPrompt(loginModel: LoginViewModel, groupId: String, onNavigateToHome: () -> Unit) {
     var isLoading by remember { mutableStateOf(true) }
     var places by remember { mutableStateOf(emptyList<MealMatesPlace>()) }
     var index by remember { mutableIntStateOf(0) }
@@ -222,9 +208,11 @@ fun RestaurantPrompt(
     Box(contentAlignment = Alignment.CenterStart) {
         // Liking complete
         if (index == places.size) {
+            val context = LocalContext.current
             updateDatabaseOnLikeCompletion(
                 GlobalObjects.user.id!!, groupId, places, likedRestaurants)
-            onNavigateToMatchedRestaurants()
+            Toast.makeText(context, "Completed Liking Restaurants!", Toast.LENGTH_SHORT).show()
+            onNavigateToHome()
         } else {
             RestaurantProfile(places[index], { onDislike() }, { onLike() })
         }

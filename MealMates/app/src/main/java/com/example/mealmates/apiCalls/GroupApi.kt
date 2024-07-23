@@ -17,7 +17,7 @@ import kotlinx.serialization.json.Json
 @OptIn(DelicateCoroutinesApi::class)
 class GroupApi {
 
-    private val host: String = "http://10.0.2.2:8080"
+    private val host: String = "https://mealmates-api-rdhyv35jla-uc.a.run.app"
     private val nullGroup = Group(-1, "", emptyList())
     private val client = HttpClient(Android) {
         install(ContentNegotiation) {

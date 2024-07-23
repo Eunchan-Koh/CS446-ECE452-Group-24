@@ -46,7 +46,11 @@ import com.example.mealmates.ui.theme.selectableList_colour
 import com.google.gson.Gson
 
 @Composable
-fun ListOfMatchedRestaurantsPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit) {
+fun ListOfMatchedRestaurantsPage(
+    loginModel: LoginViewModel,
+    restaurantId: Int,
+    onNavigateToMainPage: () -> Unit
+) {
 
     MealMatesTheme{
         Column(
@@ -58,19 +62,9 @@ fun ListOfMatchedRestaurantsPage(loginModel: LoginViewModel, onNavigateToMainPag
 
 
             /*testing from here------------------------------------------------------------*/
-            val userId = GlobalObjects.user.id!!
-            val fetchedGroups = UserApi().getUserGroups(userId)
-            val groups = fetchedGroups
-            val tempaa: RestaurantsApi = RestaurantsApi()
-//            //TODO: fixed this groups[0].gid(=3) to this group's gid. groups[1].gid is for using hardcoded values for now.
-            val grRes: Restaurants = tempaa.getRestaurants(3.toString())
-//            val taa = 3
-//            Text(text = "$taa")
-//            Text(text = "$grRes")
+            val grRes: Restaurants = RestaurantsApi().getSingleRestaurants(restaurantId.toString());
             val matchedInfo: Matched = Gson().fromJson(grRes.matched.toString(), Matched::class.java)
-//            //make a list of <liked, rid> and sort them in descending order
-            val tee = matchedInfo.liked
-//            Text(text = "$tee")
+            println("Got the info")
             val sortedRestaurants = mutableListOf(matchedInfo.liked[0] to matchedInfo.rids[0])
             for(i in 1 ..<matchedInfo.rids.size){
                 sortedRestaurants.add(matchedInfo.liked[i] to matchedInfo.rids[i])
@@ -81,8 +75,6 @@ fun ListOfMatchedRestaurantsPage(loginModel: LoginViewModel, onNavigateToMainPag
             var restoList = mutableListOf<MealMatesPlace>()
             for(i in 0 ..<sortedRestaurants.size){
                 val placeResponse:String = getPlaceDetails(sortedRestaurants[i].second)
-//                Text(text = sortedRestaurants[i].second)
-//                Text(text = placeResponse)
                 val Resto = GetPlaceDetailsResponse(placeResponse).getMealMatesPlace()
                 restoList.add(Resto)
             }

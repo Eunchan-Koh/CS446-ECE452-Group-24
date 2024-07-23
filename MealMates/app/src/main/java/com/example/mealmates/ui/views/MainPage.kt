@@ -20,8 +20,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircle
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Divider
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -38,7 +39,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.modifier.modifierLocalMapOf
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.sp
 import com.example.mealmates.R
 import com.example.mealmates.apiCalls.UserApi
 import com.example.mealmates.constants.GlobalObjects
+import com.example.mealmates.constants.RestaurantTypeToLabel
 import com.example.mealmates.models.Group
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
@@ -53,38 +54,37 @@ import com.example.mealmates.ui.theme.selectableList_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
 
 @Composable
-fun MainPage(loginModel: LoginViewModel, onNavigateToGroup: (Group) -> Unit = {}, OnNavigateToCreateNewGroup: () -> Unit = {}) {
-
+fun MainPage(
+    loginModel: LoginViewModel,
+    onNavigateToGroup: (Group) -> Unit = {},
+    onNavigateToMatches: (Int) -> Unit = {},
+    onNavigateToCreateNewGroup: () -> Unit = {}
+) {
     val (TotalGroupNum, setGroupNum) = remember {
         mutableStateOf(2)
     }
-    MealMatesTheme{
+    MealMatesTheme {
         Column(
-            modifier = Modifier.fillMaxSize(),
-//                    color = MaterialTheme.colorScheme.background
+            modifier = Modifier.fillMaxSize()
         ) {
             AdvertisementSectionMainPage()
             Divider(color = Color.Black, thickness = 1.dp)
-//            SearchBarSectionMainPage()
-//            Divider(color = Color.Black, thickness = 1.dp)
-            ListGroupsMainPage(onNavigateToGroup)
-
+            ListGroupsMainPage(onNavigateToGroup, onNavigateToMatches)
         }
         Column(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.Bottom
-        ){
+        ) {
             Box(
                 modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.BottomEnd
             ){
-                FloatingActionButMainPage(OnNavigateToCreateNewGroup)
+                FloatingActionButMainPage(onNavigateToCreateNewGroup)
             }
         }
-
     }
 }
+
 
 
 @Composable
@@ -135,9 +135,10 @@ fun SearchBarSectionMainPage(){
 }
 
 @Composable
-fun ListGroupsMainPage(OnNavigateToGroup: (Group) -> Unit = {}) {
-    //TODO: Use this information of all the user's groups. Left to Eunchan.
-
+fun ListGroupsMainPage(
+    onNavigateToGroup: (Group) -> Unit = {},
+    onNavigateToMatches: (Int) -> Unit = {}
+) {
     val userId = GlobalObjects.user.id
     var groups by remember { mutableStateOf<List<Group>>(emptyList()) }
 
@@ -149,88 +150,98 @@ fun ListGroupsMainPage(OnNavigateToGroup: (Group) -> Unit = {}) {
     }
 
     val groupSize = groups.size
-//    Text("$temp1s")
     Column(
         modifier = Modifier
             .verticalScroll(rememberScrollState())
     ) {
-
-        for (i in 0..groupSize-1) {
-
+        for (i in 0 until groupSize) {
             Column(
                 modifier = Modifier
                     .height(92.dp)
                     .padding(horizontal = 0.dp, vertical = 0.dp)
                     .fillMaxWidth()
-                    .clickable { OnNavigateToGroup(groups[i]) }
-                    .background(color = selectableList_colour),
-//                    horizontalAlignment = Alignment.CenterHorizontally
-
-                ) {
-//                val taa=groups[i].gid
-//                Text(text = "$taa")
+                    .background(color = selectableList_colour)
+                    .clickable { onNavigateToGroup(groups[i]) }
+            ) {
                 Row(
                     modifier = Modifier
-                        .fillMaxSize(),
-                    horizontalArrangement = Arrangement.Center
+                        .fillMaxSize()
+                        .padding(10.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-//                Image(painter = , contentDescription = )
-                    var GroupNImage = BitmapFactory.decodeByteArray(groups[i].image,
-                        0, groups[i].image.size)
-//                    Text(text = "$tempI")
-                    if (GroupNImage!=null)
-                        Image(bitmap = GroupNImage.asImageBitmap(), contentDescription = "")
-                    else Icon(
-                        Icons.Default.AddCircle,
-                        "add",
-                        tint = Color.LightGray,
-                        modifier = Modifier
-                            .padding(vertical = 4.dp)
-                            .width(82.dp)
-                            .height(82.dp),
-                    )
-                    Column(
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .padding(vertical = 10.dp, horizontal = 20.dp),
-                        verticalArrangement = Arrangement.Center,
-                        horizontalAlignment = Alignment.Start
+                    Row(
+                        modifier = Modifier.weight(1f),
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        var GroupNName = groups[i].name
-                        Text(GroupNName, fontWeight = FontWeight.Bold, fontSize = 24.sp)
-                        Spacer(modifier = Modifier.width(40.dp))
-                        var tagNames : String
-                        var tempSum = 0
-                        Row (
-
-                        ){
-                            Text(text = "tags: ")
-                            for(a in 0..<groups[i].preferences.size){
-                                tagNames = groups[i].preferences[a]
-                                tempSum += groups[i].preferences[0].length
-                                if( tempSum <= 20)
-                                    Text(text = "$tagNames,", fontSize = 18.sp)
-                                else {
-                                    Text(text = "...")
-                                    break
+                        var groupImage = BitmapFactory.decodeByteArray(groups[i].image, 0, groups[i].image.size)
+                        if (groupImage != null) {
+                            Image(
+                                bitmap = groupImage.asImageBitmap(),
+                                contentDescription = "",
+                                modifier = Modifier.size(82.dp)
+                            )
+                        } else {
+                            Icon(
+                                Icons.Default.AccountCircle,
+                                contentDescription = "Group Image",
+                                tint = Color.LightGray,
+                                modifier = Modifier.size(82.dp)
+                            )
+                        }
+                        Column(
+                            modifier = Modifier
+                                .fillMaxHeight()
+                                .padding(vertical = 10.dp, horizontal = 20.dp),
+                            verticalArrangement = Arrangement.Center,
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            var groupName = groups[i].name
+                            Text(groupName, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+                            Spacer(modifier = Modifier.width(40.dp))
+                            Spacer(modifier = Modifier.height(2.dp))
+                            var tagNames: String
+                            var tempSum = 0
+                            Row {
+                                Text(text = "Tags: ")
+                                for (a in groups[i].preferences.indices) {
+                                    tagNames = RestaurantTypeToLabel[groups[i].preferences[a]].toString()
+                                    tempSum += groups[i].preferences[0].length
+                                    if (tempSum <= 40) {
+                                        if (a == 0) {
+                                            Text(text = tagNames, fontSize = 18.sp)
+                                        } else {
+                                            Text(text = ", $tagNames", fontSize = 18.sp)
+                                        }
+                                    } else {
+                                        Text(text = ",...")
+                                        break
+                                    }
                                 }
                             }
                         }
-
-//                        Text("Tags: pizza, hamburger, ...", fontSize = 18.sp)
                     }
+                    Icon(
+                        imageVector = Icons.Default.List,
+                        contentDescription = "View Matches",
+                        tint = Color.Black,
+                        modifier = Modifier
+                            .size(24.dp)
+                            .clickable { onNavigateToMatches(groups[i].gid) }
+                    )
                 }
             }
             Divider(color = Color.White, thickness = 1.dp)
-            Spacer(modifier = Modifier
-                .height(5.dp)
-                .fillMaxWidth()
-                .background(color = Color.White)
+            Spacer(
+                modifier = Modifier
+                    .height(5.dp)
+                    .fillMaxWidth()
+                    .background(color = Color.White)
             )
         }
     }
-
 }
+
 
 
 @Composable

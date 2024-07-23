@@ -13,11 +13,14 @@ import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.jsonObject
+import kotlinx.serialization.json.jsonPrimitive
+import kotlinx.serialization.json.jsonArray
 
 @OptIn(DelicateCoroutinesApi::class)
 class RestaurantsApi {
 
-    private val host: String = "http://10.0.2.2:8080"
+    private val host: String = "https://mealmates-api-rdhyv35jla-uc.a.run.app"
     private val nullRestaurants = Restaurants(-1, -1)
     private val client =
         HttpClient(Android) {
@@ -32,17 +35,20 @@ class RestaurantsApi {
             }
         }
 
-    fun getRestaurants(gid: String): Restaurants {
+    fun getRestaurants(gid: String): List<Restaurants> {
         return try {
-            var restaurants: Restaurants? = null
-            runBlocking { launch { restaurants = client.get("$host/restaurants?gid=$gid").body() } }
-            if (restaurants != null) {
-                restaurants as Restaurants
-            } else {
-                nullRestaurants
+            var restaurants: List<Restaurants>? = null
+            runBlocking {
+                launch {
+                    restaurants = client.get("$host/restaurants?gid=$gid").body()
+                    println("Fetched Restaurants: $restaurants")
+                }
             }
+            println("Restaurants: $restaurants")
+            restaurants ?: listOf(nullRestaurants)
         } catch (e: Exception) {
-            throw e
+            e.printStackTrace()
+            listOf(nullRestaurants)
         }
     }
 
@@ -106,14 +112,40 @@ class RestaurantsApi {
     fun getCompletedRestaurants(gid: String): List<Restaurants> {
         return try {
             var restaurants: List<Restaurants>? = null
-            runBlocking { launch { restaurants = client.get("$host/restaurants?gid=$gid").body() } }
-            if (restaurants != null) {
-                restaurants as List<Restaurants>
-            } else {
-                emptyList()
+            runBlocking {
+                launch {
+                    restaurants = client.get("$host/restaurants/completed?gid=$gid").body()
+                    println("Fetched Completed Restaurants: $restaurants")
+                }
             }
+            restaurants?.filter {
+                val matchedObject = it.matched
+                val completedArray = matchedObject["completed"]?.jsonArray
+                val uidsArray = matchedObject["uids"]?.jsonArray
+                (completedArray?.size ?: 0) >= (uidsArray?.size ?: 0)
+            } ?: emptyList()
         } catch (e: Exception) {
-            throw e
+            e.printStackTrace()
+            emptyList()
         }
     }
+
+    @OptIn(InternalAPI::class)
+    fun getSingleRestaurants(rid: String): Restaurants {
+        return try {
+            var restaurants: Restaurants? = null
+            runBlocking {
+                launch {
+                    restaurants = client.get("$host/restaurants/single?rid=$rid").body()
+                    println("Fetched Single Restaurants: $restaurants")
+                }
+            }
+            println("Single Restaurants: $restaurants")
+            restaurants ?: nullRestaurants
+        } catch (e: Exception) {
+            e.printStackTrace()
+            nullRestaurants
+        }
+    }
+
 }
