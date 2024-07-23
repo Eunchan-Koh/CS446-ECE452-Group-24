@@ -103,8 +103,9 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
         navController.navigate(Routes.LOCATION)
     }
 
-    fun onNavigateToRestaurantPrompts() {
-        navController.navigate(Routes.RESTAURANT_PROMPTS)
+    fun onNavigateToRestaurantPrompts(groupId: Int) {
+        navController.navigate(
+            Routes.RESTAURANT_PROMPTS + "?" + "${NavArguments.GROUP_INFO.GROUP_ID}=$groupId")
     }
 
     fun onNavigateToMatchedRestaurants(rid: Int) {
@@ -438,7 +439,7 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                             ByteArray(0), // Simplified for debugging
                             location, // Simplified for debugging
                             { group: Group -> onNavigateToGroupSettings(group) },
-                            { onNavigateToRestaurantPrompts() },
+                            { onNavigateToRestaurantPrompts(groupId) },
                             { onNavigateToMatchedRestaurants(groupId) })
                     }
 
