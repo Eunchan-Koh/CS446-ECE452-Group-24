@@ -46,7 +46,11 @@ import com.example.mealmates.ui.viewModels.LoginViewModel
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
 @Composable
-fun PreferenceAndRestrictions(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit = {}) {
+fun PreferenceAndRestrictions(
+    loginModel: LoginViewModel,
+    onNavigateToMainPage: () -> Unit = {},
+    onNavigateToLocationPage: () -> Unit
+) {
     val selectedPreferences = remember { mutableStateListOf<String>() }
 
     Box(
@@ -104,14 +108,14 @@ fun PreferenceAndRestrictions(loginModel: LoginViewModel, onNavigateToMainPage: 
                 }
             }
 
-            SaveChangesButton(loginModel, onNavigateToMainPage, selectedPreferences);
+            SaveChangesButton(loginModel, onNavigateToMainPage, onNavigateToLocationPage, selectedPreferences);
         }
     }
 }
 
 @RequiresApi(Build.VERSION_CODES.S)
 @Composable
-fun SaveChangesButton(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit = {}, selectedPreferences: List<String>) {
+fun SaveChangesButton(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit = {}, onNavigateToLocationPage: () -> Unit = {}, selectedPreferences: List<String>) {
     val buttonColor = remember { mutableStateOf(md_theme_light_primary) }
 
     Row(
@@ -123,9 +127,15 @@ fun SaveChangesButton(loginModel: LoginViewModel, onNavigateToMainPage: () -> Un
     ) {
         Button(
             onClick = {
-                onNavigateToMainPage();
                 GlobalObjects.user.preferences = selectedPreferences;
                 GlobalObjects.user.restrictions = selectedPreferences;
+                println(GlobalObjects.user.location.latitude)
+                println(GlobalObjects.user.location.longitude)
+                if(GlobalObjects.user.location.latitude.equals(0.0) && GlobalObjects.user.location.longitude.equals(0.0)) {
+                    onNavigateToLocationPage();
+                } else {
+                    onNavigateToMainPage();
+                }
             },
             colors = ButtonDefaults.buttonColors(
                 md_theme_light_primary

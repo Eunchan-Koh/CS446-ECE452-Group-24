@@ -26,6 +26,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,6 +62,7 @@ import com.google.maps.android.compose.rememberCameraPositionState
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.style.TextAlign
+import com.example.mealmates.constants.GlobalObjects
 import com.google.maps.android.compose.rememberMarkerState
 
 class LocationSettingPage : AppCompatActivity() {
@@ -197,11 +199,15 @@ class LocationSettingPage : AppCompatActivity() {
                 color = md_theme_light_primary,
             )
             if (!enterLocationPrompt || locationFound) {
+                println(locationFound)
+                println(currentPlaceLatLng)
                 Button(
                     onClick = {
                         if (!locationFound) {
                             checkPermissionThenFindCurrentPlace()
                         } else {
+                            GlobalObjects.user.location = currentPlaceLatLng
+                            UserApi().addUser(GlobalObjects.user)
                             onNavigateToMainPage()
                         } },
                     colors = ButtonDefaults.buttonColors(

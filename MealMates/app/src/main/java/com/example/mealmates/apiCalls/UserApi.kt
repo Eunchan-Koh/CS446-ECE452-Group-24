@@ -109,7 +109,7 @@ class UserApi {
             var user: User? = null
             runBlocking {
                 launch {
-                    user = client.get("$host/user?email=$email").body()
+                    user = client.get("$host/user/email?email=$email").body()
                 }
             }
             if (user != null) {

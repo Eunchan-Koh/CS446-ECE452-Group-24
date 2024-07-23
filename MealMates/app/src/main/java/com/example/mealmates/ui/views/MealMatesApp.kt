@@ -28,6 +28,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.constants.NavArguments
 import com.example.mealmates.constants.Routes
 import com.example.mealmates.models.Group
@@ -214,7 +215,11 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
 
                 NavHost(
                     navController,
-                    startDestination = Routes.HOME
+                    startDestination = if (GlobalObjects.user.preferences.isEmpty()) {
+                        Routes.SURVEY
+                    } else {
+                        Routes.HOME
+                    }
                 ) {
                     composable(Routes.HOME) {
                         MainPage(
@@ -225,7 +230,7 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                     }
 
                     composable(Routes.SURVEY) {
-                        PreferenceAndRestrictions(loginModel) { onNavigateToLocationPage() }
+                        PreferenceAndRestrictions(loginModel, { onNavigateToMainPage() }, { onNavigateToLocationPage() })
                     }
 
                     composable(Routes.LOCATION) {

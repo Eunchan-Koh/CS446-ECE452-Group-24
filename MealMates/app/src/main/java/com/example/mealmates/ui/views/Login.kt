@@ -62,8 +62,8 @@ fun Login(mainViewModel: LoginViewModel = viewModel(), placesClient: PlacesClien
 fun MainView(viewModel: LoginViewModel) {
 
     // uncomment to override login process
-    GlobalObjects.user = UserApi().getUser("65f9aa62cd606f2e1413f38e")
-    viewModel.userIsComplete = true
+//    GlobalObjects.user = UserApi().getUser("65f9aa62cd606f2e1413f38e")
+//    viewModel.userIsComplete = true
 
     Column(
         modifier = Modifier.padding(20.dp, 50.dp, 20.dp, 20.dp),
@@ -114,11 +114,8 @@ fun MainView(viewModel: LoginViewModel) {
             onClickAction = {
                 println("Adding user")
                 GlobalObjects.user.name = viewModel.user.name
-                // TODO: Temporarily saving user here, should be done after location and survey
-                // ideally
                 GlobalObjects.user.image = byteArrayOf(0)
                 GlobalObjects.user.location = LatLng(0.0, 0.0)
-                UserApi().addUser(GlobalObjects.user)
                 viewModel.userIsComplete = true
             }
         } else {
