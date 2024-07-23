@@ -1,18 +1,13 @@
 package com.backend.mealmatesapi.models
 
 import kotlinx.serialization.*
-import kotlinx.serialization.encoding.Decoder
-import kotlinx.serialization.encoding.Encoder
-import java.awt.Point
 import java.awt.geom.Point2D
-import java.sql.Time
-import java.sql.Date
 
 @Serializable
 data class User(
     val id: String,
-    val email: String,
     val name: String,
+    val email: String,
     val preferences: List<String> = emptyList(),
     val restrictions: List<String> = emptyList(),
     val image: ByteArray = ByteArray(0),
@@ -21,7 +16,7 @@ data class User(
 ) {
 
     override fun toString(): String {
-        return "User(id=$id, email='$email', name='$name', preferences='$preferences', restrictions='$restrictions')"
+        return "User(id=$id, name='$name', email='$email', preferences='$preferences', restrictions='$restrictions')"
     }
 
     override fun equals(other: Any?): Boolean {
@@ -31,8 +26,8 @@ data class User(
         other as User
 
         if (id != other.id) return false
-        if (email != other.email) return false
         if (name != other.name) return false
+        if (email != other.email) return false
         if (preferences != other.preferences) return false
         if (restrictions != other.restrictions) return false
         if (!image.contentEquals(other.image)) return false
@@ -43,8 +38,8 @@ data class User(
 
     override fun hashCode(): Int {
         var result = id.hashCode()
-        result = 31 * result + email.hashCode()
         result = 31 * result + name.hashCode()
+        result = 31 * result + email.hashCode()
         result = 31 * result + preferences.hashCode()
         result = 31 * result + restrictions.hashCode()
         result = 31 * result + image.contentHashCode()

@@ -100,11 +100,11 @@ class UserController {
             "NULL"
         }
         var queryStr = "UPDATE Users SET "
-        if (user.email.isNotEmpty()) {
-            queryStr += "email = '${user.email}', "
-        }
         if (user.name.isNotEmpty()) {
             queryStr += "name = '${user.name}', "
+        }
+        if (user.email.isNotEmpty()) {
+            queryStr += "email = '${user.email}', "
         }
         if (user.preferences.isNotEmpty()) {
             queryStr += "preferences = ARRAY[${user.preferences.joinToString(",") { "'$it'" }}], "
@@ -118,7 +118,7 @@ class UserController {
         queryStr = queryStr.dropLast(2)
         queryStr += " WHERE uid = '${user.id}';"
         databaseService.query(queryStr)
-        return "Updated user with id ${user.id}, email ${user.email}, name ${user.name}, preferences ${user.preferences}, restrictions ${user.restrictions}, location ${user.location} RETURNING uid"
+        return "Updated user with id ${user.id}, name ${user.name}, email ${user.email}, preferences ${user.preferences}, restrictions ${user.restrictions}, location ${user.location} RETURNING uid"
     }
 
     @GetMapping("/groups")
