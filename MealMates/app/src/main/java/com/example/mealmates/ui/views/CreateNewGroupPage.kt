@@ -299,18 +299,17 @@ fun GroupMembersSection(
 
                 }
                 if (userCur.id != groupUser.id) {
-                    Button(
+                    Icon(
+                        imageVector = Icons.Default.Clear,
+                        contentDescription = "remove $curGroupUserName from group",
+                        tint = Color.Gray,
                         modifier = Modifier
                             .size(30.dp)
-                            .padding(end = 8.dp),
-                        onClick = { removeTempGroupMember(groupUser.id, setTempGroupMembers, tempGroupMembers) }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Clear,
-                            contentDescription = "remove $curGroupUserName from group",
-                            tint = Color.Gray
-                        )
-                    }
+                            .padding(end = 8.dp)
+                            .clickable {
+                                removeTempGroupMember(groupUser.id, setTempGroupMembers, tempGroupMembers)
+                            }
+                    )
                 }
             }
         }
@@ -410,7 +409,7 @@ fun searchUserByEmail(
     var newUser = UserApi().getUserByEmail(newMemberEmail)
     if (newUser != User()) {
         var newTempGroupMembers = tempGroupMembers.plus(newUser)
-        setTempGroupMembers(tempGroupMembers)
+        setTempGroupMembers(newTempGroupMembers)
         return true
     } else {
         return false
