@@ -16,6 +16,9 @@ object Routes {
     val RESTAURANT_PROMPTS_WITH_ARGS =
         RESTAURANT_PROMPTS + "?" + "${NavArguments.GROUP_INFO.GROUP_ID}={groupId}"
 
+    val MATCHED_RESTAURANTS_WITH_ARGS =
+        MATCHED_RESTAURANTS + "?" + "${NavArguments.GROUP_INFO.GROUP_ID}={groupId}"
+
     val GROUP_INFO_WITH_ARGS =
         GROUP_INFO +
             "?" +

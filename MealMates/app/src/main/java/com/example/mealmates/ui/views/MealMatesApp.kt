@@ -106,7 +106,7 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
 
     fun onNavigateToMatchedRestaurants(groupId: Int) {
         navController.navigate(
-            Routes.MATCHED_RESTAURANTS + "?" + " ${NavArguments.GROUP_INFO.GROUP_ID}= $groupId")
+            Routes.MATCHED_RESTAURANTS + "?" + "${NavArguments.GROUP_INFO.GROUP_ID}= $groupId")
     }
 
     fun onNavigateToGroup() {
@@ -224,7 +224,7 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                             }
 
                         composable(
-                            Routes.MATCHED_RESTAURANTS,
+                            Routes.MATCHED_RESTAURANTS_WITH_ARGS,
                             arguments =
                                 listOf(
                                     navArgument(NavArguments.GROUP_INFO.GROUP_ID) {
