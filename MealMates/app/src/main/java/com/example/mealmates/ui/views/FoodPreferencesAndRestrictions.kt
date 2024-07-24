@@ -23,6 +23,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -41,7 +42,10 @@ import androidx.compose.ui.unit.sp
 import com.example.mealmates.apiCalls.UserApi
 import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.constants.RESTAURANT_TYPE_LABEL_LIST
+import com.example.mealmates.ui.theme.button_colour
+import com.example.mealmates.ui.theme.component_colour
 import com.example.mealmates.ui.theme.md_theme_light_primary
+import com.example.mealmates.ui.theme.primary_text_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -70,7 +74,7 @@ fun PreferenceAndRestrictions(
                 text = "Food Preferences",
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
-                color = md_theme_light_primary,
+                color = primary_text_colour,
             )
 
             FlowRow(
@@ -141,7 +145,7 @@ fun SaveChangesButton(loginModel: LoginViewModel, onNavigateToMainPage: () -> Un
                 }
             },
             colors = ButtonDefaults.buttonColors(
-                md_theme_light_primary
+                button_colour,
             ),
             modifier = Modifier
                 .height(50.dp),

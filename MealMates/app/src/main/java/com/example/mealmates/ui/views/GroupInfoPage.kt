@@ -56,6 +56,10 @@ import com.example.mealmates.constants.RESTAURANT_TYPE_LABEL_LIST
 import com.example.mealmates.models.Group
 import com.example.mealmates.models.Matched
 import com.example.mealmates.models.Restaurants
+import com.example.mealmates.ui.theme.button_colour
+import com.example.mealmates.ui.theme.completed_colour
+import com.example.mealmates.ui.theme.component_colour
+import com.example.mealmates.ui.theme.primary_text_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -163,7 +167,7 @@ fun ActionButton(
     Button(
         modifier = Modifier.padding(top = 8.dp),
         onClick = { onNavigateToRestaurantPrompts() },
-        colors = ButtonDefaults.buttonColors(containerColor = Color.Black),
+        colors = ButtonDefaults.buttonColors(containerColor = button_colour),
         enabled = isEnabled) {
             val text: String =
                 if (isEnabled) {
@@ -192,7 +196,7 @@ fun HeaderSection(
                 .background(
                     brush =
                         Brush.verticalGradient(
-                            colors = listOf(Color(0xFF2196F3), Color(0xFF21CBF3))))) {
+                            colors = listOf(Color(0xFFffd7f6), Color.White)))) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center,
@@ -211,7 +215,7 @@ fun HeaderSection(
                         text = groupInfo.groupName,
                         fontSize = 30.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black)
+                        color = primary_text_colour)
                     ActionButton(group.gid, groupInfo, onNavigateToRestaurantPrompts)
                 }
             IconButton(
@@ -220,7 +224,7 @@ fun HeaderSection(
                     Icon(
                         imageVector = Icons.Default.Settings,
                         contentDescription = "Settings",
-                        tint = Color.Black,
+                        tint = button_colour,
                         modifier = Modifier.size(32.dp))
                 }
         }
@@ -233,7 +237,7 @@ fun ContentSection(groupInfo: GroupInfo) {
             Modifier.fillMaxSize()
                 .padding(16.dp)
                 .background(
-                    Color(0xfffaebd7),
+                    color = component_colour,
                     shape =
                         RoundedCornerShape(
                             topStart = 30.dp,
@@ -247,6 +251,7 @@ fun ContentSection(groupInfo: GroupInfo) {
                 text = "Members",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
+                color = primary_text_colour,
                 modifier = Modifier.padding(bottom = 8.dp))
             LazyColumn(modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)) {
                 items(groupInfo.members) { member ->
@@ -259,11 +264,12 @@ fun ContentSection(groupInfo: GroupInfo) {
                                 imageVector = icon,
                                 contentDescription = null,
                                 modifier = Modifier.size(24.dp),
-                                tint = Color.Black)
+                                tint = primary_text_colour)
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = member.name,
                                 fontSize = 16.sp,
+                                color = primary_text_colour,
                                 fontWeight =
                                     if (member.isAdmin) FontWeight.Bold else FontWeight.Normal)
                             if (member.isAdmin) {
@@ -271,7 +277,7 @@ fun ContentSection(groupInfo: GroupInfo) {
                                 Text(
                                     text = "(Admin)",
                                     fontSize = 16.sp,
-                                    color = Color.Red,
+                                    color = completed_colour,
                                     fontWeight = FontWeight.Bold)
                             }
                         }
@@ -287,6 +293,7 @@ fun ContentSection(groupInfo: GroupInfo) {
                 text = "Location",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
+                color = primary_text_colour,
                 modifier = Modifier.padding(bottom = 8.dp))
             GoogleMap(
                 modifier =
@@ -308,11 +315,11 @@ fun InfoRow(icon: ImageVector, label: String, value: String) {
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier.size(24.dp),
-                tint = Color.Black)
+                tint = primary_text_colour)
             Spacer(modifier = Modifier.width(8.dp))
             Column {
-                Text(text = label, fontSize = 16.sp, fontWeight = FontWeight.Bold)
-                Text(text = value.ifEmpty { "None" }, fontSize = 16.sp)
+                Text(text = label, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = primary_text_colour)
+                Text(text = value.ifEmpty { "None" }, fontSize = 16.sp, color = primary_text_colour)
             }
         }
 }

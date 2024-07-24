@@ -8,6 +8,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.mealmates.ui.theme.MealMatesTheme
+import com.example.mealmates.ui.theme.primary_text_colour
 
 @Composable
 fun TitleLarge(text: String) {
@@ -30,7 +31,7 @@ fun HeadlineLarge(text: String) {
             text,
             modifier = Modifier.padding(top = 13.dp, bottom = 5.dp),
             style = MaterialTheme.typography.headlineLarge.copy(
-                color = MaterialTheme.colorScheme.primary,
+                color = primary_text_colour,
                 fontWeight = FontWeight.Bold
             )
         )

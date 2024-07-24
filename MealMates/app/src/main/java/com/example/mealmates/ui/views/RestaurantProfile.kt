@@ -68,6 +68,7 @@ import com.example.mealmates.models.SearchNearbyResponse
 import com.example.mealmates.ui.theme.md_theme_light_errorContainer
 import com.example.mealmates.ui.theme.md_theme_light_onTertiary
 import com.example.mealmates.ui.theme.md_theme_light_tertiary
+import com.example.mealmates.ui.theme.primary_text_colour
 import com.example.mealmates.ui.theme.star_color
 import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.google.gson.Gson
@@ -199,6 +200,7 @@ fun RestaurantPrompt(loginModel: LoginViewModel, groupId: String, onNavigateToHo
                     Modifier.padding(16.dp).wrapContentHeight(align = Alignment.CenterVertically),
                 textAlign = TextAlign.Center,
                 fontSize = 20.sp,
+                color = primary_text_colour,
             )
         }
         return
@@ -334,13 +336,15 @@ fun RestaurantProfile(place: MealMatesPlace, onDislike: () -> Unit, onLike: () -
                     .padding(horizontal = 8.dp)
                     .offset(y = -(30).dp)) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    Text(text = place.displayName, fontWeight = FontWeight.Bold)
+                    Text(text = place.displayName, fontWeight = FontWeight.Bold, color = primary_text_colour)
                     Row(modifier = Modifier.padding(start = 4.dp)) {
                         Icon(Icons.Default.Star, "rating", tint = star_color)
                         Text(
                             text = place.rating.toString(),
                             fontSize = 15.sp,
-                            modifier = Modifier.padding(start = 4.dp))
+                            modifier = Modifier.padding(start = 4.dp),
+                            color = primary_text_colour
+                        )
                     }
 
                     // OpenWebsiteButton(url = info.website)
@@ -348,7 +352,7 @@ fun RestaurantProfile(place: MealMatesPlace, onDislike: () -> Unit, onLike: () -
 
                 // Remove city from address
                 val address = place.shortFormattedAddress.split(",").dropLast(1).joinToString()
-                Text(text = address, fontSize = 15.sp)
+                Text(text = address, fontSize = 15.sp, color = primary_text_colour)
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     for (type in place.types.take(MAX_LABELS)) {
