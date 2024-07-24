@@ -112,25 +112,32 @@ fun updateDatabaseOnLikeCompletion(
     allRestaurants: List<MealMatesPlace>,
     likedRestaurants: List<String>
 ) {
+    val group: Group = GroupApi().getGroup(groupId)
     val res: List<Restaurants> = RestaurantsApi().getRestaurants(groupId)
+    val latestRes: Restaurants? = if (res.isEmpty()) null else res.last()
+    val latestResMatchedInfo =
+        if (latestRes != null) Gson().fromJson(latestRes.matched.toString(), Matched::class.java)
+        else null
+
+    val ongoingMatch: Boolean =
+        latestResMatchedInfo != null && latestResMatchedInfo.completed.size != group.uids.size
+
     var rids = mutableListOf<String>()
     var liked = mutableListOf<Int>()
     var completed = mutableListOf<String>()
 
-    // Table row already exists
-    if (res[0].rid != -1) {
-        val matchedInfo: Matched = Gson().fromJson(res[0].matched.toString(), Matched::class.java)
-
+    // There is an ongoing match
+    if (ongoingMatch) {
         // User has already completed the matching process, skip
-        if (matchedInfo.completed.contains(userId)) {
+        if (latestResMatchedInfo!!.completed.contains(userId)) {
             println("User $userId has already completed the matching process. Skipping...")
             return
         }
 
         // Initialize with existing row data
-        rids = matchedInfo.rids.toMutableList()
-        liked = matchedInfo.liked.toMutableList()
-        completed = matchedInfo.completed.toMutableList()
+        rids = latestResMatchedInfo.rids.toMutableList()
+        liked = latestResMatchedInfo.liked.toMutableList()
+        completed = latestResMatchedInfo.completed.toMutableList()
     }
 
     for (place in allRestaurants) {
@@ -154,13 +161,14 @@ fun updateDatabaseOnLikeCompletion(
                 "completed" to Json.encodeToJsonElement(completed)))
 
     // Table row does not exist, so create
-    if (res[0].rid == -1) {
+    if (!ongoingMatch) {
         // TODO: RID is hardcoded. Replace api call once the parameter is fixed
         val updatedInfo = Restaurants(0, groupId.toInt(), updatedMatched, emptyList())
         RestaurantsApi().addRestaurants(updatedInfo)
     } else {
         // Table row exists, so update
-        val updatedInfo = Restaurants(res[0].rid, res[0].gid, updatedMatched, res[0].suggested)
+        val updatedInfo =
+            Restaurants(latestRes!!.rid, latestRes.gid, updatedMatched, latestRes.suggested)
         RestaurantsApi().editRestaurants(updatedInfo)
     }
 }
@@ -206,13 +214,15 @@ fun RestaurantPrompt(loginModel: LoginViewModel, groupId: String, onNavigateToHo
     }
 
     Box(contentAlignment = Alignment.CenterStart) {
-        // Liking complete
-        if (index == places.size) {
+        if (index > places.size) {
+            onNavigateToHome()
+        } else if (index == places.size) {
+            // Liking complete
             val context = LocalContext.current
             updateDatabaseOnLikeCompletion(
                 GlobalObjects.user.id!!, groupId, places, likedRestaurants)
             Toast.makeText(context, "Completed Liking Restaurants!", Toast.LENGTH_SHORT).show()
-            onNavigateToHome()
+            index++
         } else {
             RestaurantProfile(places[index], { onDislike() }, { onLike() })
         }

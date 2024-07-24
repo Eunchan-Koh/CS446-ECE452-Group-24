@@ -21,10 +21,10 @@ class RestaurantController {
         val result: List<List<Any>>? = databaseService.query("SELECT * FROM Restaurants r where r.gid = '$gid';")
         println(result)
         println(gid)
-        if (result.isNullOrEmpty()) {
-            return listOf(Restaurants(-1, -1))
+        return if (result.isNullOrEmpty()) {
+            listOf()
         } else {
-            return result.map {
+            result.map {
                 Restaurants(
                     it[0] as Int,
                     it[1] as Int,
