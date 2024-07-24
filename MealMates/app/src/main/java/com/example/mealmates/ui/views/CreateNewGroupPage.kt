@@ -1,6 +1,7 @@
 package com.example.mealmates.ui.views
 
 import TextInput
+import android.annotation.SuppressLint
 import android.widget.Toast
 import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
@@ -25,6 +26,7 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -54,6 +56,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextDecoration
@@ -62,7 +65,12 @@ import com.example.mealmates.apiCalls.GroupApi
 import com.example.mealmates.models.GetPlaceDetailsResponse
 import com.example.mealmates.models.Group
 import com.example.mealmates.ui.theme.md_theme_light_primary
+import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
+import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
+import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun CreateNewGroupPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit = {}) {
@@ -109,6 +117,7 @@ fun CreateNewGroupPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> U
                 )
             }
             GroupMembersSection(tempGroupMembers, setTempGroupMembers, userCur)
+            GroupLocation(tempGroupLocation, true, false)
         }
     }
 }
@@ -161,46 +170,20 @@ fun setupNewGroupInfo(
 ) {
     var groupUIDs = mutableListOf<String>()
     var adminUser = tempGroupMembers[0]
-    var groupPreferences = adminUser.preferences
+    var groupIntersectPreferences = adminUser.preferences
+    var groupUnionPreferences = adminUser.preferences
     var groupRestrictions = adminUser.restrictions
     for (user in tempGroupMembers) {
         groupUIDs.add(user.id!!)
-        groupPreferences = groupPreferences.intersect(user.preferences.toSet()).toList()
+        groupIntersectPreferences = groupIntersectPreferences.intersect(user.preferences.toSet()).toList()
+        groupUnionPreferences = groupUnionPreferences.union(user.preferences.toSet()).toList()
         groupRestrictions = groupRestrictions.union(user.restrictions.toSet()).toList()
     }
     val gid = 0
+    val groupPreferences = if (groupIntersectPreferences.size != 0) groupIntersectPreferences else groupUnionPreferences
     val newGroup = Group(gid, tempGroupName, groupUIDs, groupPreferences, groupRestrictions, tempGroupProfilePic, tempGroupLocation)
     GroupApi().createGroup(newGroup)
     onNavigateToMainPage()
-}
-
-@Composable
-fun ChooseGroupProfilePic() {
-    val curCon = LocalContext.current
-    Column(
-        modifier = Modifier
-            .background(color = Color.White)
-            .clickable {
-                Toast
-                    .makeText(
-                        curCon, "Clicked on Image Selection area!",
-                        Toast.LENGTH_SHORT
-                    )
-                    .show()
-            }
-    ) {
-        Icon(
-            Icons.Default.AddCircle,
-            "add",
-            tint = Color.LightGray,
-            modifier = Modifier
-                .padding(10.dp)
-                //            .width(82.dp)
-                //            .height(82.dp)
-                .size(110.dp),
-        )
-
-    }
 }
 
 @Composable
@@ -209,7 +192,6 @@ fun GroupMembersSection(
     setTempGroupMembers: (List<User>) -> Unit,
     userCur: User
 ) {
-    var currentGroupMemberSize = tempGroupMembers.size
     Column (
         modifier = Modifier
             .fillMaxWidth()
@@ -307,7 +289,11 @@ fun GroupMembersSection(
                             .size(30.dp)
                             .padding(end = 8.dp)
                             .clickable {
-                                removeTempGroupMember(groupUser.id, setTempGroupMembers, tempGroupMembers)
+                                removeTempGroupMember(
+                                    groupUser.id,
+                                    setTempGroupMembers,
+                                    tempGroupMembers
+                                )
                             }
                     )
                 }
