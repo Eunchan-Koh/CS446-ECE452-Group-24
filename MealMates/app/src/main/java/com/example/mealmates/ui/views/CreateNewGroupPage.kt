@@ -73,10 +73,10 @@ import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
-fun CreateNewGroupPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit = {}) {
+fun CreateNewGroupPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit = {}, onNavigateToLocationPage: () -> Unit = {}) {
     val userCur = UserApi().getUser(GlobalObjects.user.id!!)
     var tempGroupName by remember { mutableStateOf("") }
-    var tempGroupLocation = userCur.location
+    var tempGroupLocation by remember { mutableStateOf(userCur.location) }
     var tempGroupProfilePic by remember { mutableStateOf(byteArrayOf(0)) }
     val (tempGroupMembers, setTempGroupMembers) = remember {
         mutableStateOf(listOf(userCur))
@@ -117,7 +117,7 @@ fun CreateNewGroupPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> U
                 )
             }
             GroupMembersSection(tempGroupMembers, setTempGroupMembers, userCur)
-            GroupLocation(tempGroupLocation, true, false)
+            GroupLocation(tempGroupLocation, true, onNavigateToLocationPage)
         }
     }
 }
@@ -180,7 +180,7 @@ fun setupNewGroupInfo(
         groupRestrictions = groupRestrictions.union(user.restrictions.toSet()).toList()
     }
     val gid = 0
-    val groupPreferences = if (groupIntersectPreferences.size != 0) groupIntersectPreferences else groupUnionPreferences
+    val groupPreferences = groupIntersectPreferences.ifEmpty { groupUnionPreferences }
     val newGroup = Group(gid, tempGroupName, groupUIDs, groupPreferences, groupRestrictions, tempGroupProfilePic, tempGroupLocation)
     GroupApi().createGroup(newGroup)
     onNavigateToMainPage()
@@ -211,7 +211,7 @@ fun GroupMembersSection(
                         onDismissRequest = { openNewMemberDialog.value = false },
                         onConfirmation = {
                             openNewMemberDialog.value = false
-                            println("Confirmation registered") // Add logic here to handle confirmation.
+                            println("Confirmation registered")
                         },
                         dialogTitle = "Add Member",
                         dialogText = "Member Email Address",
@@ -240,7 +240,7 @@ fun GroupMembersSection(
         }
         Spacer(modifier = Modifier.height(8.dp))
         for (groupUser in tempGroupMembers) {
-            var curGroupUserName = groupUser.name
+            val curGroupUserName = groupUser.name
             var curGroupUserEmail = groupUser.email
             var curGroupUserPhoto = groupUser.image
 
@@ -392,9 +392,9 @@ fun searchUserByEmail(
     tempGroupMembers: List<User>,
     setTempGroupMembers: (List<User>) -> Unit
 ): Boolean {
-    var newUser = UserApi().getUserByEmail(newMemberEmail)
+    val newUser = UserApi().getUserByEmail(newMemberEmail)
     if (newUser != User()) {
-        var newTempGroupMembers = tempGroupMembers.plus(newUser)
+        val newTempGroupMembers = tempGroupMembers.plus(newUser)
         setTempGroupMembers(newTempGroupMembers)
         return true
     } else {

@@ -3,7 +3,9 @@ package com.example.mealmates.constants
 object Routes {
     val HOME = "home"
     val SURVEY = "survey"
-    val LOCATION = "location"
+    val LOCATION_FROM_SIGNUP = "location_from_signup"
+    val LOCATION_FROM_USER_PROFILE = "location_from_user_profile"
+    val LOCATION_FROM_GROUP_SETTINGS = "location_from_group_settings"
     val RESTAURANT_PROMPTS = "restaurant_prompts"
     val MATCHED_RESTAURANTS = "matched_restaurants"
     val GROUP = "group"
