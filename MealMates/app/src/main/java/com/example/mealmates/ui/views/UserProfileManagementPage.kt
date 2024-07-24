@@ -3,6 +3,7 @@ package com.example.mealmates.ui.views
 import android.graphics.BitmapFactory
 import android.widget.Toast
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -17,6 +18,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Edit
@@ -79,7 +81,9 @@ fun UserProfileManagementPage(
                                 Brush.verticalGradient(
                                     colors = listOf(Color(0xFFffd7f6), Color.White)))) {
                         Column(
-                            modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
+                            modifier = Modifier.fillMaxWidth().padding(top = 20.dp).verticalScroll(
+                                ScrollState(0)
+                            ),
                             horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
                                     text = "User Settings",
