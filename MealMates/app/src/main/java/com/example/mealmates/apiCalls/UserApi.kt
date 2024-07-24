@@ -112,7 +112,7 @@ class UserApi {
                     user = client.get("$host/user/email?email=$email").body()
                 }
             }
-            if (user != null) {
+            if (user?.id != "") {
                 user as User
             } else {
                 nullUser
