@@ -2,7 +2,6 @@ package com.example.mealmates.ui.views
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
@@ -29,8 +28,8 @@ import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
@@ -70,6 +69,7 @@ import com.example.mealmates.apiCalls.UserApi
 import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.constants.RESTAURANT_TYPE_LABEL_LIST
 import com.example.mealmates.models.Group
+import com.example.mealmates.models.User
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
 import com.example.mealmates.ui.theme.md_theme_light_primary
@@ -81,6 +81,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
+import kotlinx.coroutines.runBlocking
 
 @RequiresApi(Build.VERSION_CODES.S)
 @OptIn(ExperimentalLayoutApi::class, ExperimentalMaterial3Api::class)
@@ -99,11 +100,22 @@ fun GroupSettings(
     onNavigateToLocationPage: () -> Unit = {}
 ) {
     val users = mutableListOf<GroupMember>()
+    val members = mutableListOf<User>()
+
     for (i in uids.indices) {
         val user = UserApi().getUser(uids[i])
+        members.add(user)
         users.add(GroupMember(user.name, i == 0, uids[i]))
     }
-    // Format preferences so that it shows nicely using maps from constants.
+
+    val (tempGroupMembers, setTempGroupMembers) = remember {
+        mutableStateOf(members.toList())
+    }
+
+    val userCur = UserApi().getUser(GlobalObjects.user.id!!)
+    var tempGroupLocation = userCur.location
+    var tempGroupProfilePic by remember { mutableStateOf(byteArrayOf(0)) }
+
     val formattedPreferences =
         preferences.map { preference ->
             RESTAURANT_TYPE_LABEL_LIST.entries.find { it.value == preference }?.key ?: preference
@@ -122,13 +134,7 @@ fun GroupSettings(
     val curGroup = GroupApi().getGroup(gid.toString())
     val curUserID = GlobalObjects.user.id.toString()
 
-    val userCur = UserApi().getUser(GlobalObjects.user.id!!)
-    var tempGroupName by remember { mutableStateOf("") }
-    var tempGroupLocation = userCur.location
-    var tempGroupProfilePic by remember { mutableStateOf(byteArrayOf(0)) }
-    val (tempGroupMembers, setTempGroupMembers) = remember {
-        mutableStateOf(listOf(userCur))
-    }
+    var new_group_name by rememberSaveable { mutableStateOf(name) }
 
     MealMatesTheme {
         Box(
@@ -146,8 +152,6 @@ fun GroupSettings(
                 TopBar({ onNavigateToGroupInfo(curGroup) }, curGroup)
 
                 ChooseGroupPicture(groupInfo)
-
-                var new_group_name by rememberSaveable { mutableStateOf(name) }
 
                 Column(
                     modifier = Modifier
@@ -184,10 +188,8 @@ fun GroupSettings(
                         )
                     }
                 }
-//                GroupName(uids, curUserID, name, new_group_name)
 
-//                GroupMembersSection(tempGroupMembers, setTempGroupMembers, userCur)
-                GroupMembers(groupInfo, (uids[0] == curUserID), gid, onNavigateToGroupInfo, curUserID)
+                GroupMembers(tempGroupMembers, setTempGroupMembers, userCur, (uids[0] == curUserID))
 
                 FoodPreferences(groupInfo)
 
@@ -261,7 +263,7 @@ fun GroupSettings(
                     Spacer(modifier = Modifier.height(20.dp))
 
                     if (uids[0] == curUserID) {
-                        SaveButton(loginModel, { onNavigateToGroupInfo(curGroup) }, curGroup, new_group_name)
+                        SaveButton(loginModel, onNavigateToGroupInfo , onNavigateToMainPage, curGroup, new_group_name, gid, tempGroupMembers, tempGroupLocation, tempGroupProfilePic)
                     }
                 }
             }
@@ -315,15 +317,15 @@ fun ChooseGroupPicture(imageUrl: String?) {
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .padding(12.dp)
-            .clickable {
-                Toast
-                    .makeText(
-                        curCon, "Clicked on Image Selection area!",
-                        Toast.LENGTH_SHORT
-                    )
-                    .show()
-            },
+            .padding(12.dp),
+//            .clickable {
+//                Toast
+//                    .makeText(
+//                        curCon, "Clicked on Image Selection area!",
+//                        Toast.LENGTH_SHORT
+//                    )
+//                    .show()
+//            },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val painter =
@@ -413,22 +415,20 @@ fun GroupName(uids: List<String>, curUserID: String, groupName: String, new_grou
 
 @Composable
 fun GroupMembers(
-    groupInfo: GroupInfo,
-    isAdmin: Boolean,
-    gid: Int,
-    onNavigateToGroupInfo: (Group) -> Unit,
-    curUserID: String
+    tempGroupMembers: List<User>,
+    setTempGroupMembers: (List<User>) -> Unit,
+    userCur: User,
+    isAdmin: Boolean
 ) {
-    Column(
+    Column (
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
             .padding(top = 18.dp)
-    ) {
+    ){
         Row(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(),
+                .fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -443,7 +443,9 @@ fun GroupMembers(
                         },
                         dialogTitle = "Add Member",
                         dialogText = "Member Email Address",
-                        icon = Icons.Default.AccountBox
+                        icon = Icons.Default.AccountBox,
+                        tempGroupMembers = tempGroupMembers,
+                        setTempGroupMembers = setTempGroupMembers
                     )
                 };
             }
@@ -453,43 +455,21 @@ fun GroupMembers(
                 fontWeight = FontWeight.Bold,
                 color = primary_text_colour,
             )
-
-            if (isAdmin) {
+            if (isAdmin)
                 Icon(
                     imageVector = Icons.Filled.Add,
                     contentDescription = "back",
-                    tint = button_colour,
+                    tint = primary_text_colour,
                     modifier = Modifier
                         .size(24.dp)
                         .clickable {
                             openNewMemberDialog.value = !openNewMemberDialog.value
                         }
                 )
-            }
         }
-        Spacer(modifier = Modifier.width(20.dp))
-
-        for (member in groupInfo.members) {
-            var member_name = member.name
-
-            val openRemoveMemberDialog = remember { mutableStateOf(false) };
-            when {
-                openRemoveMemberDialog.value -> {
-                    AlertDialogDeleteRemoveMember(
-                        onDismissRequest = { openRemoveMemberDialog.value = false },
-                        onConfirmation = {
-                            GroupApi().deleteUserFromGroup(member.uid, gid.toString())
-                            val updatedGroup = GroupApi().getGroup(gid.toString())
-                            onNavigateToGroupInfo(updatedGroup)
-                            openRemoveMemberDialog.value = false
-                            println("Confirmation registered") // Add logic here to handle confirmation.
-                        },
-                        dialogTitle = "Remove Member",
-                        dialogText = "Are you sure you want to remove $member_name from the group?",
-                        icon = Icons.Default.AccountBox
-                    )
-                };
-            }
+        Spacer(modifier = Modifier.height(8.dp))
+        for (groupUser in tempGroupMembers) {
+            var curGroupUserName = groupUser.name
 
             Row(
                 modifier = Modifier
@@ -504,7 +484,7 @@ fun GroupMembers(
                     Icon(
                         imageVector = Icons.Default.AccountCircle,
                         contentDescription = null,
-                        tint = primary_text_colour,
+                        tint = Color.LightGray,
                         modifier = Modifier
                             .size(50.dp)
                     )
@@ -512,37 +492,41 @@ fun GroupMembers(
                     Spacer(modifier = Modifier.width(20.dp))
 
                     Text(
-                        text = member.name,
+                        text = curGroupUserName,
                         fontWeight = FontWeight.SemiBold,
-                        color = primary_text_colour
                     )
 
-                    if (member.isAdmin)  {
+                    if (userCur.id == groupUser.id) {
                         Spacer(modifier = Modifier.width(10.dp))
                         Icon(
                             imageVector = Icons.Default.Star,
                             contentDescription = "Admin",
                             modifier = Modifier.size(20.dp),
-                            tint = primary_text_colour
+                            tint = Color.Black
                         )
                     }
 
                 }
-                if (isAdmin && member.uid != curUserID) {
+                if (isAdmin && userCur.id != groupUser.id) {
                     Icon(
                         imageVector = Icons.Default.Clear,
-                        contentDescription = "remove $member_name from group",
-                        tint = button_colour,
+                        contentDescription = "remove $curGroupUserName from group",
+                        tint = Color.Gray,
                         modifier = Modifier
                             .size(30.dp)
                             .padding(end = 8.dp)
                             .clickable {
-                                openRemoveMemberDialog.value = !openRemoveMemberDialog.value
+                                removeTempGroupMember(
+                                    groupUser.id,
+                                    setTempGroupMembers,
+                                    tempGroupMembers
+                                )
                             }
                     )
                 }
             }
         }
+        Spacer(modifier = Modifier.height(12.dp))
     }
 }
 
@@ -587,9 +571,9 @@ fun GroupLocation(groupLocation: LatLng, isAdmin: Boolean, onNavigateToLocationP
         )
         if (isAdmin) {
             Icon(
-                imageVector = Icons.Filled.Edit,
-                contentDescription = "back",
-                tint = button_colour,
+                imageVector = Icons.Filled.Refresh,
+                contentDescription = "refresh group location",
+                tint = primary_text_colour,
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {
@@ -617,14 +601,20 @@ fun GroupLocation(groupLocation: LatLng, isAdmin: Boolean, onNavigateToLocationP
 }
 
 @Composable
-fun SaveButton(loginModel: LoginViewModel, onNavigateToGroupInfo: (Group) -> Unit = {}, group: Group, new_group_name: String) {
-    group.name = new_group_name;
-
+fun SaveButton(
+    loginModel: LoginViewModel,
+    onNavigateToGroupInfo: (Group) -> Unit = {},
+    onNavigateToMainPage: () -> Unit,
+    group: Group,
+    new_group_name: String,
+    gid: Int,
+    tempGroupMembers: List<User>,
+    tempGroupLocation: LatLng,
+    tempGroupProfilePic: ByteArray,
+    ) {
     Button(
         onClick = {
-            /* Handle Save */
-            GroupApi().updateGroup(group)
-            onNavigateToGroupInfo(group)
+            updateGroupInfo(onNavigateToGroupInfo, group, gid, new_group_name, tempGroupMembers, tempGroupLocation, tempGroupProfilePic)
         },
         colors = ButtonDefaults.buttonColors(
             button_colour
@@ -743,4 +733,38 @@ fun AlertDialogDeleteRemoveMember(
             }
         }
     )
+}
+
+fun updateGroupInfo(
+    onNavigateToGroupInfo: (Group) -> Unit,
+    curGroup: Group,
+    gid: Int,
+    tempGroupName: String,
+    tempGroupMembers: List<User>,
+    tempGroupLocation: LatLng,
+    tempGroupProfilePic: ByteArray
+) = runBlocking{
+    var groupUIDs = mutableListOf<String>()
+    var adminUser = tempGroupMembers[0]
+    var groupIntersectPreferences = adminUser.preferences
+    var groupUnionPreferences = adminUser.preferences
+    var groupRestrictions = adminUser.restrictions
+    for (user in tempGroupMembers) {
+        groupUIDs.add(user.id!!)
+        groupIntersectPreferences = groupIntersectPreferences.intersect(user.preferences.toSet()).toList()
+        groupUnionPreferences = groupUnionPreferences.union(user.preferences.toSet()).toList()
+        groupRestrictions = groupRestrictions.union(user.restrictions.toSet()).toList()
+    }
+    val groupPreferences = if (groupIntersectPreferences.size != 0) groupIntersectPreferences else groupUnionPreferences
+    val updatedGroup = Group(
+        gid,
+        tempGroupName,
+        groupUIDs,
+        groupPreferences,
+        groupRestrictions,
+        tempGroupProfilePic,
+        tempGroupLocation)
+    GroupApi().updateGroup(updatedGroup)
+    GroupApi().updateGroup(updatedGroup)
+    onNavigateToGroupInfo(updatedGroup)
 }

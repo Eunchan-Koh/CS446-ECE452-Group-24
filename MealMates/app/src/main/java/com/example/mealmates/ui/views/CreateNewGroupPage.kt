@@ -1,10 +1,6 @@
 package com.example.mealmates.ui.views
 
-import TextInput
-import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,9 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -39,38 +33,26 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
-import com.example.mealmates.apiCalls.UserApi
-import com.example.mealmates.constants.GlobalObjects
-import com.example.mealmates.models.User
-import com.example.mealmates.ui.theme.MealMatesTheme
-import com.example.mealmates.ui.theme.button_colour
-import com.example.mealmates.ui.viewModels.LoginViewModel
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.mealmates.apiCalls.GroupApi
-import com.example.mealmates.models.GetPlaceDetailsResponse
+import com.example.mealmates.apiCalls.UserApi
+import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.models.Group
-import com.example.mealmates.ui.theme.md_theme_light_primary
-import com.google.android.gms.maps.model.CameraPosition
+import com.example.mealmates.models.User
+import com.example.mealmates.ui.theme.button_colour
+import com.example.mealmates.ui.theme.primary_text_colour
+import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
 fun CreateNewGroupPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit = {}, onNavigateToLocationPage: () -> Unit = {}) {
@@ -101,7 +83,7 @@ fun CreateNewGroupPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> U
             ) {
                 Text(
                     text = "Group Name",
-                    color = md_theme_light_primary,
+                    color = primary_text_colour,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                 )
@@ -110,7 +92,7 @@ fun CreateNewGroupPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> U
                     onValueChange = { tempGroupName = it },
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedLabelColor = md_theme_light_primary,
+                        unfocusedLabelColor = primary_text_colour,
                         unfocusedLeadingIconColor = Color.White
                     ),
                     singleLine = true,
@@ -225,12 +207,12 @@ fun GroupMembersSection(
                 text = "Group Members",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = md_theme_light_primary,
+                color = primary_text_colour,
             )
             Icon(
                 imageVector = Icons.Filled.Add,
                 contentDescription = "back",
-                tint = md_theme_light_primary,
+                tint = primary_text_colour,
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {

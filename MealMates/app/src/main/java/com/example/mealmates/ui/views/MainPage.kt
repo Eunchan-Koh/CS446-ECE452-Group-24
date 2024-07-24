@@ -47,13 +47,12 @@ import androidx.compose.ui.unit.sp
 import com.example.mealmates.R
 import com.example.mealmates.apiCalls.UserApi
 import com.example.mealmates.constants.GlobalObjects
-import com.example.mealmates.constants.RestaurantTypeToLabel
+import com.example.mealmates.constants.RESTAURANT_TYPE_LABEL_LIST
 import com.example.mealmates.models.Group
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
 import com.example.mealmates.ui.theme.component_colour
 import com.example.mealmates.ui.theme.primary_text_colour
-import com.example.mealmates.ui.theme.selectableList_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
 
 @Composable
@@ -194,12 +193,12 @@ fun ListGroupsMainPage(
                         Column(
                             modifier = Modifier
                                 .fillMaxHeight()
-                                .padding(vertical = 10.dp, horizontal = 20.dp),
+                                .padding(vertical = 10.dp, horizontal = 5.dp),
                             verticalArrangement = Arrangement.Center,
                             horizontalAlignment = Alignment.Start
                         ) {
                             var groupName = groups[i].name
-                            Text(groupName, fontWeight = FontWeight.Bold, fontSize = 24.sp, color= primary_text_colour)
+                            Text(groupName, fontWeight = FontWeight.Bold, fontSize = 20.sp, color= primary_text_colour)
                             Spacer(modifier = Modifier.width(40.dp))
                             Spacer(modifier = Modifier.height(2.dp))
                             var tagNames: String
@@ -207,7 +206,11 @@ fun ListGroupsMainPage(
                             Row {
                                 Text(text = "Tags: ", color = primary_text_colour)
                                 for (a in groups[i].preferences.indices) {
-                                    tagNames = RestaurantTypeToLabel[groups[i].preferences[a]].toString()
+                                    val formattedPreferences =
+                                        groups[i].preferences.map { preference ->
+                                            RESTAURANT_TYPE_LABEL_LIST.entries.find { it.value == preference }?.key ?: preference
+                                        }
+                                    tagNames = formattedPreferences[a]
                                     tempSum += groups[i].preferences[0].length
                                     if (tempSum <= 40) {
                                         if (a == 0) {
