@@ -148,6 +148,7 @@ fun GroupSettings(
                 ChooseGroupPicture(groupInfo)
 
                 var new_group_name by rememberSaveable { mutableStateOf(name) }
+                var new_group_location by rememberSaveable { mutableStateOf(location) }
 
                 Column(
                     modifier = Modifier
@@ -261,7 +262,7 @@ fun GroupSettings(
                     Spacer(modifier = Modifier.height(20.dp))
 
                     if (uids[0] == curUserID) {
-                        SaveButton(loginModel, { onNavigateToGroupInfo(curGroup) }, curGroup, new_group_name)
+                        SaveButton(loginModel, { onNavigateToGroupInfo(curGroup) }, curGroup, new_group_name, new_group_location)
                     }
                 }
             }
@@ -617,8 +618,9 @@ fun GroupLocation(groupLocation: LatLng, isAdmin: Boolean, onNavigateToLocationP
 }
 
 @Composable
-fun SaveButton(loginModel: LoginViewModel, onNavigateToGroupInfo: (Group) -> Unit = {}, group: Group, new_group_name: String) {
+fun SaveButton(loginModel: LoginViewModel, onNavigateToGroupInfo: (Group) -> Unit = {}, group: Group, new_group_name: String, new_group_location: LatLng) {
     group.name = new_group_name;
+    group.location = new_group_location
 
     Button(
         onClick = {

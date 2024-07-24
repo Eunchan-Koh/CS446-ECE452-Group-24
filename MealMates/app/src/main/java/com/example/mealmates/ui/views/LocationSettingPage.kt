@@ -67,6 +67,7 @@ import com.google.maps.android.compose.GoogleMap
 import com.google.maps.android.compose.Marker
 import com.google.maps.android.compose.MarkerState
 import androidx.compose.ui.graphics.RectangleShape
+import com.example.mealmates.apiCalls.GroupApi
 import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.models.AutocompletePlace
 import com.example.mealmates.models.Group
@@ -86,12 +87,26 @@ class LocationSettingPage : AppCompatActivity() {
     var enterLocationPrompt by mutableStateOf(false)
     var currentPlaceLatLng by mutableStateOf(LatLng(0.0, 0.0))
     @Composable
-    fun LocationSettings(loginModel: LoginViewModel, placesClient: PlacesClient, isFromGroupPage: Boolean, onNavigateToMainOrProfilePage: () -> Unit = {}, onNavigateToGroupPage: (Group) -> Unit, group: Group?) {
+    fun LocationSettings(
+        loginModel: LoginViewModel,
+        placesClient: PlacesClient,
+        isFromGroupPage: Boolean,
+        onNavigateToMainOrProfilePage: () -> Unit = {},
+        onNavigateToGroupPage: (Group) -> Unit,
+        groupId: String?,
+        group: Group?
+    ) {
         this.placesClient = placesClient
         this.loginModel = loginModel
         this.context = LocalContext.current
+        println("aaaaaa")
+        if (group != null) {
+            println(group.uids)
+            println(group.name)
+        }
+        val curGroup = if (groupId != null) GroupApi().getGroup(groupId) else group
         checkPermission()
-        FindCurrentLocationButton(isFromGroupPage, onNavigateToMainOrProfilePage, onNavigateToGroupPage, group, currentPlaceFound)
+        FindCurrentLocationButton(isFromGroupPage, onNavigateToMainOrProfilePage, onNavigateToGroupPage, groupId, curGroup, currentPlaceFound)
     }
 
     private fun checkPermission() {
@@ -204,6 +219,7 @@ class LocationSettingPage : AppCompatActivity() {
         isFromGroupPage: Boolean,
         onNavigateToMainOrProfilePage: () -> Unit,
         onNavigateToGroupPage: (Group) -> Unit,
+        groupId: String?,
         group: Group?,
         locationFound: Boolean
     ) {
@@ -230,6 +246,8 @@ class LocationSettingPage : AppCompatActivity() {
                         } else {
                             if (isFromGroupPage && group != null ) {
                                 group.location = currentPlaceLatLng
+                                println("?????")
+                                println(group.uids)
                                 onNavigateToGroupPage(group)
                             } else {
                                 GlobalObjects.user.location = currentPlaceLatLng

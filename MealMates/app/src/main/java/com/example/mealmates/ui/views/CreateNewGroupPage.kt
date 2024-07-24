@@ -1,10 +1,6 @@
 package com.example.mealmates.ui.views
 
-import TextInput
-import android.annotation.SuppressLint
-import android.widget.Toast
 import androidx.compose.foundation.ScrollState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -24,9 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBox
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.AddCircle
 import androidx.compose.material.icons.filled.Clear
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -44,42 +38,47 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.example.mealmates.apiCalls.UserApi
 import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.models.User
-import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextDecoration
 import androidx.compose.ui.unit.sp
 import com.example.mealmates.apiCalls.GroupApi
-import com.example.mealmates.models.GetPlaceDetailsResponse
 import com.example.mealmates.models.Group
 import com.example.mealmates.ui.theme.md_theme_light_primary
-import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
-import com.google.maps.android.compose.GoogleMap
-import com.google.maps.android.compose.Marker
-import com.google.maps.android.compose.MarkerState
-import com.google.maps.android.compose.rememberCameraPositionState
 
 @Composable
-fun CreateNewGroupPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> Unit = {}, onNavigateToLocationPage: () -> Unit = {}) {
+fun CreateNewGroupPage(
+    loginModel: LoginViewModel,
+    groupId: Int,
+    name: String,
+    preferences: List<String>,
+    restrictions: List<String>,
+    uids: List<String>,
+    image: ByteArray,
+    location: LatLng,
+    onNavigateToMainPage: () -> Unit = {},
+    onNavigateToLocationPage: (Group) -> Unit = {}
+) {
     val userCur = UserApi().getUser(GlobalObjects.user.id!!)
-    var tempGroupName by remember { mutableStateOf("") }
-    var tempGroupLocation by remember { mutableStateOf(userCur.location) }
-    var tempGroupProfilePic by remember { mutableStateOf(byteArrayOf(0)) }
+    var tempGroupName by remember { mutableStateOf(name) }
+    val initialLocation = if (location != LatLng(0.0, 0.0)) location else userCur.location
+    var tempGroupLocation by remember { mutableStateOf(initialLocation) }
+    var tempGroupProfilePic by remember { mutableStateOf(image) }
+    var tempGroupUsers = listOf(userCur)
+    for (uid in uids) {
+        val curUser = UserApi().getUser(uid)
+        tempGroupUsers = tempGroupUsers.plus(curUser).toList()
+    }
     val (tempGroupMembers, setTempGroupMembers) = remember {
-        mutableStateOf(listOf(userCur))
+        mutableStateOf(tempGroupUsers)
     }
 
     Box(
@@ -117,7 +116,11 @@ fun CreateNewGroupPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> U
                 )
             }
             GroupMembersSection(tempGroupMembers, setTempGroupMembers, userCur)
-            GroupLocation(tempGroupLocation, true, onNavigateToLocationPage)
+            val curTempUIDs by remember { mutableStateOf(tempGroupMembers.map { user -> user.id!! }) }
+            val curGroup = Group(0, tempGroupName, preferences, restrictions, curTempUIDs, tempGroupProfilePic, tempGroupLocation)
+            println("......")
+            println(curTempUIDs)
+            GroupLocation(tempGroupLocation, true) { onNavigateToLocationPage(curGroup) }
         }
     }
 }

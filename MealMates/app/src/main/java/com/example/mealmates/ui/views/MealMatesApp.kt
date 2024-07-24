@@ -34,7 +34,6 @@ import com.example.mealmates.constants.Routes
 import com.example.mealmates.models.Group
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
-import com.example.mealmates.ui.theme.md_theme_light_primary
 import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.net.PlacesClient
@@ -109,8 +108,22 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
         navController.navigate(Routes.LOCATION_FROM_USER_PROFILE)
     }
 
-    fun onNavigateToLocationFromGroupSettingsPage() {
-        navController.navigate(Routes.LOCATION_FROM_GROUP_SETTINGS)
+    fun onNavigateToLocationFromGroupSettingsPage(groupId: Int) {
+        navController.navigate(Routes.LOCATION_FROM_GROUP_SETTINGS + "?" + "${NavArguments.GROUP_INFO.GROUP_ID}=$groupId")
+    }
+
+    fun onNavigateToLocationFromCreateNewGroupPage(group: Group) {
+        println("This is the group $group")
+        navController.navigate(
+            Routes.LOCATION_FROM_CREATE_NEW_GROUP +
+                    "?" +
+                    "${NavArguments.GROUP_INFO.GROUP_ID}= ${group.gid}&" +
+                    "${NavArguments.GROUP_INFO.GROUP_NAME}= ${group.name}&" +
+                    "${NavArguments.GROUP_INFO.RESTRICTIONS}= ${group.restrictions}&" +
+                    "${NavArguments.GROUP_INFO.PREFERENCES}= ${group.preferences}&" +
+                    "${NavArguments.GROUP_INFO.USERS}= ${group.uids}&" +
+                    "${NavArguments.GROUP_INFO.IMAGE}= ${group.image}&" +
+                    "${NavArguments.GROUP_INFO.LOCATION}= ${group.location}")
     }
 
     fun onNavigateToRestaurantPrompts(groupId: Int) {
@@ -173,6 +186,20 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                 "${NavArguments.GROUP_INFO.USERS}= ${group.uids}&" +
                 "${NavArguments.GROUP_INFO.IMAGE}= ${group.image}&" +
                 "${NavArguments.GROUP_INFO.LOCATION}= ${group.location}")
+    }
+
+    fun onNavigateToCreateNewGroup(group: Group) {
+        println("This is the group $group")
+        navController.navigate(
+            Routes.CREATE_NEW_GROUP +
+                    "?" +
+                    "${NavArguments.GROUP_INFO.GROUP_ID}= ${group.gid}&" +
+                    "${NavArguments.GROUP_INFO.GROUP_NAME}= ${group.name}&" +
+                    "${NavArguments.GROUP_INFO.RESTRICTIONS}= ${group.restrictions}&" +
+                    "${NavArguments.GROUP_INFO.PREFERENCES}= ${group.preferences}&" +
+                    "${NavArguments.GROUP_INFO.USERS}= ${group.uids}&" +
+                    "${NavArguments.GROUP_INFO.IMAGE}= ${group.image}&" +
+                    "${NavArguments.GROUP_INFO.LOCATION}= ${group.location}")
     }
 
     fun onNavigateToMatchList(groupId: Int) {
@@ -252,17 +279,28 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
 
                     composable(Routes.LOCATION_FROM_SIGNUP) {
                         val locationSettingPage = LocationSettingPage()
-                        locationSettingPage.LocationSettings(loginModel, placesClient, false, { onNavigateToMainPage() }, { group: Group -> onNavigateToGroupSettings(group) }, null)
+                        locationSettingPage.LocationSettings(loginModel, placesClient, false, { onNavigateToMainPage() }, { group: Group -> onNavigateToGroupSettings(group) }, null, null)
                     }
 
                     composable(Routes.LOCATION_FROM_USER_PROFILE) {
                         val locationSettingPage = LocationSettingPage()
-                        locationSettingPage.LocationSettings(loginModel, placesClient, false, { onNavigateToProfile() }, { group: Group -> onNavigateToGroupSettings(group) }, null)
+                        locationSettingPage.LocationSettings(loginModel, placesClient, false, { onNavigateToProfile() }, { group: Group -> onNavigateToGroupSettings(group) }, null, null)
                     }
 
-                    composable(Routes.LOCATION_FROM_GROUP_SETTINGS) {
+                    composable(
+                        Routes.LOCATION_FROM_GROUP_SETTINGS_WITH_ARGS,
+                        arguments =
+                        listOf(
+                            navArgument(NavArguments.GROUP_INFO.GROUP_ID) {
+                                defaultValue = ""
+                            })
+                    ) {backStackEntry ->
+                        val groupId =
+                            backStackEntry.arguments?.getString(
+                                NavArguments.GROUP_INFO.GROUP_ID
+                            ) ?: ""
                         val locationSettingPage = LocationSettingPage()
-                        locationSettingPage.LocationSettings(loginModel, placesClient, true, { onNavigateToMainPage() }, { group: Group -> onNavigateToGroupSettings(group) }, null)
+                        locationSettingPage.LocationSettings(loginModel, placesClient, true, { onNavigateToMainPage() }, { group: Group -> onNavigateToGroupSettings(group) }, groupId, null)
                     }
 
                     composable(
@@ -309,7 +347,7 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                     }
 
                     composable(Routes.CREATE_NEW_GROUP) {
-                        CreateNewGroupPage(loginModel, { onNavigateToMainPage() }, { onNavigateToLocationFromSignupPage() } )
+                        CreateNewGroupPage(loginModel, -1, "", listOf(), listOf(), listOf(), byteArrayOf(0), LatLng(0.0, 0.0), { onNavigateToMainPage() }, { group: Group -> onNavigateToLocationFromCreateNewGroupPage(group) } )
                     }
 
                     composable(Routes.GROUP_MEMBERS) {
@@ -394,7 +432,7 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                             location, // Simplified for debugging
                             { onNavigateToMainPage() },
                             { group: Group -> onNavigateToGroupInfo(group) },
-                            { onNavigateToLocationFromGroupSettingsPage() }
+                            { onNavigateToLocationFromGroupSettingsPage(groupId) }
                         )
                     }
 
@@ -477,6 +515,152 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                             location, // Simplified for debugging
                             { group: Group -> onNavigateToGroupSettings(group) },
                             { onNavigateToRestaurantPrompts(groupId) })
+                    }
+
+                    composable(
+                        Routes.CREATE_NEW_GROUP_WITH_ARGS,
+                        arguments =
+                        listOf(
+                            navArgument(NavArguments.GROUP_INFO.GROUP_ID) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.GROUP_NAME) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.USERS) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.PREFERENCES) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.IMAGE) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.LOCATION) {
+                                defaultValue = ""
+                            })
+                    ) { backStackEntry ->
+                        val groupId =
+                            convertToInt(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.GROUP_ID
+                                ) ?: ""
+                            )
+                        val groupName =
+                            backStackEntry.arguments?.getString(
+                                NavArguments.GROUP_INFO.GROUP_NAME
+                            ) ?: ""
+                        val uids =
+                            convertToStringList(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.USERS
+                                ) ?: ""
+                            )
+                        val preferences =
+                            convertToStringList(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.PREFERENCES
+                                ) ?: ""
+                            )
+                        val restrictions =
+                            convertToStringList(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.RESTRICTIONS
+                                ) ?: ""
+                            )
+                        val image =
+                            backStackEntry.arguments?.getString(
+                                NavArguments.GROUP_INFO.IMAGE
+                            ) ?: ""
+                        val location =
+                            convertToLatLng(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.LOCATION
+                                ) ?: "0.0,0.0"
+                            )
+
+                        val curGroup = Group(groupId, groupName, uids, preferences, restrictions, ByteArray(0), location)
+
+                        CreateNewGroupPage(
+                            loginModel,
+                            groupId,
+                            groupName,
+                            preferences, // Simplified for debugging
+                            restrictions, // Simplified for debugging
+                            uids, // Simplified for debugging
+                            ByteArray(0), // Simplified for debugging
+                            location, // Simplified for debugging
+                            { onNavigateToMainPage() },
+                            { onNavigateToLocationFromCreateNewGroupPage(curGroup) }
+                        )
+                    }
+
+                    composable(
+                        Routes.LOCATION_FROM_CREATE_NEW_GROUP_WITH_ARGS,
+                        arguments =
+                        listOf(
+                            navArgument(NavArguments.GROUP_INFO.GROUP_ID) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.GROUP_NAME) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.USERS) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.PREFERENCES) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.IMAGE) {
+                                defaultValue = ""
+                            },
+                            navArgument(NavArguments.GROUP_INFO.LOCATION) {
+                                defaultValue = ""
+                            })
+                    ) { backStackEntry ->
+                        val groupId =
+                            convertToInt(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.GROUP_ID
+                                ) ?: ""
+                            )
+                        val groupName =
+                            backStackEntry.arguments?.getString(
+                                NavArguments.GROUP_INFO.GROUP_NAME
+                            ) ?: ""
+                        val uids =
+                            convertToStringList(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.USERS
+                                ) ?: ""
+                            )
+                        val preferences =
+                            convertToStringList(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.PREFERENCES
+                                ) ?: ""
+                            )
+                        val restrictions =
+                            convertToStringList(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.RESTRICTIONS
+                                ) ?: ""
+                            )
+                        val image =
+                            backStackEntry.arguments?.getString(
+                                NavArguments.GROUP_INFO.IMAGE
+                            ) ?: ""
+                        val location =
+                            convertToLatLng(
+                                backStackEntry.arguments?.getString(
+                                    NavArguments.GROUP_INFO.LOCATION
+                                ) ?: "0.0,0.0"
+                            )
+
+                        val curGroup = Group(groupId, groupName, uids, preferences, restrictions, ByteArray(0), location)
+
+                        val locationSettingPage = LocationSettingPage()
+                        locationSettingPage.LocationSettings(loginModel, placesClient, true, { onNavigateToProfile() }, { group: Group -> onNavigateToCreateNewGroup(group) }, null, curGroup)
                     }
 
                     composable(
