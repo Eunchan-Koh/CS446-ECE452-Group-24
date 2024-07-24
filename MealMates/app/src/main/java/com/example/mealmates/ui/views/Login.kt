@@ -30,7 +30,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.mealmates.apiCalls.UserApi
 import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.ui.components.HeadlineLarge
 import com.example.mealmates.ui.theme.MealMatesTheme
@@ -38,8 +37,8 @@ import com.example.mealmates.ui.theme.button_colour
 import com.example.mealmates.ui.theme.md_theme_light_onSecondary
 import com.example.mealmates.ui.theme.md_theme_light_primary
 import com.example.mealmates.ui.viewModels.LoginViewModel
-import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.libraries.places.api.net.PlacesClient
 
 @RequiresApi(Build.VERSION_CODES.S)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
@@ -62,7 +61,8 @@ fun Login(mainViewModel: LoginViewModel = viewModel(), placesClient: PlacesClien
 fun MainView(viewModel: LoginViewModel) {
 
     // uncomment to override login process
-//    GlobalObjects.user = UserApi().getUser("65f9aa62cd606f2e1413f38e")
+//    GlobalObjects.user = UserApi().getUser("65f9aa62cd606f2e1413f38e") //samirhas49@gmail.com
+//    GlobalObjects.user = UserApi().getUser("6696c8cfa7dc358bbb47ff74") //sajodja@gmail.com
 //    viewModel.userIsComplete = true
 
     Column(

@@ -372,7 +372,8 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                             restrictions, // Simplified for debugging
                             uids, // Simplified for debugging
                             ByteArray(0), // Simplified for debugging
-                            location // Simplified for debugging
+                            location, // Simplified for debugging
+                            { onNavigateToMainPage() }
                         ) { group: Group ->
                             onNavigateToGroupInfo(group)
                         }

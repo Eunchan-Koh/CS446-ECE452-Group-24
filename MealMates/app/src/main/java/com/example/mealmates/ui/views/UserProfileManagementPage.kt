@@ -215,7 +215,7 @@ fun LocationSetupProfile(userLocation: LatLng, onNavigateToLocationPage: () -> U
             }
         GoogleMap(
             modifier =
-                Modifier.height((LocalConfiguration.current.screenHeightDp * 0.30).dp)
+                Modifier.height((LocalConfiguration.current.screenHeightDp * 0.28).dp)
                     .width((LocalConfiguration.current.screenWidthDp * 0.90).dp),
             cameraPositionState =
                 rememberCameraPositionState {
@@ -291,11 +291,13 @@ fun onSave(currentUser: User, newName: String) {
 fun SaveProfileButton(currentUser: User, tempUserName: String) {
     val context = LocalContext.current
     Button(
+        modifier = Modifier
+            .height(50.dp),
         onClick = {
             onSave(currentUser, tempUserName)
             Toast.makeText(context, "Saved Profile Changes", Toast.LENGTH_SHORT).show()
         },
         colors = ButtonDefaults.buttonColors(containerColor = button_colour)) {
-            Text("Save Changes")
+            Text("Save Changes", fontSize = 16.sp, fontWeight = FontWeight.Bold)
         }
 }
