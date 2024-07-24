@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -50,6 +51,8 @@ import com.example.mealmates.constants.RestaurantTypeToLabel
 import com.example.mealmates.models.Group
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
+import com.example.mealmates.ui.theme.component_colour
+import com.example.mealmates.ui.theme.primary_text_colour
 import com.example.mealmates.ui.theme.selectableList_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
 
@@ -68,7 +71,6 @@ fun MainPage(
             modifier = Modifier.fillMaxSize()
         ) {
             AdvertisementSectionMainPage()
-            Divider(color = Color.Black, thickness = 1.dp)
             ListGroupsMainPage(onNavigateToGroup, onNavigateToMatches)
         }
         Column(
@@ -93,7 +95,7 @@ fun AdvertisementSectionMainPage(){
         modifier = Modifier
             .height(168.dp)
             .fillMaxWidth()
-            .background(color = Color.LightGray),
+            .background(color = component_colour),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
 
@@ -157,10 +159,10 @@ fun ListGroupsMainPage(
         for (i in 0 until groupSize) {
             Column(
                 modifier = Modifier
-                    .height(92.dp)
-                    .padding(horizontal = 0.dp, vertical = 0.dp)
+                    .height(100.dp)
+                    .padding(horizontal = 10.dp, vertical = 5.dp)
                     .fillMaxWidth()
-                    .background(color = selectableList_colour)
+                    .background(color = component_colour, RoundedCornerShape(20.dp))
                     .clickable { onNavigateToGroup(groups[i]) }
             ) {
                 Row(
@@ -197,24 +199,24 @@ fun ListGroupsMainPage(
                             horizontalAlignment = Alignment.Start
                         ) {
                             var groupName = groups[i].name
-                            Text(groupName, fontWeight = FontWeight.Bold, fontSize = 24.sp)
+                            Text(groupName, fontWeight = FontWeight.Bold, fontSize = 24.sp, color= primary_text_colour)
                             Spacer(modifier = Modifier.width(40.dp))
                             Spacer(modifier = Modifier.height(2.dp))
                             var tagNames: String
                             var tempSum = 0
                             Row {
-                                Text(text = "Tags: ")
+                                Text(text = "Tags: ", color = primary_text_colour)
                                 for (a in groups[i].preferences.indices) {
                                     tagNames = RestaurantTypeToLabel[groups[i].preferences[a]].toString()
                                     tempSum += groups[i].preferences[0].length
                                     if (tempSum <= 40) {
                                         if (a == 0) {
-                                            Text(text = tagNames, fontSize = 18.sp)
+                                            Text(text = tagNames, fontSize = 18.sp, color = primary_text_colour)
                                         } else {
-                                            Text(text = ", $tagNames", fontSize = 18.sp)
+                                            Text(text = ", $tagNames", fontSize = 18.sp, color = primary_text_colour)
                                         }
                                     } else {
-                                        Text(text = ",...")
+                                        Text(text = ",...", color = primary_text_colour)
                                         break
                                     }
                                 }
@@ -224,7 +226,7 @@ fun ListGroupsMainPage(
                     Icon(
                         imageVector = Icons.Default.List,
                         contentDescription = "View Matches",
-                        tint = Color.Black,
+                        tint = button_colour,
                         modifier = Modifier
                             .size(24.dp)
                             .clickable { onNavigateToMatches(groups[i].gid) }

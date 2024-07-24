@@ -4,6 +4,7 @@ import TextInput
 import android.annotation.SuppressLint
 import android.os.Build
 import androidx.annotation.RequiresApi
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.ButtonDefaults
@@ -24,18 +26,26 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
+import com.example.mealmates.R
+import com.example.mealmates.apiCalls.UserApi
 import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.ui.components.HeadlineLarge
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
+import com.example.mealmates.ui.theme.component_colour
+import com.example.mealmates.ui.theme.error_colour
 import com.example.mealmates.ui.theme.md_theme_light_onSecondary
 import com.example.mealmates.ui.theme.md_theme_light_primary
+import com.example.mealmates.ui.theme.on_button_colour
+import com.example.mealmates.ui.theme.primary_text_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.google.android.gms.maps.model.LatLng
 import com.google.android.libraries.places.api.net.PlacesClient
@@ -61,8 +71,7 @@ fun Login(mainViewModel: LoginViewModel = viewModel(), placesClient: PlacesClien
 fun MainView(viewModel: LoginViewModel) {
 
     // uncomment to override login process
-//    GlobalObjects.user = UserApi().getUser("65f9aa62cd606f2e1413f38e") //samirhas49@gmail.com
-//    GlobalObjects.user = UserApi().getUser("6696c8cfa7dc358bbb47ff74") //sajodja@gmail.com
+//    GlobalObjects.user = UserApi().getUser("65f9aa62cd606f2e1413f38e")
 //    viewModel.userIsComplete = true
 
     Column(
@@ -70,14 +79,6 @@ fun MainView(viewModel: LoginViewModel) {
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text(
-            text = "MealMates",
-            style =
-                TextStyle(
-                    fontFamily = FontFamily.Default,
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 60.sp,
-                    color = md_theme_light_primary))
 
         if (viewModel.userIsAuthenticated && !viewModel.userIsComplete) {
             var name by rememberSaveable { mutableStateOf(viewModel.user.name) }
@@ -85,7 +86,7 @@ fun MainView(viewModel: LoginViewModel) {
             if (!validateName(name)) {
                 Text(
                     text = "Please enter a valid name",
-                    style = TextStyle(color = androidx.compose.material.MaterialTheme.colors.error))
+                    style = TextStyle(color = error_colour))
             }
 
             Column(
@@ -98,7 +99,7 @@ fun MainView(viewModel: LoginViewModel) {
                 )
                 Spacer(modifier = Modifier.height(20.dp))
                 TextInput(
-                    label = "Enter your name",
+                    label = "",
                     placeholder = "Name",
                     value = name,
                     onValueChange = { name = it })
@@ -119,13 +120,13 @@ fun MainView(viewModel: LoginViewModel) {
                 viewModel.userIsComplete = true
             }
         } else {
-            //            Image(
-            //                painter = painterResource(id = R.drawable.logotransparent),
-            //                contentDescription = "MealMates Logo",
-            //                modifier = Modifier
-            //                    .size(500.dp)
-            //                    .padding(20.dp)
-            //            )
+                        Image(
+                            painter = painterResource(id = R.drawable.logo_transparent),
+                            contentDescription = "MealMates Logo",
+                            modifier = Modifier
+                                .size(500.dp)
+                                .padding(20.dp)
+                        )
         }
         LogButton(
             text = buttonText,
@@ -155,7 +156,7 @@ fun LogButton(
                 .border(0.dp, md_theme_light_onSecondary),
             colors =
                 ButtonDefaults.buttonColors(
-                    backgroundColor = button_colour, contentColor = md_theme_light_onSecondary),
+                    backgroundColor = button_colour, contentColor = on_button_colour),
             shape = RoundedCornerShape(150.dp)) {
                 Text(
                     text = text,

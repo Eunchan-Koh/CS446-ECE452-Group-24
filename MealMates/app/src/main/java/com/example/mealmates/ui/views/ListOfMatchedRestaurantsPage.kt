@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
@@ -42,6 +43,8 @@ import com.example.mealmates.models.GetPlaceDetailsResponse
 import com.example.mealmates.models.Matched
 import com.example.mealmates.models.MealMatesPlace
 import com.example.mealmates.models.Restaurants
+import com.example.mealmates.ui.theme.component_colour
+import com.example.mealmates.ui.theme.primary_text_colour
 import com.example.mealmates.ui.theme.selectableList_colour
 import com.google.gson.Gson
 
@@ -98,10 +101,9 @@ fun ListOfMatchedRestaurantsPage(
                     Column(
                         modifier = Modifier
                             .height(102.dp)
-                            .padding(vertical = 0.dp)
+                            .padding(horizontal = 10.dp, vertical = 5.dp)
                             .fillMaxWidth()
-                            .background(color = selectableList_colour)
-                            .clickable { /*to the corresponding group page*/ },
+                            .background(color = component_colour, RoundedCornerShape(20.dp))
 
                         ) {
                         Row(
@@ -131,7 +133,7 @@ fun ListOfMatchedRestaurantsPage(
                             Icon(
                                 Icons.Default.CheckCircle,
                                 "Place",
-                                tint = Color.LightGray,
+                                tint = primary_text_colour,
                                 modifier = Modifier
                                     .size(60.dp),
                             )
@@ -144,20 +146,19 @@ fun ListOfMatchedRestaurantsPage(
                             ){
                                 val PlaceName = thisPlace.displayName
                                 val PlaceAddress = thisPlace.shortFormattedAddress
-                                Text(PlaceName, fontWeight = FontWeight.Bold, fontSize = 20.sp)
+                                Text(PlaceName, fontWeight = FontWeight.Bold, fontSize = 20.sp, color = primary_text_colour)
                                 var adSize:TextUnit
                                 if(PlaceAddress.length < 60){
                                     adSize = 15.sp
                                 }else{
                                     adSize = 10.sp
                                 }
-                                Text(PlaceAddress, fontSize = adSize)
+                                Text(PlaceAddress, fontSize = adSize, color = primary_text_colour)
                             }
                         }
 
 
                     }
-                    Divider(color = Color.White, thickness = 1.dp)
                 }
             }
 
@@ -212,12 +213,12 @@ fun TopRestaurantInfoSectionListOfMatched(place: MealMatesPlace){
         modifier = Modifier
             .height(75.dp)
             .fillMaxWidth()
-            .background(color = Color.LightGray)
+            .background(color = component_colour)
             .padding(vertical = 10.dp, horizontal = 15.dp)
     ){
-        Text(place.displayName)//hardcoded for now
+        Text(place.displayName, color= primary_text_colour)
         Spacer(modifier = Modifier.padding(5.dp))
-        Text(place.shortFormattedAddress)
+        Text(place.shortFormattedAddress, color= primary_text_colour)
     }
 }
 
@@ -230,7 +231,7 @@ fun OtherTopPicksSectionListOfMatched(){
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.Start
     ){
-        Text("Other top picks", fontWeight = FontWeight.Bold, fontSize = 25.sp)
+        Text("Other top picks", fontWeight = FontWeight.Bold, fontSize = 25.sp, color = primary_text_colour)
     }
 }
 

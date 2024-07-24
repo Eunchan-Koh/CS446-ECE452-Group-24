@@ -71,7 +71,9 @@ import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.constants.RESTAURANT_TYPE_LABEL_LIST
 import com.example.mealmates.models.Group
 import com.example.mealmates.ui.theme.MealMatesTheme
+import com.example.mealmates.ui.theme.button_colour
 import com.example.mealmates.ui.theme.md_theme_light_primary
+import com.example.mealmates.ui.theme.primary_text_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -152,7 +154,7 @@ fun GroupSettings(
                 ) {
                     Text(
                         text = "Group Name",
-                        color = md_theme_light_primary,
+                        color = primary_text_colour,
                         fontWeight = FontWeight.Bold,
                         fontSize = 20.sp,
                     )
@@ -162,7 +164,7 @@ fun GroupSettings(
                             onValueChange = { new_group_name = it },
                             modifier = Modifier.fillMaxWidth(),
                             colors = OutlinedTextFieldDefaults.colors(
-                                unfocusedLabelColor = md_theme_light_primary,
+                                unfocusedLabelColor = primary_text_colour,
                                 unfocusedLeadingIconColor = Color.White
                             ),
                             singleLine = true,
@@ -173,7 +175,7 @@ fun GroupSettings(
                             onValueChange = { new_group_name = it },
                             modifier = Modifier.fillMaxWidth(),
                             colors = OutlinedTextFieldDefaults.colors(
-                                unfocusedLabelColor = md_theme_light_primary,
+                                unfocusedLabelColor = primary_text_colour,
                                 unfocusedLeadingIconColor = Color.White
                             ),
                             singleLine = true,
@@ -275,7 +277,7 @@ fun TopBar(onNavigateToGroupInfo: (Group) -> Unit, group: Group){
             Icon(
                 imageVector = Icons.Filled.KeyboardArrowLeft,
                 contentDescription = "Back",
-                tint = Color.Black,
+                tint = button_colour,
                 modifier = Modifier
                     .size(40.dp)
             )
@@ -293,7 +295,7 @@ fun TopBar(onNavigateToGroupInfo: (Group) -> Unit, group: Group){
                 fontSize = 24.sp,
                 textAlign = TextAlign.Center,
                 fontWeight = FontWeight.Bold,
-                color = md_theme_light_primary,
+                color = primary_text_colour,
             )
         }
     }
@@ -448,14 +450,14 @@ fun GroupMembers(
                 text = "Group Members",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = md_theme_light_primary,
+                color = primary_text_colour,
             )
 
             if (isAdmin) {
                 Icon(
                     imageVector = Icons.Filled.Add,
                     contentDescription = "back",
-                    tint = md_theme_light_primary,
+                    tint = button_colour,
                     modifier = Modifier
                         .size(24.dp)
                         .clickable {
@@ -501,7 +503,7 @@ fun GroupMembers(
                     Icon(
                         imageVector = Icons.Default.AccountCircle,
                         contentDescription = null,
-                        tint = Color.LightGray,
+                        tint = primary_text_colour,
                         modifier = Modifier
                             .size(50.dp)
                     )
@@ -511,6 +513,7 @@ fun GroupMembers(
                     Text(
                         text = member.name,
                         fontWeight = FontWeight.SemiBold,
+                        color = primary_text_colour
                     )
 
                     if (member.isAdmin)  {
@@ -519,7 +522,7 @@ fun GroupMembers(
                             imageVector = Icons.Default.Star,
                             contentDescription = "Admin",
                             modifier = Modifier.size(20.dp),
-                            tint = Color.Black
+                            tint = primary_text_colour
                         )
                     }
 
@@ -528,7 +531,7 @@ fun GroupMembers(
                     Icon(
                         imageVector = Icons.Default.Clear,
                         contentDescription = "remove $member_name from group",
-                        tint = Color.Gray,
+                        tint = button_colour,
                         modifier = Modifier
                             .size(30.dp)
                             .padding(end = 8.dp)
@@ -549,13 +552,13 @@ fun FoodPreferences(groupInfo: GroupInfo) {
         text = "Preferences",
         fontSize = 20.sp,
         fontWeight = FontWeight.Bold,
-        color = md_theme_light_primary,
+        color = primary_text_colour,
     )
     Text(
         text = groupInfo.preferences,
         fontSize = 16.sp,
         fontWeight = FontWeight.Normal,
-        color = Color.Black,
+        color = primary_text_colour,
     )
 }
 
@@ -579,13 +582,13 @@ fun GroupLocation(groupLocation: LatLng, isAdmin: Boolean, isExistingGroup: Bool
             text = "Group Location",
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold,
-            color = md_theme_light_primary,
+            color = primary_text_colour,
         )
         if (isAdmin && isExistingGroup) {
             Icon(
                 imageVector = Icons.Filled.Edit,
                 contentDescription = "back",
-                tint = md_theme_light_primary,
+                tint = button_colour,
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {
@@ -623,7 +626,7 @@ fun SaveButton(loginModel: LoginViewModel, onNavigateToGroupInfo: (Group) -> Uni
             onNavigateToGroupInfo(group)
         },
         colors = ButtonDefaults.buttonColors(
-            md_theme_light_primary
+            button_colour
         ),
         modifier = Modifier
             .height(50.dp)
@@ -650,13 +653,13 @@ fun AlertDialogAddNewMember(
             Icon(
                 icon,
                 contentDescription = "Example Icon",
-                tint = Color.Gray,
+                tint = button_colour,
                 modifier = Modifier
                     .size(50.dp),
             )
         },
         title = {
-            Text(text = dialogTitle)
+            Text(text = dialogTitle, color = primary_text_colour)
         },
         text = {
             Column {
@@ -706,16 +709,16 @@ fun AlertDialogDeleteRemoveMember(
             Icon(
                 icon,
                 contentDescription = "Warning Icon",
-                tint = Color.Gray,
+                tint = button_colour,
                 modifier = Modifier
                     .size(50.dp),
             )
         },
         title = {
-            Text(text = dialogTitle)
+            Text(text = dialogTitle, color = primary_text_colour)
         },
         text = {
-            Text(text = dialogText)
+            Text(text = dialogText, color = primary_text_colour)
         },
         onDismissRequest = {
             onDismissRequest()

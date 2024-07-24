@@ -26,7 +26,11 @@ import com.example.mealmates.models.Restaurants
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import androidx.compose.runtime.*
+import com.example.mealmates.ui.theme.button_colour
+import com.example.mealmates.ui.theme.completed_colour
+import com.example.mealmates.ui.theme.component_colour
 import com.example.mealmates.ui.theme.md_theme_light_primary
+import com.example.mealmates.ui.theme.primary_text_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
 
 @Composable
@@ -56,7 +60,8 @@ fun MatchListPage(loginViewModel: LoginViewModel, gid: Int, onNavigateToMatch: (
             .padding(16.dp)
     ) {
         SectionHeader("Completed Matches")
-        LazyColumn {
+        LazyColumn (
+        ) {
             items(completedMatches) { match ->
                 println("This is the match: $match")
                 MatchRow(match = match, status = "Completed", onClick = { onNavigateToMatch(match.rid) })
@@ -80,7 +85,7 @@ fun SectionHeader(title: String) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp)
-            .background(md_theme_light_primary, RoundedCornerShape(8.dp))
+            .background(button_colour, RoundedCornerShape(8.dp))
             .padding(8.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -100,7 +105,7 @@ fun MatchRow(match: Restaurants, status: String, onClick: () -> Unit) {
             .fillMaxWidth()
             .padding(vertical = 4.dp)
             .clickable { onClick() }
-            .background(Color(0xfffaebd7), RoundedCornerShape(8.dp))
+            .background(component_colour, RoundedCornerShape(8.dp))
             .padding(16.dp)
     ) {
         Row(
@@ -109,14 +114,14 @@ fun MatchRow(match: Restaurants, status: String, onClick: () -> Unit) {
             modifier = Modifier.fillMaxWidth()
         ) {
             Column {
-                Text("Match ID: ${match.rid}", fontSize = 16.sp, color = Color.Black)
+                Text("Match ID: ${match.rid}", fontSize = 16.sp, color = primary_text_colour)
             }
             Row(verticalAlignment = Alignment.CenterVertically) {
-                Text(status, fontSize = 16.sp, color = if (status == "Completed") Color.Green else Color.Gray)
+                Text(status, fontSize = 16.sp, color = if (status == "Completed") completed_colour else Color.Gray)
                 Icon(
                     imageVector = if (status == "Completed") Icons.Default.Check else Icons.Default.PlayArrow,
                     contentDescription = null,
-                    tint = if (status == "Completed") Color.Green else Color.Gray,
+                    tint = if (status == "Completed") completed_colour else Color.Gray,
                     modifier = Modifier.padding(start = 8.dp)
                 )
             }

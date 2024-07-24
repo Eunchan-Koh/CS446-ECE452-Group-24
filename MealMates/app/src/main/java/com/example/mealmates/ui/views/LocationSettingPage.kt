@@ -63,6 +63,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.text.style.TextAlign
 import com.example.mealmates.constants.GlobalObjects
+import com.example.mealmates.ui.theme.button_colour
+import com.example.mealmates.ui.theme.on_button_colour
+import com.example.mealmates.ui.theme.primary_text_colour
 import com.google.maps.android.compose.rememberMarkerState
 
 class LocationSettingPage : AppCompatActivity() {
@@ -200,7 +203,7 @@ class LocationSettingPage : AppCompatActivity() {
                 text = "Set up your location",
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
-                color = md_theme_light_primary,
+                color = primary_text_colour,
             )
             if (!enterLocationPrompt || locationFound) {
                 println(locationFound)
@@ -216,7 +219,7 @@ class LocationSettingPage : AppCompatActivity() {
                             onNavigateToMainPage()
                         } },
                     colors = ButtonDefaults.buttonColors(
-                        md_theme_light_primary
+                        button_colour
                     ),
                     modifier = Modifier
                         .height(50.dp)
@@ -227,7 +230,7 @@ class LocationSettingPage : AppCompatActivity() {
                     if (locationFound) {
                         text = "Continue"
                     }
-                    Text(text, fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(text, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = on_button_colour)
                 }
             } else {
                 Button(

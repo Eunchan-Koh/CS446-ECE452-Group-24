@@ -47,7 +47,9 @@ import com.example.mealmates.constants.RESTAURANT_TYPE_LABEL_LIST
 import com.example.mealmates.models.User
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
+import com.example.mealmates.ui.theme.component_colour
 import com.example.mealmates.ui.theme.md_theme_light_primary
+import com.example.mealmates.ui.theme.primary_text_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
@@ -74,8 +76,8 @@ fun UserProfileManagementPage(
                         Modifier.fillMaxWidth()
                             .background(
                                 brush =
-                                    Brush.verticalGradient(
-                                        colors = listOf(Color(0xFF2196F3), Color(0xFF21CBF3))))) {
+                                Brush.verticalGradient(
+                                    colors = listOf(Color(0xFFffd7f6), Color.White)))) {
                         Column(
                             modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
                             horizontalAlignment = Alignment.CenterHorizontally) {
@@ -84,7 +86,7 @@ fun UserProfileManagementPage(
                                     fontSize = 24.sp,
                                     textAlign = TextAlign.Center,
                                     fontWeight = FontWeight.Bold,
-                                    color = Color.Black,
+                                    color = primary_text_colour,
                                 )
                                 ChoosePicProfile(currentUser)
                             }
@@ -96,7 +98,7 @@ fun UserProfileManagementPage(
                             Modifier.fillMaxWidth()
                                 .padding(vertical = 8.dp)
                                 .background(
-                                    Color(0xfffaebd7),
+                                    color = component_colour,
                                     shape =
                                         RoundedCornerShape(
                                             topStart = 30.dp,
@@ -113,12 +115,12 @@ fun UserProfileManagementPage(
                             Column(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
                                 Text(
                                     text = "Email",
-                                    color = md_theme_light_primary,
+                                    color = primary_text_colour,
                                     fontWeight = FontWeight.Bold,
                                     fontSize = 20.sp,
                                 )
                                 Text(
-                                    text = currentUser.email, fontSize = 16.sp, color = Color.Black)
+                                    text = currentUser.email, fontSize = 16.sp, color = primary_text_colour)
                             }
                             HorizontalDivider(
                                 thickness = 1.dp,
@@ -158,14 +160,14 @@ fun ChoosePicProfile(currentUser: User) {
                 Icon(
                     Icons.Default.AccountCircle,
                     "add",
-                    tint = Color.Black,
+                    tint = primary_text_colour,
                     modifier = Modifier.padding(10.dp).size(110.dp),
                 )
-            Icon(
-                Icons.Default.Edit,
-                "Change profile photo",
-                tint = Color.Black,
-                modifier = Modifier.padding(6.dp))
+//            Icon(
+//                Icons.Default.Edit,
+//                "Change profile photo",
+//                tint = button_colour,
+//                modifier = Modifier.padding(6.dp))
         }
 }
 
@@ -175,7 +177,7 @@ fun nameSetupProfile(userName: String): String {
     Column(modifier = Modifier.height(92.dp).fillMaxWidth().padding(vertical = 8.dp)) {
         Text(
             text = "Name",
-            color = md_theme_light_primary,
+            color = primary_text_colour,
             fontWeight = FontWeight.Bold,
             fontSize = 20.sp,
         )
@@ -185,7 +187,7 @@ fun nameSetupProfile(userName: String): String {
             modifier = Modifier.fillMaxWidth(),
             colors =
                 OutlinedTextFieldDefaults.colors(
-                    unfocusedLabelColor = md_theme_light_primary,
+                    unfocusedLabelColor = primary_text_colour,
                     unfocusedLeadingIconColor = Color.White),
             singleLine = true,
             placeholder = { Text("Name", color = Color.Gray, textAlign = TextAlign.Center) })
@@ -205,12 +207,12 @@ fun LocationSetupProfile(userLocation: LatLng, onNavigateToLocationPage: () -> U
                     text = "Location",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = md_theme_light_primary,
+                    color = primary_text_colour,
                 )
                 Icon(
                     imageVector = Icons.Filled.Edit,
                     contentDescription = "Edit location",
-                    tint = md_theme_light_primary,
+                    tint = button_colour,
                     modifier = Modifier.size(24.dp).clickable { onNavigateToLocationPage() })
             }
         GoogleMap(
@@ -264,12 +266,12 @@ fun Preferences(preferences: List<String>, onNavigateToSurvey: () -> Unit = {}) 
                     text = "Preferences",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
-                    color = md_theme_light_primary,
+                    color = primary_text_colour,
                 )
                 Icon(
                     imageVector = Icons.Filled.Edit,
                     contentDescription = "Edit preferences",
-                    tint = md_theme_light_primary,
+                    tint = button_colour,
                     modifier = Modifier.size(24.dp).clickable { onNavigateToSurvey() })
             }
         Text(

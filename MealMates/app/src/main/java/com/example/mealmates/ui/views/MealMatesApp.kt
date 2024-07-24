@@ -33,6 +33,7 @@ import com.example.mealmates.constants.NavArguments
 import com.example.mealmates.constants.Routes
 import com.example.mealmates.models.Group
 import com.example.mealmates.ui.theme.MealMatesTheme
+import com.example.mealmates.ui.theme.button_colour
 import com.example.mealmates.ui.theme.md_theme_light_primary
 import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.google.android.gms.maps.model.LatLng
@@ -186,7 +187,7 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
             bottomBar = {
                 if (showBottomBar)
                     BottomNavigation(
-                        backgroundColor = md_theme_light_primary,
+                        backgroundColor = button_colour,
                         modifier = Modifier.padding(horizontal = 0.dp, vertical = 0.dp)) {
                             val currentDestination = navBackStackEntry?.destination
 
