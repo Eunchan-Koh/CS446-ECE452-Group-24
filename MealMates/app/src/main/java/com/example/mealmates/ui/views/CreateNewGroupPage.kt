@@ -50,7 +50,6 @@ import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.models.Group
 import com.example.mealmates.models.User
 import com.example.mealmates.ui.theme.button_colour
-import com.example.mealmates.ui.theme.md_theme_light_primary
 import com.example.mealmates.ui.theme.primary_text_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.google.android.gms.maps.model.LatLng
@@ -84,7 +83,7 @@ fun CreateNewGroupPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> U
             ) {
                 Text(
                     text = "Group Name",
-                    color = md_theme_light_primary,
+                    color = primary_text_colour,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                 )
@@ -93,7 +92,7 @@ fun CreateNewGroupPage(loginModel: LoginViewModel, onNavigateToMainPage: () -> U
                     onValueChange = { tempGroupName = it },
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedLabelColor = md_theme_light_primary,
+                        unfocusedLabelColor = primary_text_colour,
                         unfocusedLeadingIconColor = Color.White
                     ),
                     singleLine = true,
