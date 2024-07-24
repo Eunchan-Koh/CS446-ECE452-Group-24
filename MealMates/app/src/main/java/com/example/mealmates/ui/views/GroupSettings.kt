@@ -2,7 +2,6 @@ package com.example.mealmates.ui.views
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.widget.Toast
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.ScrollState
@@ -317,15 +316,15 @@ fun ChooseGroupPicture(imageUrl: String?) {
         modifier = Modifier
             .fillMaxWidth()
             .fillMaxHeight()
-            .padding(12.dp)
-            .clickable {
-                Toast
-                    .makeText(
-                        curCon, "Clicked on Image Selection area!",
-                        Toast.LENGTH_SHORT
-                    )
-                    .show()
-            },
+            .padding(12.dp),
+//            .clickable {
+//                Toast
+//                    .makeText(
+//                        curCon, "Clicked on Image Selection area!",
+//                        Toast.LENGTH_SHORT
+//                    )
+//                    .show()
+//            },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         val painter =
