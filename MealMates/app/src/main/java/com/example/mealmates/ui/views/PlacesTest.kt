@@ -98,6 +98,24 @@ fun getPlaceDetails(placeID: String): String {
     }
 }
 
+fun locationAutocomplete(textInput: String): String {
+    val client = HttpClient(Android)
+    val apiKey = "AIzaSyAjTN0RQCtZ3sWV6g_bw-D75cZkk6bmL3s"
+    return try {
+        var responseString = ""
+        runBlocking {
+            launch {
+                val res = client.get("https://maps.googleapis.com/maps/api/place/autocomplete/json?input=${textInput}&key=${apiKey}")
+                    .bodyAsText()
+                responseString = res
+            }
+        }
+        responseString
+    } catch (e: Exception) {
+        throw e
+    }
+}
+
 /*@Composable
 fun AndroidPlacesAPIMethod(placesClient: PlacesClient) {
     val numMembers = 5

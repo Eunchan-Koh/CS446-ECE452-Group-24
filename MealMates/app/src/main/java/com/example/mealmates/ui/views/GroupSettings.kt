@@ -96,6 +96,7 @@ fun GroupSettings(
     location: LatLng,
     onNavigateToMainPage: () -> Unit = {},
     onNavigateToGroupInfo: (Group) -> Unit = {},
+    onNavigateToLocationPage: () -> Unit = {}
 ) {
     val users = mutableListOf<GroupMember>()
     for (i in uids.indices) {
@@ -190,7 +191,7 @@ fun GroupSettings(
 
                 FoodPreferences(groupInfo)
 
-                GroupLocation(groupInfo, uids, curUserID)
+                GroupLocation(groupInfo, uids, curUserID, onNavigateToLocationPage)
 
                 Spacer(modifier = Modifier.height(20.dp))
 
@@ -563,13 +564,13 @@ fun FoodPreferences(groupInfo: GroupInfo) {
 }
 
 @Composable
-fun GroupLocation(groupInfo: GroupInfo, uids: List<String>, curUserID: String) {
-    GroupLocation(groupInfo.location, uids[0] == curUserID, true)
+fun GroupLocation(groupInfo: GroupInfo, uids: List<String>, curUserID: String, onNavigateToLocationPage: () -> Unit = {}) {
+    GroupLocation(groupInfo.location, uids[0] == curUserID, onNavigateToLocationPage)
 }
 
-    @SuppressLint("UnrememberedMutableState")
-    @Composable
-fun GroupLocation(groupLocation: LatLng, isAdmin: Boolean, isExistingGroup: Boolean) {
+@SuppressLint("UnrememberedMutableState")
+@Composable
+fun GroupLocation(groupLocation: LatLng, isAdmin: Boolean, onNavigateToLocationPage: () -> Unit = {}) {
     Spacer(modifier = Modifier.height(20.dp))
     Row(
         modifier = Modifier
@@ -584,7 +585,7 @@ fun GroupLocation(groupLocation: LatLng, isAdmin: Boolean, isExistingGroup: Bool
             fontWeight = FontWeight.Bold,
             color = primary_text_colour,
         )
-        if (isAdmin && isExistingGroup) {
+        if (isAdmin) {
             Icon(
                 imageVector = Icons.Filled.Edit,
                 contentDescription = "back",
@@ -592,7 +593,7 @@ fun GroupLocation(groupLocation: LatLng, isAdmin: Boolean, isExistingGroup: Bool
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {
-                        // TODO: Add ability to search for new location
+                        onNavigateToLocationPage()
                     }
             )
         }

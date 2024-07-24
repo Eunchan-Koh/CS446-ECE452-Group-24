@@ -101,8 +101,16 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
         navController.navigate(Routes.HOME)
     }
 
-    fun onNavigateToLocationPage() {
-        navController.navigate(Routes.LOCATION)
+    fun onNavigateToLocationFromSignupPage() {
+        navController.navigate(Routes.LOCATION_FROM_SIGNUP)
+    }
+
+    fun onNavigateToLocationFromUserProfilePage() {
+        navController.navigate(Routes.LOCATION_FROM_USER_PROFILE)
+    }
+
+    fun onNavigateToLocationFromGroupSettingsPage() {
+        navController.navigate(Routes.LOCATION_FROM_GROUP_SETTINGS)
     }
 
     fun onNavigateToRestaurantPrompts(groupId: Int) {
@@ -224,7 +232,7 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                     startDestination = if (GlobalObjects.user.preferences.isEmpty()) {
                         Routes.SURVEY
                     } else if (GlobalObjects.user.preferences.isNotEmpty() && GlobalObjects.user.location.latitude.equals(0.0) && GlobalObjects.user.location.longitude.equals(0.0)) {
-                        Routes.LOCATION
+                        Routes.LOCATION_FROM_SIGNUP
                     } else {
                         Routes.HOME
                     }
@@ -239,12 +247,22 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                     }
 
                     composable(Routes.SURVEY) {
-                        PreferenceAndRestrictions(loginModel, { onNavigateToMainPage() }, { onNavigateToLocationPage() }, { onNavigateToProfile() })
+                        PreferenceAndRestrictions(loginModel, { onNavigateToMainPage() }, { onNavigateToLocationFromSignupPage() }, { onNavigateToProfile() })
                     }
 
-                    composable(Routes.LOCATION) {
+                    composable(Routes.LOCATION_FROM_SIGNUP) {
                         val locationSettingPage = LocationSettingPage()
-                        locationSettingPage.LocationSettings(loginModel, placesClient, { onNavigateToMainPage() }, { onNavigateToProfile() })
+                        locationSettingPage.LocationSettings(loginModel, placesClient, false, { onNavigateToMainPage() }, { group: Group -> onNavigateToGroupSettings(group) }, null)
+                    }
+
+                    composable(Routes.LOCATION_FROM_USER_PROFILE) {
+                        val locationSettingPage = LocationSettingPage()
+                        locationSettingPage.LocationSettings(loginModel, placesClient, false, { onNavigateToProfile() }, { group: Group -> onNavigateToGroupSettings(group) }, null)
+                    }
+
+                    composable(Routes.LOCATION_FROM_GROUP_SETTINGS) {
+                        val locationSettingPage = LocationSettingPage()
+                        locationSettingPage.LocationSettings(loginModel, placesClient, true, { onNavigateToMainPage() }, { group: Group -> onNavigateToGroupSettings(group) }, null)
                     }
 
                     composable(
@@ -291,7 +309,7 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                     }
 
                     composable(Routes.CREATE_NEW_GROUP) {
-                        CreateNewGroupPage(loginModel) { onNavigateToMainPage() }
+                        CreateNewGroupPage(loginModel, { onNavigateToMainPage() }, { onNavigateToLocationFromSignupPage() } )
                     }
 
                     composable(Routes.GROUP_MEMBERS) {
@@ -300,7 +318,7 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                     }
 
                     composable(Routes.PROFILE) {
-                        UserProfileManagementPage(loginModel, { onNavigateToSurvey() }, { onNavigateToLocationPage() })
+                        UserProfileManagementPage(loginModel, { onNavigateToSurvey() }, { onNavigateToLocationFromUserProfilePage() })
                     }
 
                     composable(
@@ -374,10 +392,10 @@ fun MealMatesApp(loginModel: LoginViewModel, placesClient: PlacesClient) {
                             uids, // Simplified for debugging
                             ByteArray(0), // Simplified for debugging
                             location, // Simplified for debugging
-                            { onNavigateToMainPage() }
-                        ) { group: Group ->
-                            onNavigateToGroupInfo(group)
-                        }
+                            { onNavigateToMainPage() },
+                            { group: Group -> onNavigateToGroupInfo(group) },
+                            { onNavigateToLocationFromGroupSettingsPage() }
+                        )
                     }
 
                     // test
