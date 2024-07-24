@@ -32,13 +32,13 @@ import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -70,7 +70,6 @@ import com.example.mealmates.apiCalls.UserApi
 import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.constants.RESTAURANT_TYPE_LABEL_LIST
 import com.example.mealmates.models.Group
-import com.example.mealmates.models.User
 import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.button_colour
 import com.example.mealmates.ui.theme.md_theme_light_primary
@@ -95,7 +94,8 @@ fun GroupSettings(
     uids: List<String>,
     image: ByteArray,
     location: LatLng,
-    onNavigateToGroupInfo: (Group) -> Unit = {}
+    onNavigateToMainPage: () -> Unit = {},
+    onNavigateToGroupInfo: (Group) -> Unit = {},
 ) {
     val users = mutableListOf<GroupMember>()
     for (i in uids.indices) {
@@ -120,6 +120,14 @@ fun GroupSettings(
 
     val curGroup = GroupApi().getGroup(gid.toString())
     val curUserID = GlobalObjects.user.id.toString()
+
+    val userCur = UserApi().getUser(GlobalObjects.user.id!!)
+    var tempGroupName by remember { mutableStateOf("") }
+    var tempGroupLocation = userCur.location
+    var tempGroupProfilePic by remember { mutableStateOf(byteArrayOf(0)) }
+    val (tempGroupMembers, setTempGroupMembers) = remember {
+        mutableStateOf(listOf(userCur))
+    }
 
     MealMatesTheme {
         Box(
@@ -177,7 +185,8 @@ fun GroupSettings(
                 }
 //                GroupName(uids, curUserID, name, new_group_name)
 
-                GroupMembers(groupInfo, (uids[0] == curUserID), gid)
+//                GroupMembersSection(tempGroupMembers, setTempGroupMembers, userCur)
+                GroupMembers(groupInfo, (uids[0] == curUserID), gid, onNavigateToGroupInfo, curUserID)
 
                 FoodPreferences(groupInfo)
 
@@ -193,13 +202,43 @@ fun GroupSettings(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.SpaceEvenly,
                 ) {
+                    val openLeaveGroupDialog = remember { mutableStateOf(false) };
+                    val openDeleteGroupDialog = remember { mutableStateOf(false) };
+                    when {
+                        openLeaveGroupDialog.value -> {
+                            AlertDialogDeleteRemoveMember(
+                                onDismissRequest = { openLeaveGroupDialog.value = false },
+                                onConfirmation = {
+                                    GroupApi().deleteUserFromGroup(curUserID, gid.toString())
+                                    onNavigateToMainPage()
+                                    openLeaveGroupDialog.value = false
+                                },
+                                dialogTitle = "Leave group",
+                                dialogText = "Are you sure you want to leave this group?",
+                                icon = Icons.Default.Warning
+                            )
+                        };
+                        openDeleteGroupDialog.value -> {
+                            AlertDialogDeleteRemoveMember(
+                                onDismissRequest = { openLeaveGroupDialog.value = false },
+                                onConfirmation = {
+                                    GroupApi().deleteGroup(gid.toString())
+                                    onNavigateToMainPage()
+                                    openLeaveGroupDialog.value = false
+                                },
+                                dialogTitle = "Delete group",
+                                dialogText = "Are you sure you want to delete this group?",
+                                icon = Icons.Default.Warning
+                            )
+                        };
+                    }
 
                     if (uids[0] == curUserID) {
                         Text(
                             text = "Delete Group",
                             textAlign = TextAlign.Start,
                             modifier = Modifier.clickable {
-                                GroupApi().deleteGroup(gid.toString())
+                                openDeleteGroupDialog.value = !openDeleteGroupDialog.value
                             },
                             fontWeight = FontWeight.SemiBold,
                             textDecoration = TextDecoration.Underline,
@@ -210,7 +249,7 @@ fun GroupSettings(
                             text = "Leave Group",
                             textAlign = TextAlign.Start,
                             modifier = Modifier.clickable {
-                                GroupApi().deleteUserFromGroup(curUserID, gid.toString())
+                                openLeaveGroupDialog.value = !openLeaveGroupDialog.value
                             },
                             fontWeight = FontWeight.SemiBold,
                             textDecoration = TextDecoration.Underline,
@@ -220,7 +259,9 @@ fun GroupSettings(
 
                     Spacer(modifier = Modifier.height(20.dp))
 
-                    SaveButton(loginModel, { onNavigateToGroupInfo(curGroup) }, curGroup, new_group_name)
+                    if (uids[0] == curUserID) {
+                        SaveButton(loginModel, { onNavigateToGroupInfo(curGroup) }, curGroup, new_group_name)
+                    }
                 }
             }
         }
@@ -373,7 +414,9 @@ fun GroupName(uids: List<String>, curUserID: String, groupName: String, new_grou
 fun GroupMembers(
     groupInfo: GroupInfo,
     isAdmin: Boolean,
-    gid: Int
+    gid: Int,
+    onNavigateToGroupInfo: (Group) -> Unit,
+    curUserID: String
 ) {
     Column(
         modifier = Modifier
@@ -435,6 +478,8 @@ fun GroupMembers(
                         onDismissRequest = { openRemoveMemberDialog.value = false },
                         onConfirmation = {
                             GroupApi().deleteUserFromGroup(member.uid, gid.toString())
+                            val updatedGroup = GroupApi().getGroup(gid.toString())
+                            onNavigateToGroupInfo(updatedGroup)
                             openRemoveMemberDialog.value = false
                             println("Confirmation registered") // Add logic here to handle confirmation.
                         },
@@ -482,7 +527,7 @@ fun GroupMembers(
                     }
 
                 }
-                if (isAdmin) {
+                if (isAdmin && member.uid != curUserID) {
                     Icon(
                         imageVector = Icons.Default.Clear,
                         contentDescription = "remove $member_name from group",
@@ -492,7 +537,6 @@ fun GroupMembers(
                             .padding(end = 8.dp)
                             .clickable {
                                 openRemoveMemberDialog.value = !openRemoveMemberDialog.value
-//                                notification.value = "remove $member_name from group"
                             }
                     )
                 }

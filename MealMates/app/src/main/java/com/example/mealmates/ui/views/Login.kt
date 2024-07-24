@@ -47,8 +47,8 @@ import com.example.mealmates.ui.theme.md_theme_light_primary
 import com.example.mealmates.ui.theme.on_button_colour
 import com.example.mealmates.ui.theme.primary_text_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
-import com.google.android.libraries.places.api.net.PlacesClient
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.libraries.places.api.net.PlacesClient
 
 @RequiresApi(Build.VERSION_CODES.S)
 @SuppressLint("RememberReturnType", "UnusedMaterialScaffoldPaddingParameter")
