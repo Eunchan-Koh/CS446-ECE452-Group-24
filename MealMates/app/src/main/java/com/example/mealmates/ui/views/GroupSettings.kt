@@ -1,5 +1,6 @@
 package com.example.mealmates.ui.views
 
+import android.annotation.SuppressLint
 import android.os.Build
 import android.widget.Toast
 import androidx.annotation.RequiresApi
@@ -76,6 +77,8 @@ import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.google.android.gms.maps.model.CameraPosition
 import com.google.android.gms.maps.model.LatLng
 import com.google.maps.android.compose.GoogleMap
+import com.google.maps.android.compose.Marker
+import com.google.maps.android.compose.MarkerState
 import com.google.maps.android.compose.rememberCameraPositionState
 
 @RequiresApi(Build.VERSION_CODES.S)
@@ -514,6 +517,12 @@ fun FoodPreferences(groupInfo: GroupInfo) {
 
 @Composable
 fun GroupLocation(groupInfo: GroupInfo, uids: List<String>, curUserID: String) {
+    GroupLocation(groupInfo.location, uids[0] == curUserID, true)
+}
+
+    @SuppressLint("UnrememberedMutableState")
+    @Composable
+fun GroupLocation(groupLocation: LatLng, isAdmin: Boolean, isExistingGroup: Boolean) {
     Spacer(modifier = Modifier.height(20.dp))
     Row(
         modifier = Modifier
@@ -528,7 +537,7 @@ fun GroupLocation(groupInfo: GroupInfo, uids: List<String>, curUserID: String) {
             fontWeight = FontWeight.Bold,
             color = md_theme_light_primary,
         )
-        if (uids[0] == curUserID) {
+        if (isAdmin && isExistingGroup) {
             Icon(
                 imageVector = Icons.Filled.Edit,
                 contentDescription = "back",
@@ -549,8 +558,14 @@ fun GroupLocation(groupInfo: GroupInfo, uids: List<String>, curUserID: String) {
             .width((LocalConfiguration.current.screenWidthDp * 0.90).dp),
         cameraPositionState =
         rememberCameraPositionState {
-            position = CameraPosition.fromLatLngZoom(groupInfo.location, 10f)
-        })
+            position = CameraPosition.fromLatLngZoom(groupLocation, 10f)
+        }) {
+        Marker(
+            state = MarkerState(groupLocation),
+            title = "Your Location",
+            snippet = "Your location"
+        )
+    }
 }
 
 @Composable
