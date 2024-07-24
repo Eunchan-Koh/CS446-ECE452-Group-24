@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -72,7 +73,9 @@ fun UserProfileManagementPage(
 
     MealMatesTheme {
         Column(
-            modifier = Modifier.fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally) {
+            modifier = Modifier.fillMaxSize().fillMaxHeight().verticalScroll(
+                ScrollState(0)
+            ).padding(bottom = 20.dp), horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(
                     modifier =
                         Modifier.fillMaxWidth()
@@ -81,9 +84,7 @@ fun UserProfileManagementPage(
                                 Brush.verticalGradient(
                                     colors = listOf(Color(0xFFffd7f6), Color.White)))) {
                         Column(
-                            modifier = Modifier.fillMaxWidth().padding(top = 20.dp).verticalScroll(
-                                ScrollState(0)
-                            ),
+                            modifier = Modifier.fillMaxWidth().padding(top = 20.dp),
                             horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
                                     text = "User Settings",
