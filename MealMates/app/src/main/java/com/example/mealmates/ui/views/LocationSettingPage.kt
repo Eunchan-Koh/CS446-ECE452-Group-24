@@ -99,11 +99,6 @@ class LocationSettingPage : AppCompatActivity() {
         this.placesClient = placesClient
         this.loginModel = loginModel
         this.context = LocalContext.current
-        println("aaaaaa")
-        if (group != null) {
-            println(group.uids)
-            println(group.name)
-        }
         val curGroup = if (groupId != null) GroupApi().getGroup(groupId) else group
         checkPermission()
         FindCurrentLocationButton(isFromGroupPage, onNavigateToMainOrProfilePage, onNavigateToGroupPage, groupId, curGroup, currentPlaceFound)
@@ -246,8 +241,6 @@ class LocationSettingPage : AppCompatActivity() {
                         } else {
                             if (isFromGroupPage && group != null ) {
                                 group.location = currentPlaceLatLng
-                                println("?????")
-                                println(group.uids)
                                 onNavigateToGroupPage(group)
                             } else {
                                 GlobalObjects.user.location = currentPlaceLatLng
@@ -266,6 +259,20 @@ class LocationSettingPage : AppCompatActivity() {
                 ) {
                     val text = if (!locationFound) "Find Current Location" else "Save"
                     Text(text, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = on_button_colour)
+                }
+                if (!enterLocationPrompt) {
+                    Button(
+                        onClick = { enterLocationPrompt = true },
+                        colors = ButtonDefaults.buttonColors(
+                            button_colour
+                        ),
+                        modifier = Modifier
+                            .height(50.dp)
+                            .padding(end = 10.dp),
+                        shape = CircleShape
+                    ) {
+                        Text("Enter Location Manually", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = on_button_colour)
+                    }
                 }
             }
             if (enterLocationPrompt) {

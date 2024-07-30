@@ -72,13 +72,20 @@ fun CreateNewGroupPage(
     val initialLocation = if (location != LatLng(0.0, 0.0)) location else userCur.location
     var tempGroupLocation by remember { mutableStateOf(initialLocation) }
     var tempGroupProfilePic by remember { mutableStateOf(image) }
-    var tempGroupUsers = listOf(userCur)
+    var tempGroupUserIDs by remember { mutableStateOf(listOf(userCur.id!!)) }
+    var tempGroupUsers by remember { mutableStateOf(listOf(userCur)) }
     for (uid in uids) {
         val curUser = UserApi().getUser(uid)
-        tempGroupUsers = tempGroupUsers.plus(curUser).toList()
+        if (curUser.id != userCur.id) {
+            tempGroupUserIDs = tempGroupUserIDs.plus(curUser.id!!).toList()
+            tempGroupUsers = tempGroupUsers.plus(curUser).toList()
+        }
     }
     val (tempGroupMembers, setTempGroupMembers) = remember {
         mutableStateOf(tempGroupUsers)
+    }
+    val (tempGroupMemberIDs, setTempGroupMemberIDs) = remember {
+        mutableStateOf(tempGroupUserIDs)
     }
 
     Box(
@@ -115,11 +122,8 @@ fun CreateNewGroupPage(
                     singleLine = true,
                 )
             }
-            GroupMembersSection(tempGroupMembers, setTempGroupMembers, userCur)
-            val curTempUIDs by remember { mutableStateOf(tempGroupMembers.map { user -> user.id!! }) }
-            val curGroup = Group(0, tempGroupName, preferences, restrictions, curTempUIDs, tempGroupProfilePic, tempGroupLocation)
-            println("......")
-            println(curTempUIDs)
+            GroupMembersSection(tempGroupMembers, setTempGroupMembers, tempGroupMemberIDs, setTempGroupMemberIDs, userCur)
+            val curGroup = Group(0, tempGroupName, tempGroupMemberIDs, preferences, restrictions, tempGroupProfilePic, tempGroupLocation)
             GroupLocation(tempGroupLocation, true) { onNavigateToLocationPage(curGroup) }
         }
     }
@@ -193,6 +197,8 @@ fun setupNewGroupInfo(
 fun GroupMembersSection(
     tempGroupMembers: List<User>,
     setTempGroupMembers: (List<User>) -> Unit,
+    tempGroupMemberIDs: List<String>,
+    setTempGroupMemberIDs: (List<String>) -> Unit,
     userCur: User
 ) {
     Column (
@@ -220,7 +226,9 @@ fun GroupMembersSection(
                         dialogText = "Member Email Address",
                         icon = Icons.Default.AccountBox,
                         tempGroupMembers = tempGroupMembers,
-                        setTempGroupMembers = setTempGroupMembers
+                        setTempGroupMembers = setTempGroupMembers,
+                        tempGroupMemberIDs = tempGroupMemberIDs,
+                        setTempGroupMemberIDs = setTempGroupMemberIDs
                     )
                 };
             }
@@ -323,7 +331,9 @@ fun AlertDialogAddNewMember(
     dialogText: String,
     icon: ImageVector,
     tempGroupMembers: List<User>,
-    setTempGroupMembers: (List<User>) -> Unit
+    setTempGroupMembers: (List<User>) -> Unit,
+    tempGroupMemberIDs: List<String>,
+    setTempGroupMemberIDs: (List<String>) -> Unit
 ) {
     var newMemberEmail by remember { mutableStateOf("") }
     var searchNewUserFailure by remember { mutableStateOf(false) }
@@ -368,7 +378,7 @@ fun AlertDialogAddNewMember(
         confirmButton = {
             TextButton(
                 onClick = {
-                    if (!searchUserByEmail(newMemberEmail, tempGroupMembers, setTempGroupMembers)) {
+                    if (!searchUserByEmail(newMemberEmail, tempGroupMembers, setTempGroupMembers, tempGroupMemberIDs, setTempGroupMemberIDs)) {
                         searchNewUserFailure = true
                     } else {
                         onConfirmation()
@@ -393,12 +403,16 @@ fun AlertDialogAddNewMember(
 fun searchUserByEmail(
     newMemberEmail: String,
     tempGroupMembers: List<User>,
-    setTempGroupMembers: (List<User>) -> Unit
+    setTempGroupMembers: (List<User>) -> Unit,
+    tempGroupMemberIDs: List<String>,
+    setTempGroupMemberIDs: (List<String>) -> Unit
 ): Boolean {
     val newUser = UserApi().getUserByEmail(newMemberEmail)
     if (newUser != User()) {
         val newTempGroupMembers = tempGroupMembers.plus(newUser)
         setTempGroupMembers(newTempGroupMembers)
+        val newTempGroupMemberIDs = tempGroupMemberIDs.plus(newUser.id!!).toList()
+        setTempGroupMemberIDs(newTempGroupMemberIDs)
         return true
     } else {
         return false
