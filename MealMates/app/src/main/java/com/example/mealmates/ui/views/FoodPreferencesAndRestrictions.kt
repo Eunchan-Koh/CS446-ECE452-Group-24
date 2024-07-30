@@ -15,15 +15,17 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Card
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -37,9 +39,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.mealmates.apiCalls.UserApi
 import com.example.mealmates.constants.GlobalObjects
 import com.example.mealmates.constants.RESTAURANT_TYPE_LABEL_LIST
 import com.example.mealmates.ui.theme.button_colour
@@ -62,20 +64,26 @@ fun PreferenceAndRestrictions(
     Box(
         Modifier
             .fillMaxSize()
-            .padding(30.dp)
+            .padding(horizontal = 30.dp)
     ) {
         Column(
             Modifier
                 .fillMaxSize()
                 .verticalScroll(ScrollState(0)),
             verticalArrangement = Arrangement.SpaceBetween,
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = "Food Preferences",
                 fontSize = 40.sp,
                 fontWeight = FontWeight.Bold,
                 color = primary_text_colour,
+                textAlign = TextAlign.Center,
+                modifier = Modifier
+                    .padding(top = 30.dp)
             )
+
+            InfoMessageCard()
 
             FlowRow(
                 Modifier
@@ -127,7 +135,7 @@ fun SaveChangesButton(loginModel: LoginViewModel, onNavigateToMainPage: () -> Un
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(30.dp),
+            .padding(20.dp),
         verticalAlignment = Alignment.Bottom,
         horizontalArrangement = Arrangement.Center,
     ) {
@@ -202,5 +210,42 @@ fun CancelButton() {
         shape = CircleShape
     ) {
         Text(text = "Cancel", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+    }
+}
+
+@Composable
+fun InfoMessageCard() {
+    Card(
+        backgroundColor = component_colour,
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Row {
+                Icon(
+                    Icons.Outlined.Info,
+                    "Important information",
+                    tint = primary_text_colour,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                )
+                Text(
+                    text = "Important Information",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    color = primary_text_colour
+                )
+            }
+
+            Text(
+                text = "Currently, our app does not provide specific information on Halal or Kosher options due to data limitations. Please verify dietary information directly with the restaurants. Thank you for understanding."
+            )
+        }
     }
 }
