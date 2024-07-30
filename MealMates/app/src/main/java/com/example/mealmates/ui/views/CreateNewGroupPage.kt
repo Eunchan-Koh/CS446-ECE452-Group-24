@@ -50,14 +50,8 @@ import com.example.mealmates.models.User
 import com.example.mealmates.ui.theme.button_colour
 import com.example.mealmates.ui.theme.primary_text_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.sp
-import com.example.mealmates.apiCalls.GroupApi
-import com.example.mealmates.models.Group
-import com.example.mealmates.ui.theme.md_theme_light_primary
 import com.google.android.gms.maps.model.LatLng
 
 @Composable

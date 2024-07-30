@@ -244,7 +244,7 @@ fun InfoMessageCard() {
             }
 
             Text(
-                text = "Currently, our app does not provide specific information on Halal or Kosher options due to data limitations. Please verify dietary information directly with the restaurants. Thank you for understanding."
+                text = "Currently, our app does not provide specific information on Allergens and Religious dietary restrictions due to data limitations. Please verify dietary information directly with the restaurants. Thank you for understanding."
             )
         }
     }

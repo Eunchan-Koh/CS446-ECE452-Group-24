@@ -98,6 +98,7 @@
 | July 30, 2024 |        |   1h    |     |       |        | Worked on D7  |
 | July 30, 2024 |        |       |   1h  |       |        | Added Info card on the food preferences page and improved UI  |
 | July 30, 2024 |         |       |       |       | 1h     | Worked on D7                                                                                                                                                                                                                       |
+| July 29, 2024 |        |       |   2h  |       |        | Worked on Final status report part of D7 & added new info card for allergens  |
 
 **How to update time log**<br />
 copy the line below. paste it below the table above, and modify the sections you need.<br />
