@@ -312,7 +312,7 @@ fun AllergenInfoMessageCard() {
             }
 
             Text(
-                text = "Currently, our app does not provide specific information on Allergens and Halal or Kosher options due to data limitations. Please verify dietary information directly with the restaurants. Thank you for understanding."
+                text = "Currently, our app does not provide specific information on Accessibility, Allergens and Religious dietary restrictions due to data limitations. Please verify accessibility and dietary information directly with the restaurants. Thank you for understanding."
             )
         }
     }
