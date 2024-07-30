@@ -15,7 +15,7 @@
 | June 10, 2024 | 0.5h   |       |       |       |        | worked on buddy team evaluation	|					                                         
 | June 12, 2024 |   |    1h   |       |       |        | Worked on D2	|                                               |
 | June 14, 2024 |        |       |  1h   |       |        | Worked on D2 |
-| June 14, 2024 |         | 1h  |       |       |        | Figma design of app
+| June 14, 2024 |         | 1h  |   2h  |       |        | Figma design of app
 | June 18, 2024 | 0.5h   | 0.5h  | 0.5h  | 0.5h  | 0.5h   | group discussion						                                                                                                             |
 | June 20, 2024 |        |       |  4.5h |   3h    |        | Watch Building android apps lecture to learn more about app dev	and set up emulator on android studio |
 | June 20, 2024 |  |  |  | 4h | | setup database models and connect to app |
