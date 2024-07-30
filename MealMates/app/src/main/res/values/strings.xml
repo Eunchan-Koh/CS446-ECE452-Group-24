@@ -1,0 +1,6 @@
+<resources>
+    <string name="app_name">MealMates</string>
+    <string name="com_auth0_client_id">2Qp09SPPJtbi5kZICrYQBHe4RRltjFI4</string>
+    <string name="com_auth0_domain">dev-cog1thu33l6uz3pp.us.auth0.com</string>
+    <string name="com_auth0_scheme">app</string>
+</resources>
