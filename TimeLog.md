@@ -63,6 +63,7 @@
 | July 25, 2024 |        |       |   2h  |       |        | Worked on D6 (Client-Server) |
 | July 26, 2024 |        |       |  2.5h |       |        | Continue working on D6 (Client-server diagrams) |
 | July 29, 2024 |        |       |   1h  |       |        | Worked on D7  |
+| July 30, 2024 |        |       |   1h  |       |        | Added Info card on the food preferences page and improved UI  |
 
 **How to update time log**<br />
 copy the line below. paste it below the table above, and modify the sections you need.<br />
