@@ -114,7 +114,7 @@ fun GroupSettings(
     }
 
     val userCur = UserApi().getUser(GlobalObjects.user.id!!)
-    var tempGroupLocation = userCur.location
+    var tempGroupLocation = if (location != LatLng(0.0, 0.0)) location else userCur.location
     var tempGroupProfilePic by remember { mutableStateOf(byteArrayOf(0)) }
 
     val formattedPreferences =
