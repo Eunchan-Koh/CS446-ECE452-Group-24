@@ -33,16 +33,22 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.example.mealmates.apiCalls.GroupApi
 import com.example.mealmates.apiCalls.UserApi
 import com.example.mealmates.constants.GlobalObjects
+import com.example.mealmates.models.Group
 import com.example.mealmates.models.User
 import com.example.mealmates.ui.theme.button_colour
+import com.example.mealmates.ui.theme.primary_text_colour
 import com.example.mealmates.ui.viewModels.LoginViewModel
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.setValue
@@ -107,7 +113,7 @@ fun CreateNewGroupPage(
             ) {
                 Text(
                     text = "Group Name",
-                    color = md_theme_light_primary,
+                    color = primary_text_colour,
                     fontWeight = FontWeight.Bold,
                     fontSize = 20.sp,
                 )
@@ -116,7 +122,7 @@ fun CreateNewGroupPage(
                     onValueChange = { tempGroupName = it },
                     modifier = Modifier.fillMaxWidth(),
                     colors = OutlinedTextFieldDefaults.colors(
-                        unfocusedLabelColor = md_theme_light_primary,
+                        unfocusedLabelColor = primary_text_colour,
                         unfocusedLeadingIconColor = Color.White
                     ),
                     singleLine = true,
@@ -236,12 +242,12 @@ fun GroupMembersSection(
                 text = "Group Members",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
-                color = md_theme_light_primary,
+                color = primary_text_colour,
             )
             Icon(
                 imageVector = Icons.Filled.Add,
                 contentDescription = "back",
-                tint = md_theme_light_primary,
+                tint = primary_text_colour,
                 modifier = Modifier
                     .size(24.dp)
                     .clickable {
