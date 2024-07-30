@@ -16,8 +16,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.Card
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
+import androidx.compose.material.icons.outlined.Info
 import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
@@ -33,19 +35,16 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
 import com.example.mealmates.apiCalls.RestaurantsApi
-import com.example.mealmates.apiCalls.UserApi
-import com.example.mealmates.constants.GlobalObjects
-import com.example.mealmates.ui.theme.MealMatesTheme
-import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.example.mealmates.models.GetPlaceDetailsResponse
 import com.example.mealmates.models.Matched
 import com.example.mealmates.models.MealMatesPlace
 import com.example.mealmates.models.Restaurants
+import com.example.mealmates.ui.theme.MealMatesTheme
 import com.example.mealmates.ui.theme.component_colour
 import com.example.mealmates.ui.theme.primary_text_colour
 import com.example.mealmates.ui.theme.selectableList_colour
+import com.example.mealmates.ui.viewModels.LoginViewModel
 import com.google.gson.Gson
 
 @Composable
@@ -85,6 +84,7 @@ fun ListOfMatchedRestaurantsPage(
             ImageSectionListOfMatched(restoList[0])
             Divider(color = Color.Black, thickness = 1.dp)
             TopRestaurantInfoSectionListOfMatched(restoList[0])
+            AllergenInfoMessageCard()
             //first value of the list is the liked, second is rid. sort by order of liked num
             //TODO: add algorithm if needed. For now, Ordering only based on number of likes
             /*testing until here------------------------------------------------------------*/
@@ -279,5 +279,41 @@ fun ListRestaurantsListOfMatched(size: Int, placesA: List<MealMatesPlace>){
 
         }
         Divider(color = Color.White, thickness = 1.dp)
+    }
+}
+@Composable
+fun AllergenInfoMessageCard() {
+    Card(
+        backgroundColor = component_colour,
+        shape = RoundedCornerShape(8.dp),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(4.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(16.dp)
+        ) {
+            Row {
+                Icon(
+                    Icons.Outlined.Info,
+                    "Important information",
+                    tint = primary_text_colour,
+                    modifier = Modifier
+                        .padding(end = 8.dp)
+                )
+                Text(
+                    text = "Important Information",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(bottom = 8.dp),
+                    color = primary_text_colour
+                )
+            }
+
+            Text(
+                text = "Currently, our app does not provide specific information on Accessibility, Allergens and Religious dietary restrictions due to data limitations. Please verify accessibility and dietary information directly with the restaurants. Thank you for understanding."
+            )
+        }
     }
 }
