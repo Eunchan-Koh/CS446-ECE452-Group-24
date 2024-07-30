@@ -38,6 +38,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
@@ -767,4 +768,95 @@ fun updateGroupInfo(
     GroupApi().updateGroup(updatedGroup)
     GroupApi().updateGroup(updatedGroup)
     onNavigateToGroupInfo(updatedGroup)
+}
+
+@Composable
+fun AlertDialogAddNewMember(
+    onDismissRequest: () -> Unit,
+    onConfirmation: () -> Unit,
+    dialogTitle: String,
+    dialogText: String,
+    icon: ImageVector,
+    tempGroupMembers: List<User>,
+    setTempGroupMembers: (List<User>) -> Unit
+) {
+    var newMemberEmail by remember { mutableStateOf("") }
+    var searchNewUserFailure by remember { mutableStateOf(false) }
+
+    AlertDialog(
+        icon = {
+            Icon(
+                icon,
+                contentDescription = "Example Icon",
+                tint = Color.Gray,
+                modifier = Modifier
+                    .size(50.dp),
+            )
+        },
+        title = {
+            Text(text = dialogTitle)
+        },
+        text = {
+            Column {
+                TextField(
+                    value = newMemberEmail,
+                    onValueChange = { searchNewUserFailure = false
+                        newMemberEmail = it },
+                    label = { Text("Email Address") },
+                    modifier = Modifier.fillMaxWidth(),
+                    isError = searchNewUserFailure,
+                    supportingText = {
+                        if (searchNewUserFailure) {
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = "User with email '${newMemberEmail}' does not exist",
+                                color = MaterialTheme.colorScheme.error
+                            )
+                        }
+                    },
+                )
+            }
+        },
+        onDismissRequest = {
+            onDismissRequest()
+        },
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    if (!searchUserByEmail(newMemberEmail, tempGroupMembers, setTempGroupMembers)) {
+                        searchNewUserFailure = true
+                    } else {
+                        onConfirmation()
+                    }
+                }
+            ) {
+                Text("Confirm")
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = {
+                    onDismissRequest()
+                }
+            ) {
+                Text("Dismiss")
+            }
+        }
+    )
+}
+
+
+fun searchUserByEmail(
+    newMemberEmail: String,
+    tempGroupMembers: List<User>,
+    setTempGroupMembers: (List<User>) -> Unit
+): Boolean {
+    val newUser = UserApi().getUserByEmail(newMemberEmail)
+    if (newUser != User()) {
+        val newTempGroupMembers = tempGroupMembers.plus(newUser)
+        setTempGroupMembers(newTempGroupMembers)
+        return true
+    } else {
+        return false
+    }
 }
